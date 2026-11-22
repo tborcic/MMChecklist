@@ -1,0 +1,2599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Majora's Mask 3D — 100% Hearts & Masks Tracker</title>
+  <style>
+    :root {
+      --bg: #120f1d;
+      --surface: #1d1830;
+      --surface-hover: #272040;
+      --border: #362c59;
+      --text: #f3effa;
+      --muted: #a69ec2;
+      --accent: #a855f7;
+      --gold: #facc15;
+      --heart: #f43f5e;
+      --green: #10b981;
+      --sky: #38bdf8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding-bottom: 4rem;
+    }
+
+    header {
+      background: linear-gradient(180deg, #24193d 0%, var(--bg) 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1rem 0.9rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    @media (max-width: 760px), (max-height: 600px) { header { position: static; } }
+
+    .container { max-width: 1120px; margin: 0 auto; padding: 0 1rem; }
+
+    .top-bar {
+      display: flex; flex-wrap: wrap; justify-content: space-between;
+      align-items: center; gap: 1rem; margin-bottom: 1rem;
+    }
+
+    h1 {
+      font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+
+    h1 span.badge {
+      font-size: 0.75rem; background: var(--accent); color: #fff;
+      padding: 0.15rem 0.5rem; border-radius: 999px;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+
+    .top-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+
+    button.btn-secondary {
+      background: var(--surface); border: 1px solid var(--border); color: var(--text);
+      padding: 0.55rem 0.85rem; border-radius: 8px; font-size: 0.85rem; cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    button.btn-secondary:hover { background: var(--surface-hover); border-color: var(--accent); }
+
+    button.reset-btn {
+      background: transparent; border: 1px solid #5c2838; color: #fda4af;
+      padding: 0.55rem 0.9rem; border-radius: 8px; font-size: 0.85rem; cursor: pointer;
+      transition: background 0.15s;
+    }
+    button.reset-btn:hover { background: rgba(244, 63, 94, 0.15); }
+
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 0.5rem; margin-bottom: 0.8rem;
+    }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.45rem 0.7rem; }
+    .stat-label { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+    .stat-value { font-size: 1.02rem; font-weight: 700; margin-top: 0.05rem; }
+    .stat-value.hearts { color: var(--heart); }
+    .stat-value.masks { color: var(--gold); }
+    .stat-value.steps { color: var(--sky); }
+    .stat-value.gear { color: var(--green); }
+
+    .controls { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; }
+
+    input[type="search"], select {
+      background: var(--surface); border: 1px solid var(--border); color: var(--text);
+      padding: 0.55rem 0.85rem; border-radius: 8px; font-size: 0.9rem; outline: none;
+    }
+    input[type="search"] { flex: 1; min-width: 210px; }
+    input[type="search"]:focus, select:focus { border-color: var(--accent); }
+
+    .filter-toggle {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: var(--surface); border: 1px solid var(--border); color: var(--text);
+      padding: 0.5rem 0.85rem; border-radius: 8px; font-size: 0.88rem; font-weight: 600;
+      cursor: pointer; user-select: none; transition: background 0.15s, border-color 0.15s;
+    }
+    .filter-toggle:hover { background: var(--surface-hover); border-color: var(--green); }
+
+    .filter-toggle input[type="checkbox"], .inv-item input[type="checkbox"] {
+      appearance: none; width: 18px; height: 18px; min-width: 18px;
+      border: 2px solid var(--green); border-radius: 5px;
+      display: grid; place-content: center; background: #120f1d; cursor: pointer;
+    }
+    .filter-toggle input[type="checkbox"]:checked, .inv-item input[type="checkbox"]:checked {
+      background: var(--green); border-color: var(--green);
+    }
+    .filter-toggle input[type="checkbox"]:checked::after, .inv-item input[type="checkbox"]:checked::after {
+      content: "✓"; color: #052e16; font-weight: 900; font-size: 12px;
+    }
+
+    .inventory-panel {
+      margin-top: 1.5rem; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1rem 1.15rem;
+    }
+    .inventory-header {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+      gap: 0.75rem; margin-bottom: 0.85rem; padding-bottom: 0.55rem; border-bottom: 1px solid var(--border);
+    }
+    .inventory-title { font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+    .inventory-actions { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+    .inv-group-title {
+      font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted);
+      margin: 0.75rem 0 0.45rem; font-weight: 700;
+    }
+    .inv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 0.45rem; }
+    .inv-item {
+      display: flex; align-items: center; gap: 0.55rem; background: #151124;
+      border: 1px solid #2b2247; border-radius: 8px; padding: 0.5rem 0.65rem;
+      font-size: 0.86rem; cursor: pointer; user-select: none; transition: border-color 0.15s, background 0.15s;
+    }
+    .inv-item:hover { background: #211a38; border-color: var(--accent); }
+    .inv-item.owned { border-color: rgba(16, 185, 129, 0.55); background: rgba(16, 185, 129, 0.08); }
+
+    .section-title {
+      font-size: 1.2rem; font-weight: 700; margin: 2rem 0 0.75rem; padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;
+    }
+    .section-count { font-size: 0.85rem; color: var(--muted); font-weight: 500; }
+
+    .checklist { display: grid; gap: 0.65rem; }
+
+    .item {
+      display: flex; align-items: flex-start; gap: 0.85rem; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 10px; padding: 0.9rem 1rem;
+      transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+    }
+    .item:hover { background: var(--surface-hover); border-color: var(--accent); }
+    .item.checked { opacity: 0.62; background: #161224; }
+    .item.checked .item-title { text-decoration: line-through; color: var(--muted); }
+
+    .item input[type="checkbox"].main-check {
+      appearance: none; width: 22px; height: 22px; min-width: 22px;
+      border: 2px solid var(--accent); border-radius: 6px; margin-top: 2px;
+      display: grid; place-content: center; cursor: pointer; background: #120f1d;
+    }
+    .item input[type="checkbox"].main-check:checked { background: var(--green); border-color: var(--green); }
+    .item input[type="checkbox"].main-check:checked::after { content: "✓"; color: #052e16; font-weight: 900; font-size: 14px; }
+
+    .item-body { flex: 1; min-width: 0; }
+    .item-header { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; margin-bottom: 0.35rem; }
+    .item-title { font-weight: 700; font-size: 1rem; cursor: pointer; }
+
+    .tag { font-size: 0.72rem; padding: 0.12rem 0.5rem; border-radius: 6px; font-weight: 600; background: #2b2347; color: #d8b4fe; }
+    .tag.mask { background: rgba(250, 204, 21, 0.15); color: var(--gold); }
+    .tag.heart { background: rgba(244, 63, 94, 0.15); color: #fda4af; }
+    .tag.container { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; }
+    .tag.day { background: rgba(56, 189, 248, 0.15); color: var(--sky); }
+    .tag.tod { background: rgba(168, 85, 247, 0.18); color: #e9d5ff; }
+    .tag.ready { background: rgba(16, 185, 129, 0.18); color: #6ee7b7; }
+    .tag.missing { background: rgba(244, 63, 94, 0.15); color: #fda4af; }
+
+    .item-desc { font-size: 0.92rem; color: #d4cee8; }
+
+    .req-block { margin-top: 0.55rem; display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.82rem; }
+    .req-row { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; }
+    .req-label { color: var(--muted); font-weight: 700; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.05em; margin-right: 0.2rem; }
+    .gear-chip { padding: 0.1rem 0.45rem; border-radius: 5px; font-weight: 600; font-size: 0.76rem; }
+    .gear-chip.have { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.35); }
+    .gear-chip.need { background: rgba(244, 63, 94, 0.1); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.35); }
+    .cond-text { color: #e2dcf5; }
+
+    .item-meta { margin-top: 0.5rem; font-size: 0.82rem; color: #cbd5e1; display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
+    .item-meta a { color: #c084fc; text-decoration: none; font-weight: 600; }
+    .item-meta a:hover { text-decoration: underline; }
+
+    .toggle-steps-btn {
+      background: #251d40; border: 1px solid #433670; color: #e9d5ff; font-size: 0.78rem; font-weight: 600;
+      padding: 0.22rem 0.6rem; border-radius: 6px; cursor: pointer; transition: background 0.15s, border-color 0.15s;
+    }
+    .toggle-steps-btn:hover { background: #312654; border-color: var(--accent); }
+
+    .sub-checklist {
+      margin-top: 0.65rem; padding: 0.65rem 0.8rem; background: #141022; border: 1px solid #2c234a;
+      border-radius: 8px; display: none; flex-direction: column; gap: 0.5rem;
+    }
+    .sub-checklist.open { display: flex; }
+
+    .sub-item { display: flex; align-items: flex-start; gap: 0.55rem; font-size: 0.86rem; color: #ddd6fe; cursor: pointer; user-select: none; }
+    .sub-item .step-num { color: var(--sky); font-weight: 700; min-width: 1.4rem; }
+    .sub-item.done span.step-text { text-decoration: line-through; color: var(--muted); }
+
+    .sub-item input[type="checkbox"].sub-check {
+      appearance: none; width: 16px; height: 16px; min-width: 16px; border: 1.5px solid var(--sky);
+      border-radius: 4px; margin-top: 3px; display: grid; place-content: center; cursor: pointer; background: #120f1d;
+    }
+    .sub-item input[type="checkbox"].sub-check:checked { background: var(--sky); border-color: var(--sky); }
+    .sub-item input[type="checkbox"].sub-check:checked::after { content: "✓"; color: #082f49; font-weight: 900; font-size: 11px; }
+
+    .tip-box {
+      margin-top: 0.3rem; padding: 0.45rem 0.65rem; border-left: 3px solid var(--gold);
+      background: rgba(250, 204, 21, 0.06); font-size: 0.82rem; color: #fde68a; border-radius: 0 6px 6px 0;
+    }
+
+    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+
+    .view-tabs { display: flex; gap: 0.35rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
+    .view-tabs button {
+      background: var(--surface); border: 1px solid var(--border); color: var(--muted);
+      padding: 0.45rem 1rem; border-radius: 999px; font-size: 0.88rem; font-weight: 700; cursor: pointer;
+    }
+    .view-tabs button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .now-controls { margin-bottom: 0.6rem; display: none; }
+    .now-controls.show { display: flex; }
+
+    .tag.bottle { background: rgba(56, 189, 248, 0.15); color: var(--sky); }
+    .tag.fairy { background: rgba(236, 72, 153, 0.15); color: #f9a8d4; }
+    .tag.now { background: rgba(250, 204, 21, 0.2); color: var(--gold); }
+    .tag.cycle { background: rgba(251, 146, 60, 0.15); color: #fdba74; }
+    .tag.note { background: rgba(250, 204, 21, 0.12); color: #fde68a; }
+
+    .link-chip {
+      padding: 0.1rem 0.45rem; border-radius: 5px; font-weight: 600; font-size: 0.76rem; cursor: pointer;
+      background: rgba(168, 85, 247, 0.12); color: #e9d5ff; border: 1px solid rgba(168, 85, 247, 0.35);
+    }
+    .link-chip:hover { border-color: var(--accent); background: rgba(168, 85, 247, 0.25); }
+    .link-chip.done { opacity: 0.55; text-decoration: line-through; }
+    .gear-chip.clickable { cursor: pointer; text-decoration: underline dotted; }
+    .when-chip { padding: 0.1rem 0.45rem; border-radius: 5px; font-size: 0.76rem; background: rgba(56, 189, 248, 0.1); color: #bae6fd; border: 1px solid rgba(56, 189, 248, 0.3); }
+
+    .region-progress { height: 5px; background: #2b2247; border-radius: 999px; overflow: hidden; margin: -0.45rem 0 0.8rem; }
+    .region-progress > div { height: 100%; background: linear-gradient(90deg, var(--accent), var(--green)); }
+
+    .notes-box {
+      width: 100%; margin-top: 0.55rem; min-height: 64px; resize: vertical; background: #141022; color: var(--text);
+      border: 1px solid #2c234a; border-radius: 8px; padding: 0.5rem 0.65rem; font: inherit; font-size: 0.85rem;
+    }
+    .notes-box:focus { outline: none; border-color: var(--gold); }
+
+    .counter { display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 700; }
+    .counter button {
+      width: 26px; height: 26px; border-radius: 6px; border: 1px solid #433670; background: #251d40;
+      color: #e9d5ff; font-weight: 800; cursor: pointer;
+    }
+    .counter button:hover { border-color: var(--accent); }
+
+    .toast {
+      position: fixed; left: 50%; bottom: 1.25rem; transform: translateX(-50%) translateY(150%);
+      background: #2a2145; border: 1px solid var(--accent); color: var(--text); padding: 0.65rem 0.9rem;
+      border-radius: 10px; font-size: 0.88rem; z-index: 200; transition: transform 0.2s; max-width: 92vw;
+      display: flex; gap: 0.75rem; align-items: center; box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast button { background: var(--accent); color: #fff; border: 0; border-radius: 6px; padding: 0.3rem 0.7rem; font-weight: 700; cursor: pointer; }
+    [role="button"]:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+    .item.flash { animation: flash 1.6s ease-out; }
+    @keyframes flash { 0% { box-shadow: 0 0 0 3px var(--gold); } 100% { box-shadow: 0 0 0 0 transparent; } }
+
+    .planner-intro { color: var(--muted); font-size: 0.88rem; margin-top: 1.5rem; }
+    .planner-period { margin-top: 1.4rem; }
+    .planner-row {
+      display: grid; grid-template-columns: 165px 1fr auto; gap: 0.75rem; align-items: start;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+      padding: 0.6rem 0.8rem; margin-top: 0.4rem; font-size: 0.88rem;
+    }
+    .planner-time { color: var(--sky); font-weight: 700; }
+    .planner-title { font-weight: 700; color: #e9d5ff; cursor: pointer; }
+    .planner-title:hover { text-decoration: underline; }
+    .planner-label { color: #d4cee8; }
+    .planner-tags { display: flex; gap: 0.3rem; flex-wrap: wrap; justify-content: flex-end; }
+    @media (max-width: 640px) { .planner-row { grid-template-columns: 1fr; } .planner-tags { justify-content: flex-start; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="top-bar">
+      <h1>Majora's Mask 3D <span class="badge">Checklist</span></h1>
+      <div class="top-actions">
+        <button class="btn-secondary" onclick="toggleInventoryPanel()">Toggle Collected Gear</button>
+        <button class="btn-secondary" onclick="toggleAllSteps(true)">Expand All Steps</button>
+        <button class="btn-secondary" onclick="toggleAllSteps(false)">Collapse All Steps</button>
+        <button class="btn-secondary" onclick="exportProgress()">Export Progress</button>
+        <button class="btn-secondary" onclick="document.getElementById('import-file').click()">Import Progress</button>
+        <input type="file" id="import-file" accept=".json,application/json" style="display:none" onchange="importProgress(this)" />
+        <button class="reset-btn" onclick="resetProgress()">Reset All Checkmarks</button>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Total Hearts</div><div class="stat-value hearts" id="heart-meter">3 / 20 Hearts</div></div>
+      <div class="stat-card"><div class="stat-label">Pieces of Heart</div><div class="stat-value" id="hp-count">0 / 52</div></div>
+      <div class="stat-card"><div class="stat-label">Heart Containers</div><div class="stat-value" id="hc-count">0 / 4</div></div>
+      <div class="stat-card"><div class="stat-label">Masks Collected</div><div class="stat-value masks" id="mask-count">0 / 24</div></div>
+      <div class="stat-card"><div class="stat-label">Bottles</div><div class="stat-value gear" id="bottle-count">0 / 7</div></div>
+      <div class="stat-card"><div class="stat-label">Great Fairy Rewards</div><div class="stat-value masks" id="fairy-count">0 / 4</div></div>
+      <div class="stat-card"><div class="stat-label">Collected Gear</div><div class="stat-value gear" id="gear-count">0 / 0</div></div>
+      <div class="stat-card"><div class="stat-label">Sub-Steps Done</div><div class="stat-value steps" id="step-count">0 / 0</div></div>
+    </div>
+
+    <div class="view-tabs" id="view-tabs">
+      <button type="button" data-view="checklist" onclick="setView('checklist')">Checklist</button>
+      <button type="button" data-view="planner" onclick="setView('planner')">Cycle Planner</button>
+      <button type="button" data-view="now" onclick="setView('now')">Right Now</button>
+    </div>
+
+    <div class="controls now-controls" id="now-controls">
+      <span class="req-label">It is</span>
+      <select id="now-day" onchange="onNowChange()">
+        <option value="1">Day 1 (First Day)</option>
+        <option value="2">Day 2 (Second Day)</option>
+        <option value="3">Day 3 (Final Day)</option>
+      </select>
+      <select id="now-hour" onchange="onNowChange()"></select>
+      <label class="filter-toggle">
+        <input type="checkbox" id="now-anytime" onchange="onNowChange()" />
+        <span>Also show anytime items I have gear for</span>
+      </label>
+    </div>
+
+    <div class="controls">
+      <input type="search" id="search" placeholder="Search mask, location, day, time, step, or required item..." oninput="render()" />
+      <select id="type-filter" onchange="render()">
+        <option value="all">All Categories (91)</option>
+        <option value="mask">Masks Only (24)</option>
+        <option value="heart">Pieces of Heart Only (52)</option>
+        <option value="container">Boss Heart Containers (4)</option>
+        <option value="bottle">Bottles (7)</option>
+        <option value="fairy">Stray Fairies / Great Fairies (4)</option>
+      </select>
+      <select id="sort-mode" onchange="onSortChange()">
+        <option value="default">Sort: Game order</option>
+        <option value="closest">Sort: Closest to done</option>
+      </select>
+      <select id="day-filter" onchange="render()">
+        <option value="all">All Days / Anytime</option>
+        <option value="Anytime">Anytime</option>
+        <option value="Day 1">Day 1</option>
+        <option value="Night 1">Night 1</option>
+        <option value="Day 2">Day 2</option>
+        <option value="Night 2">Night 2</option>
+        <option value="Day 3">Day 3</option>
+        <option value="Night 3">Night 3</option>
+        <option value="3-Day Cycle">Multi-Day / 3-Day Cycle</option>
+      </select>
+      <select id="tod-filter" onchange="render()">
+        <option value="all">All Times of Day</option>
+        <option value="Anytime">Any Time</option>
+        <option value="Morning / Day">Morning / Day (6 AM–6 PM)</option>
+        <option value="Evening">Evening (6 PM–12 AM)</option>
+        <option value="Late Night">Late Night (12 AM–6 AM)</option>
+        <option value="Multi-Time">Multi-Time / Sequence</option>
+      </select>
+      <select id="region-filter" onchange="render()">
+        <option value="all">All Regions</option>
+        <option value="Clock Town">Clock Town</option>
+        <option value="Termina Field & Ranch">Termina Field & Romani Ranch</option>
+        <option value="Southern Swamp & Woodfall">Southern Swamp & Woodfall</option>
+        <option value="Snowhead & Mountains">Snowhead & Mountains</option>
+        <option value="Great Bay">Great Bay</option>
+        <option value="Ikana Canyon">Ikana</option>
+        <option value="The Moon">The Moon</option>
+      </select>
+      <select id="status-filter" onchange="render()">
+        <option value="all">Show All</option>
+        <option value="unchecked">Uncollected Only</option>
+        <option value="checked">Collected Only</option>
+      </select>
+      <label class="filter-toggle" title="Show only items whose required gear/items/masks you have checked as collected">
+        <input type="checkbox" id="owned-only-filter" onchange="render()" />
+        <span>Items I Have On Me</span>
+      </label>
+      <label class="filter-toggle" title="Hide masks, heart pieces and containers you've already marked as completed">
+        <input type="checkbox" id="hide-completed-filter" onchange="onHideCompletedChange()" />
+        <span>Hide Completed</span>
+      </label>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <section class="inventory-panel" id="inventory-panel">
+    <div class="inventory-header">
+      <div class="inventory-title">
+        <span>Collected Items &amp; Gear Checklist</span>
+        <span class="tag ready" id="owned-summary">0 on hand</span>
+      </div>
+      <div class="inventory-actions">
+        <button type="button" class="btn-secondary" onclick="setAllGear(true)">Check All Gear</button>
+        <button type="button" class="btn-secondary" onclick="setAllGear(false)">Clear Gear</button>
+      </div>
+    </div>
+    <div id="inventory-grid-container"></div>
+  </section>
+</div>
+
+<main class="container" id="app"></main>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+const GUIDE_LINKS = {
+  masks: "https://www.zeldadungeon.net/Zelda06Masks.php",
+  hearts: "https://www.zeldadungeon.net/Zelda06HeartPieces.php",
+  heartsAlt: "https://strategywiki.org/wiki/The_Legend_of_Zelda:_Majora%27s_Mask/Heart_Pieces",
+  bosses: "https://zelda.fandom.com/wiki/Heart_Container"
+};
+
+/* Every item listed in requiresGear is REQUIRED (nothing is "recommended" or "optional").
+   An entry that is an array means "any one of these". */
+const GEAR_ITEMS = [
+  { id: "g_ocarina", group: "Songs", label: "Ocarina of Time" },
+  { id: "g_sot", group: "Songs", label: "Song of Time" },
+  { id: "g_soh", group: "Songs", label: "Song of Healing (Human Link)" },
+  { id: "g_epona", group: "Songs", label: "Epona's Song / Epona" },
+  { id: "g_sonata", group: "Songs", label: "Sonata of Awakening" },
+  { id: "g_lullaby", group: "Songs", label: "Goron Lullaby" },
+  { id: "g_bossa", group: "Songs", label: "New Wave Bossa Nova" },
+  { id: "g_elegy", group: "Songs", label: "Elegy of Emptiness" },
+  { id: "g_storms", group: "Songs", label: "Song of Storms" },
+  { id: "g_oath", group: "Songs", label: "Oath to Order" },
+  { id: "g_scarecrow", group: "Songs", label: "Scarecrow's Song (taught to Pierre)" },
+
+  { id: "g_sword", group: "Equipment & Items", label: "Sword" },
+  { id: "g_magic", group: "Equipment & Items", label: "Magic Meter" },
+  { id: "g_bow", group: "Equipment & Items", label: "Hero's Bow" },
+  { id: "g_fire_arrows", group: "Equipment & Items", label: "Fire Arrows" },
+  { id: "g_ice_arrows", group: "Equipment & Items", label: "Ice Arrows" },
+  { id: "g_light_arrows", group: "Equipment & Items", label: "Light Arrows" },
+  { id: "g_bombs", group: "Equipment & Items", label: "Bomb Bag" },
+  { id: "g_powder_keg", group: "Equipment & Items", label: "Powder Kegs (Goron)" },
+  { id: "g_deku_sticks", group: "Equipment & Items", label: "Deku Sticks" },
+  { id: "g_magic_beans", group: "Equipment & Items", label: "Magic Beans" },
+  { id: "g_lens", group: "Equipment & Items", label: "Lens of Truth" },
+  { id: "g_hookshot", group: "Equipment & Items", label: "Hookshot" },
+  { id: "g_mirror_shield", group: "Equipment & Items", label: "Mirror Shield" },
+  { id: "g_bottle", group: "Equipment & Items", label: "Empty Bottle" },
+  { id: "g_pictograph", group: "Equipment & Items", label: "Pictograph Box" },
+  { id: "g_wallet", group: "Equipment & Items", label: "Adult Wallet (200 Rupees)" },
+  { id: "g_giant_wallet", group: "Equipment & Items", label: "Giant's Wallet (500 Rupees)" },
+  { id: "g_remains", group: "Equipment & Items", label: "All 4 Boss Remains" },
+
+  { id: "g_moons_tear", group: "Trade Items & Letters", label: "Moon's Tear" },
+  { id: "g_land_deed", group: "Trade Items & Letters", label: "Land Title Deed" },
+  { id: "g_swamp_deed", group: "Trade Items & Letters", label: "Swamp Title Deed" },
+  { id: "g_mountain_deed", group: "Trade Items & Letters", label: "Mountain Title Deed" },
+  { id: "g_ocean_deed", group: "Trade Items & Letters", label: "Ocean Title Deed" },
+  { id: "g_letter_kafei", group: "Trade Items & Letters", label: "Letter to Kafei" },
+  { id: "g_pendant", group: "Trade Items & Letters", label: "Pendant of Memories" },
+  { id: "g_express_mail", group: "Trade Items & Letters", label: "Special Delivery to Mama" },
+
+  { id: "g_deku_mask", group: "Masks", label: "Deku Mask" },
+  { id: "g_goron_mask", group: "Masks", label: "Goron Mask" },
+  { id: "g_zora_mask", group: "Masks", label: "Zora Mask" },
+  { id: "g_bremen_mask", group: "Masks", label: "Bremen Mask" },
+  { id: "g_bunny_hood", group: "Masks", label: "Bunny Hood" },
+  { id: "g_romani_mask", group: "Masks", label: "Romani's Mask" },
+  { id: "g_kafei_mask", group: "Masks", label: "Kafei's Mask" },
+  { id: "g_keaton_mask", group: "Masks", label: "Keaton Mask" },
+  { id: "g_kamaro_mask", group: "Masks", label: "Kamaro's Mask" },
+  { id: "g_allnight_mask", group: "Masks", label: "All-Night Mask" },
+  { id: "g_couples_mask", group: "Masks", label: "Couple's Mask" },
+  { id: "g_postman_hat", group: "Masks", label: "Postman's Hat" },
+  { id: "g_don_gero_mask", group: "Masks", label: "Don Gero's Mask" },
+  { id: "g_captain_hat", group: "Masks", label: "Captain's Hat" },
+  { id: "g_garo_mask", group: "Masks", label: "Garo's Mask" },
+  { id: "g_truth_mask", group: "Masks", label: "Mask of Truth" },
+  { id: "g_stone_mask", group: "Masks", label: "Stone Mask" },
+  { id: "g_gibdo_mask", group: "Masks", label: "Gibdo Mask" },
+  { id: "g_great_fairy_mask", group: "Masks", label: "Great Fairy's Mask" },
+  { id: "g_blast_mask", group: "Masks", label: "Blast Mask" },
+  { id: "g_troupe_mask", group: "Masks", label: "Troupe Leader's Mask" },
+  { id: "g_scents_mask", group: "Masks", label: "Mask of Scents" },
+  { id: "g_giant_mask", group: "Masks", label: "Giant's Mask" },
+  { id: "g_fierce_deity_mask", group: "Masks", label: "Fierce Deity's Mask" }
+];
+
+/* Checklist mask -> matching entry in the Masks gear section */
+const MASK_TO_GEAR = {
+  m1: "g_deku_mask", m2: "g_great_fairy_mask", m3: "g_blast_mask", m4: "g_bremen_mask",
+  m5: "g_kafei_mask", m6: "g_allnight_mask", m7: "g_keaton_mask", m8: "g_postman_hat",
+  m9: "g_couples_mask", m10: "g_troupe_mask", m11: "g_kamaro_mask", m12: "g_bunny_hood",
+  m13: "g_romani_mask", m14: "g_garo_mask", m15: "g_truth_mask", m16: "g_scents_mask",
+  m17: "g_goron_mask", m18: "g_don_gero_mask", m19: "g_zora_mask", m20: "g_stone_mask",
+  m21: "g_captain_hat", m22: "g_gibdo_mask", m23: "g_giant_mask", m24: "g_fierce_deity_mask"
+};
+const GEAR_TO_MASK = Object.fromEntries(Object.entries(MASK_TO_GEAR).map(([m, g]) => [g, m]));
+const GEAR_BY_ID = Object.fromEntries(GEAR_ITEMS.map(g => [g.id, g]));
+
+const ANY_PAPER = ["g_land_deed", "g_swamp_deed", "g_mountain_deed", "g_ocean_deed", "g_letter_kafei", "g_express_mail"];
+const FIRE = ["g_fire_arrows", "g_deku_sticks"];
+
+/* IMPORTANT: item IDs are stored in people's saves. Never renumber or reuse them.
+   Gaps are deliberate: hp26 (Koume, a Bottle in MM3D) and hp44 (duplicate) were removed;
+   hp53/hp54 were added later. New items must get new, never-used IDs. */
+const ITEMS = [
+  // ==================== 24 MASKS ====================
+  {
+    id: "m1", type: "mask", day: "Night 3", tod: "Late Night", region: "Clock Town",
+    title: "Deku Mask",
+    requiresGear: [],
+    req: "Nothing — this is the story prologue. You start as a Deku Scrub and must finish the first 3-day cycle.",
+    guide: GUIDE_LINKS.masks,
+    desc: "Skull Kid steals your Ocarina and curses you into a Deku Scrub. To undo it you must climb the Clock Tower at midnight before the moon falls, knock the Ocarina out of Skull Kid's hands, and travel back in time. The Happy Mask Salesman then heals you and the curse becomes the Deku Mask, which lets you turn into a Deku Scrub at will.",
+    steps: [
+      "As Deku Link, find the Clock Town Stray Fairy: by day it floats in the Laundry Pool (South Clock Town, down the stairs on the east side); by night it hovers over crates in East Clock Town (reach it with the nearby Deku Flower).",
+      "Take the fairy to the Great Fairy Fountain in North Clock Town — she gives you magic, which powers Deku Bubbles.",
+      "In North Clock Town, talk to Jim (the Bombers' leader) and win hide-and-seek by catching all 5 Bombers around town before the timer ends. He tells you the secret code.",
+      "In East Clock Town, tell the code to the Bomber guarding the hideout tunnel, crawl through (pop the balloon in your way with a Deku Bubble), and come out in the Astral Observatory.",
+      "Look through the telescope at the moon — watch the Moon's Tear fall, then go out the back door and pick it up in Termina Field.",
+      "Back in South Clock Town, give the Moon's Tear to the Business Scrub next to the Clock Tower to get the Land Title Deed (keep it — it starts a heart piece trading chain).",
+      "Wait until 12:00 AM on the Night of the Final Day (Night 3). The Clock Tower door in South Clock Town opens — climb the stairs to the top.",
+      "Shoot Skull Kid with a Deku Bubble (Z/L-target, then press B) so he drops the Ocarina. Pick it up.",
+      "Play the Song of Time (it plays from Zelda's memory) to return to Dawn of the First Day.",
+      "Talk to the Happy Mask Salesman inside the Clock Tower. He teaches you the Song of Healing — play it to break the curse and receive the Deku Mask."
+    ]
+  },
+  {
+    id: "m2", type: "mask", day: "Anytime", tod: "Anytime", region: "Clock Town",
+    title: "Great Fairy's Mask",
+    requiresGear: ["g_soh", "g_deku_mask"],
+    req: "Must return the fairy as Human Link (not as a Deku Scrub).",
+    guide: GUIDE_LINKS.masks,
+    desc: "The Clock Town Great Fairy gives a different reward depending on your form. As Deku Link (in the prologue) she gives magic. Bring her the Clock Town Stray Fairy again as Human Link and she gives the Great Fairy's Mask, which draws Stray Fairies toward you inside temples. The Stray Fairy reappears every cycle, so you can redo this at any time.",
+    steps: [
+      "Remove all masks so you are Human Link.",
+      "Daytime (6 AM–6 PM): go to the Laundry Pool via the stairs in South Clock Town and grab the Stray Fairy floating there. Nighttime: go to East Clock Town and use the Deku Flower near the Stock Pot Inn to reach the fairy above the crates, then switch back to human.",
+      "Walk into the Great Fairy Fountain in North Clock Town with the fairy as Human Link.",
+      "The Great Fairy restores herself and gives you the Great Fairy's Mask."
+    ]
+  },
+  {
+    id: "m3", type: "mask", day: "Night 1", tod: "Late Night", region: "Clock Town",
+    title: "Blast Mask",
+    requiresGear: ["g_soh", "g_sword"],
+    req: "Must be in North Clock Town at 12:00 AM on Night 1.",
+    guide: GUIDE_LINKS.masks,
+    desc: "At midnight on the first night, the thief Sakon snatches the Bomb Shop Lady's bag of Big Bomb Bags in North Clock Town. Hit him before he escapes and she gives you the Blast Mask. Saving her is also what makes the All-Night Mask appear in the Curiosity Shop on Night 3.",
+    steps: [
+      "Be in North Clock Town before 12:00 AM on the Night of the First Day (stand near the south entrance from South Clock Town).",
+      "At 12:00 AM the Bomb Shop Lady walks in carrying a large bag and Sakon runs up and grabs it.",
+      "Chase Sakon and hit him with your sword (a Deku Bubble or an arrow also works) before he reaches the exit.",
+      "Talk to the Old Lady after she gets her bag back. She gives you the Blast Mask."
+    ]
+  },
+  {
+    id: "m4", type: "mask", day: "Night 1", tod: "Evening", region: "Clock Town",
+    title: "Bremen Mask",
+    requiresGear: ["g_soh"],
+    req: "Night 1 or Night 2 (6 PM–6 AM), as Human Link.",
+    guide: GUIDE_LINKS.masks,
+    desc: "Guru-Guru, the music-box man from the Gorman Troupe, practices alone in the Laundry Pool at night. Talk to him as Human Link and he confesses that he stole this mask, then gives it to you. The Bremen Mask makes small animals march behind you (you need it for the Bunny Hood).",
+    steps: [
+      "Go to the Laundry Pool (stairs in the east part of South Clock Town) on Night 1 or Night 2.",
+      "Make sure you are Human Link (no transformation mask on).",
+      "Talk to Guru-Guru, who is turning his music box under the shelter.",
+      "Listen to his whole story. At the end he gives you the Bremen Mask."
+    ]
+  },
+  {
+    id: "m5", type: "mask", day: "Day 1", tod: "Morning / Day", region: "Clock Town",
+    title: "Kafei's Mask",
+    requiresGear: ["g_soh"],
+    req: "Day 1 or Day 2, 10:00 AM–8:00 PM, inside the Mayor's Residence.",
+    guide: GUIDE_LINKS.masks,
+    desc: "Madame Aroma, the mayor's wife, is looking for her missing son Kafei. She gives you a mask of his face so you can ask people about him. This mask starts the Anju & Kafei quest, which leads to the Keaton Mask, Postman's Hat, Couple's Mask and several heart pieces.",
+    steps: [
+      "Go to the Mayor's Residence in East Clock Town on Day 1 or Day 2 between 10:00 AM and 8:00 PM.",
+      "Enter Madame Aroma's room (she sits with her butler) and talk to her.",
+      "Agree to look for Kafei. She gives you Kafei's Mask."
+    ]
+  },
+  {
+    id: "m6", type: "mask", day: "Night 3", tod: "Evening", region: "Clock Town",
+    title: "All-Night Mask",
+    requiresGear: ["g_giant_wallet", "g_sword"],
+    req: "Must save the Bomb Shop Lady on Night 1 of the SAME cycle, and carry 500 Rupees. Curiosity Shop opens at 10:00 PM.",
+    guide: GUIDE_LINKS.masks,
+    desc: "If you stop Sakon on Night 1, he cannot sell the stolen bomb bag, so the Curiosity Shop in West Clock Town sells the All-Night Mask instead on the Final Night. It costs 500 Rupees, so you need the Giant's Wallet, which comes from clearing all 30 Gold Skulltulas in the Oceanside Spider House (any day in MM3D).",
+    steps: [
+      "Get the Giant's Wallet: clear all 30 Gold Skulltulas in the Oceanside Spider House on Great Bay Coast and talk to the man who appears at the entrance.",
+      "In a new cycle, stop Sakon from robbing the Bomb Shop Lady at 12:00 AM on Night 1 in North Clock Town (see Blast Mask).",
+      "Gather 500 Rupees (withdraw from the West Clock Town bank if needed).",
+      "On Night 3, enter the Curiosity Shop (West Clock Town, the door at the back) at or after 10:00 PM.",
+      "Buy the All-Night Mask from the shop owner for 500 Rupees."
+    ]
+  },
+  {
+    id: "m7", type: "mask", day: "Day 3", tod: "Morning / Day", region: "Clock Town",
+    title: "Keaton Mask",
+    requiresGear: ["g_kafei_mask"],
+    req: "The Anju & Kafei quest must be followed through Day 1, Day 2 and Day 3 of ONE cycle.",
+    guide: GUIDE_LINKS.masks,
+    desc: "Kafei is hiding in the back room of the Curiosity Shop, reached from the Laundry Pool. If you deliver Anju's letter to him, then come to the back room on the afternoon of the Final Day, Kafei leaves to chase Sakon. The Curiosity Shop owner then gives you the Keaton Mask and Kafei's letter to his mother.",
+    steps: [
+      "Day 1, daytime: wear Kafei's Mask and talk to Anju at the front desk of the Stock Pot Inn (East Clock Town). She asks you to meet her in the kitchen at 11:30 PM.",
+      "Night 1, 11:30 PM: go to the Stock Pot Inn kitchen (ground floor) and talk to Anju. She gives you the Letter to Kafei.",
+      "Before the morning of Day 2, put the Letter to Kafei in any red mailbox in Clock Town. The Postman will deliver it on Day 2.",
+      "Day 2, afternoon: go to the Laundry Pool, ring the bell next to the door at the back, and talk to Kafei when he opens it. He gives you the Pendant of Memories (keep it for the Couple's Mask).",
+      "Day 3, by 1:00 PM: ring the bell again and go into the back room. Watch the scene — Kafei sees Sakon and runs off to chase him.",
+      "Talk to the Curiosity Shop owner in the back room. He gives you the Keaton Mask and the Special Delivery to Mama."
+    ]
+  },
+  {
+    id: "m8", type: "mask", day: "Night 3", tod: "Evening", region: "Clock Town",
+    title: "Postman's Hat",
+    requiresGear: ["g_express_mail"],
+    req: "Special Delivery to Mama (from the Keaton Mask steps). Madame Aroma must be at the Milk Bar, which happens on Night 3.",
+    guide: GUIDE_LINKS.masks,
+    desc: "On the Final Day the Postman panics about the moon but won't leave until his work is done. Give him the Special Delivery to Mama and he rushes it to Madame Aroma at the Milk Bar. When he comes out he is finally free to flee and gives you his hat. (Handing the letter to Madame Aroma yourself instead gives a Bottle of Chateau Romani — do that in a different cycle, see Bottles.)",
+    steps: [
+      "Get the Special Delivery to Mama on Day 3 (Keaton Mask steps 1–6).",
+      "Go to the Post Office in West Clock Town on Night 3 and talk to the panicking Postman.",
+      "Give him the Special Delivery to Mama. He runs off to deliver it.",
+      "Follow him to the Milk Bar in East Clock Town and wait outside.",
+      "When he comes out, he stops near the East Clock Town exit. Talk to him and he gives you the Postman's Hat."
+    ]
+  },
+  {
+    id: "m9", type: "mask", day: "Night 3", tod: "Late Night", region: "Clock Town",
+    title: "Couple's Mask",
+    requiresGear: ["g_kafei_mask", "g_epona", "g_garo_mask", "g_hookshot"],
+    req: "Whole Anju & Kafei quest in ONE cycle, including a trip to Sakon's Hideout in Ikana Canyon on the evening of Day 3.",
+    guide: GUIDE_LINKS.masks,
+    desc: "The final reward of the Anju & Kafei quest. Anju must decide to wait for Kafei (give her the Pendant of Memories), and you must help Kafei get his stolen Sun's Mask back from Sakon's Hideout. Kafei then returns to the Stock Pot Inn just before dawn on the Final Day and the two make the Couple's Mask, which they give to you.",
+    steps: [
+      "Do Keaton Mask steps 1–4 to get the Letter to Kafei delivered and receive the Pendant of Memories on Day 2.",
+      "Day 2: give the Pendant of Memories to Anju at the Stock Pot Inn. She decides to stay and wait for Kafei.",
+      "Day 3, by 1:00 PM: be in the Curiosity Shop back room so Kafei sees Sakon and heads to Ikana (also get the Keaton Mask and the Special Delivery to Mama).",
+      "Ride Epona into the Road to Ikana. Wear Garo's Mask and talk to the ghost guard so he makes a tree appear, then Hookshot up into Ikana Canyon.",
+      "Go to Sakon's Hideout (lower Ikana Canyon) and meet Kafei at the entrance. Wait for Sakon to arrive in the evening and open the hideout.",
+      "Inside, you switch between Link and Kafei. Step on the switches and push the blocks in each room so the other character can move on. Kafei grabs the Sun's Mask at the end.",
+      "Use the Song of Soaring (or travel) back to Clock Town. On Night 3, go into Anju's room (the Employees' Room) at the Stock Pot Inn.",
+      "Stay in the room until Kafei arrives shortly before dawn. Watch the reunion and receive the Couple's Mask."
+    ]
+  },
+  {
+    id: "m10", type: "mask", day: "Night 1", tod: "Evening", region: "Clock Town",
+    title: "Troupe Leader's Mask",
+    requiresGear: ["g_romani_mask", "g_deku_mask", "g_goron_mask", "g_zora_mask"],
+    req: "Night 1 or Night 2, after 10:00 PM. Romani's Mask is needed to get into the Milk Bar.",
+    guide: GUIDE_LINKS.masks,
+    desc: "The Indigo-Go's need someone to stand in for their band members in a sound check at the Latte Milk Bar. Play each part of the song as Human, Deku, Goron and Zora Link. Gorman, the Troupe Leader drinking at the bar, is moved to tears and gives you his mask.",
+    steps: [
+      "Go to the Milk Bar in East Clock Town after 10:00 PM on Night 1 or Night 2, wearing Romani's Mask so the doorman lets you in.",
+      "Talk to Toto, the Zora manager standing near the stage.",
+      "Step onto the stage and play the part he asks for as Human Link (Ocarina).",
+      "Put on the Deku Mask and play the Deku Pipes part, then the Goron Mask (Goron Drums), then the Zora Mask (Zora Guitar).",
+      "After the sound check, Gorman at the bar tells his story and gives you the Troupe Leader's Mask."
+    ]
+  },
+  {
+    id: "m11", type: "mask", day: "Night 1", tod: "Late Night", region: "Termina Field & Ranch",
+    title: "Kamaro's Mask",
+    requiresGear: ["g_soh"],
+    req: "Any night between 12:00 AM and 6:00 AM.",
+    guide: GUIDE_LINKS.masks,
+    desc: "The ghost of the dancer Kamaro dances on top of a mushroom-shaped rock in north Termina Field after midnight. Play him the Song of Healing and he passes his dance on to you as Kamaro's Mask. You need it for the Rosa Sisters' heart piece in West Clock Town (Night 1 or 2), so getting it on Night 1 lets you do both in one cycle.",
+    steps: [
+      "On any night after 12:00 AM, leave Clock Town through the North Clock Town exit into north Termina Field.",
+      "Look for Kamaro dancing on top of the mushroom-shaped rock structure a short way north (toward the snow).",
+      "Walk up to him and talk to him.",
+      "Play the Song of Healing. He gives you Kamaro's Mask."
+    ]
+  },
+  {
+    id: "m12", type: "mask", day: "Anytime", tod: "Morning / Day", region: "Termina Field & Ranch",
+    title: "Bunny Hood",
+    requiresGear: ["g_bremen_mask", "g_powder_keg"],
+    req: "Romani Ranch in daytime (6 AM–6 PM). A Powder Keg clears the boulder blocking Milk Road.",
+    guide: GUIDE_LINKS.masks,
+    desc: "Grog, who runs the Cucco Shack at Romani Ranch, wants to see his chicks grow into Cuccos before the moon falls. Wear the Bremen Mask and march so all 10 chicks follow you, and they grow up. Grog gives you the Bunny Hood, which makes you run faster and shows timers in some minigames.",
+    steps: [
+      "Get Powder Kegs from the Goron in Goron Village (pass his test as Goron Link).",
+      "Go to Milk Road (south Termina Field). If the big boulder blocks the way to Romani Ranch, place a Powder Keg next to it and blow it up.",
+      "Enter Romani Ranch between 6 AM and 6 PM and go into the Cucco Shack (the small building on the left).",
+      "Put on the Bremen Mask and hold the action button to march. Walk close to each chick so it joins the line behind you.",
+      "Keep marching with all 10 chicks until they all grow into adult Cuccos.",
+      "Talk to Grog. He gives you the Bunny Hood."
+    ]
+  },
+  {
+    id: "m13", type: "mask", day: "Day 2", tod: "Evening", region: "Termina Field & Ranch",
+    title: "Romani's Mask",
+    requiresGear: ["g_bow", "g_powder_keg"],
+    req: "Defend the barn on Night 1, then escort Cremia's wagon at 6:00 PM on Day 2 — same cycle.",
+    guide: GUIDE_LINKS.masks,
+    desc: "Romani asks you to help defend the barn from the ghost-like 'Them' on the first night. After that, her sister Cremia asks you to ride shotgun on the milk delivery to Clock Town on the evening of Day 2. Shoot the masked Gorman Brothers chasing the wagon, and Cremia gives you Romani's Mask, which gets you into the Milk Bar.",
+    steps: [
+      "Blow up the Milk Road boulder with a Powder Keg and enter Romani Ranch on Day 1 (before 6 PM).",
+      "Talk to Romani in the field and pass her balloon archery practice. She teaches you Epona's Song and asks for help at 2:00 AM.",
+      "Night 1: be at the ranch by 2:00 AM. Shoot every ghost heading for the barn with arrows until 5:15 AM — don't let any reach the barn doors.",
+      "Day 2: go back to the ranch and talk to Cremia near the barn before 6:00 PM. Agree to go with her.",
+      "At 6:00 PM ride in the back of the wagon. Shoot the Gorman Brothers' horses/riders as they try to break the milk jars.",
+      "When the wagon reaches Clock Town safely, Cremia gives you Romani's Mask."
+    ]
+  },
+  {
+    id: "m14", type: "mask", day: "Anytime", tod: "Morning / Day", region: "Termina Field & Ranch",
+    title: "Garo's Mask",
+    requiresGear: ["g_epona"],
+    req: "Daytime (6 AM–6 PM). Costs 10 Rupees to enter the race.",
+    guide: GUIDE_LINKS.masks,
+    desc: "The Gorman Brothers run a racetrack on Milk Road. Beat them in a horse race on Epona and they give you Garo's Mask. You need it to get into Ikana Canyon (the ghost guard on the Road to Ikana only helps people wearing it).",
+    steps: [
+      "Learn Epona's Song from Romani at Romani Ranch (see Romani's Mask step 2).",
+      "Go to Gorman Track on Milk Road in daytime. Play Epona's Song to call Epona.",
+      "Talk to the Gorman Brothers and pay 10 Rupees to race.",
+      "Use your carrots to sprint on the straights and jump the fences. Cross the finish line first.",
+      "They give you Garo's Mask."
+    ]
+  },
+  {
+    id: "m15", type: "mask", day: "Anytime", tod: "Anytime", region: "Southern Swamp & Woodfall",
+    title: "Mask of Truth",
+    requiresGear: ["g_deku_mask", "g_goron_mask", "g_bombs", "g_bow", "g_hookshot", "g_bottle", "g_magic_beans", FIRE],
+    req: "Bugs in a bottle (catch them under rocks), Magic Beans plus water (Spring Water or Song of Storms).",
+    guide: GUIDE_LINKS.masks,
+    desc: "A man in the Swamp Spider House has been turned into a spider. Defeat all 30 Gold Skulltulas hidden in the house and he turns back and gives you the Mask of Truth, which lets you read the minds of animals and get Gossip Stones to talk. Skulltulas hide in pots, under bug holes, behind beehives, in high places and inside a tree.",
+    steps: [
+      "Go to the island on the east side of Southern Swamp, near the Deku Palace's back exit. Burn the web over the door with a lit Deku Stick or a Fire Arrow.",
+      "Main room: break the pots, cut the grass and check the water by the statue at the bottom of the ramp. Shoot down the beehives with arrows so the Skulltulas behind them fall.",
+      "Release Bugs from a bottle into each patch of soft soil. A Skulltula climbs out of each one.",
+      "Plant Magic Beans in the soil patches and water them with Spring Water (or play the Song of Storms). Ride the plants up to the Skulltulas you couldn't reach.",
+      "Use the Hookshot to pull in Skulltula tokens on high walls and ceilings, and bomb anything that looks cracked.",
+      "In the room with the big tree, roll into the tree as Goron Link to knock out the Skulltulas hidden in it.",
+      "When the counter shows 30/30, go back to the entrance room and talk to the man. He gives you the Mask of Truth."
+    ]
+  },
+  {
+    id: "m16", type: "mask", day: "Anytime", tod: "Anytime", region: "Southern Swamp & Woodfall",
+    title: "Mask of Scents",
+    requiresGear: ["g_deku_mask", "g_sonata", "g_bottle", "g_bunny_hood"],
+    req: "Odolwa defeated and the Deku Princess returned in the same cycle.",
+    guide: GUIDE_LINKS.masks,
+    desc: "After you rescue the Deku Princess from Woodfall Temple and bring her home, the Deku Butler challenges you to a race through the Deku Shrine. Keep up with him to the end and he gives you the Mask of Scents. The Bunny Hood keeps you from falling behind.",
+    steps: [
+      "Clear Woodfall Temple and defeat Odolwa.",
+      "In the temple's rescue room, catch the Deku Princess in an Empty Bottle.",
+      "Take her to the Deku King in the throne room of Deku Palace and release her. Watch the scene.",
+      "Talk to the Deku Butler; follow him to the Deku Shrine next to the palace.",
+      "Wear the Bunny Hood and race him through the shrine's corridors, avoiding the fire and rolling obstacles.",
+      "Reach the end with him and he gives you the Mask of Scents."
+    ]
+  },
+  {
+    id: "m17", type: "mask", day: "Anytime", tod: "Anytime", region: "Snowhead & Mountains",
+    title: "Goron Mask",
+    requiresGear: ["g_bow", "g_lens", "g_magic", "g_soh"],
+    req: "Must be winter in Mountain Village (before Goht is defeated this cycle).",
+    guide: GUIDE_LINKS.masks,
+    desc: "The ghost of the Goron hero Darmani wanders Mountain Village, but only the Lens of Truth shows him. Follow him up a hidden path to his grave in the Goron Graveyard and play the Song of Healing. His spirit becomes the Goron Mask.",
+    steps: [
+      "Leave Clock Town north and shoot down the icicles blocking the path with your bow to reach Mountain Village.",
+      "Get the Lens of Truth from the Lens Cave in Goron Village (follow the invisible-platform path with Tatl's help).",
+      "In Mountain Village, use the Lens of Truth to see Darmani's ghost and talk to him.",
+      "Keep the Lens on and follow him up the hidden ledges to the Goron Graveyard.",
+      "At his grave, talk to Darmani and play the Song of Healing. You receive the Goron Mask."
+    ]
+  },
+  {
+    id: "m18", type: "mask", day: "Anytime", tod: "Anytime", region: "Snowhead & Mountains",
+    title: "Don Gero's Mask",
+    requiresGear: ["g_goron_mask", FIRE],
+    req: "Must be winter in Mountain Village (before Goht is defeated this cycle).",
+    guide: GUIDE_LINKS.masks,
+    desc: "A starving Goron is stuck on a frozen ledge in Mountain Village. Feed him a Rock Sirloin and he gives you Don Gero's Mask, which lets you talk to frogs (needed for the frog-choir heart piece). The Rock Sirloin is in pots on the Goron Shrine chandelier, which only spins once every torch is lit.",
+    steps: [
+      "Go into the Goron Shrine in Goron Village.",
+      "Light every unlit torch around the room: carry fire from a lit torch on a Deku Stick, or shoot Fire Arrows. The chandelier starts spinning.",
+      "As Goron Link, roll around the upper ring and slam into the chandelier to break its pots. A Rock Sirloin falls out.",
+      "Pick up the Rock Sirloin as Goron Link (you can't roll while carrying it) and walk it all the way back to Mountain Village.",
+      "Find the frozen, starving Goron on the ledge in Mountain Village and give him the Rock Sirloin. He gives you Don Gero's Mask."
+    ]
+  },
+  {
+    id: "m19", type: "mask", day: "Anytime", tod: "Anytime", region: "Great Bay",
+    title: "Zora Mask",
+    requiresGear: ["g_epona", "g_soh"],
+    req: "Epona is needed to jump the fence between west Termina Field and Great Bay.",
+    guide: GUIDE_LINKS.masks,
+    desc: "Mikau, the Zora guitarist, washes up dying off Great Bay Coast after trying to get the Zora eggs back from the pirates. Push him to shore, listen to his last song, and heal his spirit with the Song of Healing. He becomes the Zora Mask.",
+    steps: [
+      "In west Termina Field, play Epona's Song, ride Epona and jump the fence into Great Bay.",
+      "On Great Bay Coast, look for seagulls circling over the water — Mikau is floating beneath them.",
+      "Swim out and push him back to the beach.",
+      "Listen to his story, then play the Song of Healing. You receive the Zora Mask."
+    ]
+  },
+  {
+    id: "m20", type: "mask", day: "Anytime", tod: "Anytime", region: "Great Bay",
+    title: "Stone Mask",
+    requiresGear: ["g_epona", "g_zora_mask", "g_lens", "g_magic", "g_bottle"],
+    req: "A Red or Blue Potion in a bottle (buy one at the Swamp potion shop or Trading Post).",
+    guide: GUIDE_LINKS.masks,
+    desc: "MM3D change: the invisible soldier Shiro is no longer on the Road to Ikana. He sits in the big outdoor courtyard of the Pirates' Fortress where the Gerudo patrol. Spot him with the Lens of Truth and give him a potion, and he gives you the Stone Mask, which makes most enemies and guards ignore you.",
+    steps: [
+      "Fill a bottle with a Red or Blue Potion.",
+      "Get into the Pirates' Fortress courtyard: as Zora Link, swim through the underwater entrance near the fortress and through the sewer until you surface in the courtyard.",
+      "Turn on the Lens of Truth near the central watchtower and look around the courtyard for the invisible soldier Shiro.",
+      "Sneak past the patrolling Gerudo (getting caught throws you out) and talk to Shiro.",
+      "Give him the potion. He gives you the Stone Mask."
+    ]
+  },
+  {
+    id: "m21", type: "mask", day: "Anytime", tod: "Anytime", region: "Ikana Canyon",
+    title: "Captain's Hat",
+    requiresGear: ["g_epona", "g_sonata", "g_bow", "g_sword"],
+    req: "Epona is needed to jump the fence onto the Road to Ikana.",
+    guide: GUIDE_LINKS.masks,
+    desc: "Captain Keeta, the giant skeleton leader of Ikana's soldiers, lies at the top of Ikana Graveyard. Wake him with the Sonata of Awakening, keep up with him as he runs, then beat him in a fight. He leaves a chest with the Captain's Hat, which lets you give orders to the Stalchildren in the graveyard.",
+    steps: [
+      "Ride Epona east from Termina Field and jump the fence onto the Road to Ikana. Take the left branch to Ikana Graveyard.",
+      "Walk to the top (north end) of the graveyard and find the giant skeleton.",
+      "Play the Sonata of Awakening in front of it. Captain Keeta wakes up and runs away.",
+      "Chase him and catch up before he gets too far (arrows and sword hits slow him down).",
+      "Fight him: hit him with your sword until he falls.",
+      "Open the chest he leaves behind to get the Captain's Hat."
+    ]
+  },
+  {
+    id: "m22", type: "mask", day: "Anytime", tod: "Anytime", region: "Ikana Canyon",
+    title: "Gibdo Mask",
+    requiresGear: ["g_epona", "g_captain_hat", "g_garo_mask", "g_hookshot", "g_ice_arrows", "g_soh"],
+    req: "Song of Storms is learned in these steps (Night 1 in Ikana Graveyard).",
+    guide: GUIDE_LINKS.masks,
+    desc: "Pamela's father is half-turned into a Gibdo in the basement of the Music Box House in Ikana Canyon. The music box only works once the river flows again, which takes the Song of Storms (learned beneath Ikana Graveyard) played for the cursed composer Sharp. Then you can sneak in and play him the Song of Healing.",
+    steps: [
+      "Night 1: in Ikana Graveyard, wear the Captain's Hat and tell the Stalchildren to open the grave they are guarding. Drop in.",
+      "Beneath the Graveyard, fight through to the Iron Knuckle and defeat it. The ghost of Flat teaches you the Song of Storms.",
+      "Ride back to the Road to Ikana. Wear Garo's Mask and talk to the ghost guard so a tree appears, then Hookshot up into Ikana Canyon.",
+      "Freeze the Octoroks in the river with Ice Arrows and use them as platforms to reach the upper canyon and the Spring Water Cave.",
+      "In the cave, play the Song of Storms for Sharp. His curse lifts and the river starts flowing, which turns the music box on.",
+      "Wait outside the Music Box House until Pamela comes out, then slip inside before the door closes.",
+      "Go down to the basement and play the Song of Healing for her father. You receive the Gibdo Mask."
+    ]
+  },
+  {
+    id: "m23", type: "mask", day: "Anytime", tod: "Anytime", region: "Ikana Canyon",
+    title: "Giant's Mask",
+    requiresGear: ["g_elegy", "g_deku_mask", "g_goron_mask", "g_zora_mask", "g_hookshot", "g_mirror_shield", "g_bow"],
+    req: "Light Arrows are found inside Stone Tower Temple.",
+    guide: GUIDE_LINKS.masks,
+    desc: "MM3D change: the Giant's Mask is no longer in a chest in the temple. You get it in the middle of the Twinmold boss fight. Defeat the blue Twinmold first as normal Link, and a chest with the Giant's Mask appears in the middle of the arena. Wear it to grow giant and finish the red Twinmold.",
+    steps: [
+      "Climb Stone Tower using the Elegy of Emptiness statues and enter Stone Tower Temple.",
+      "Get the Light Arrows in the temple and flip the temple upside down, then clear it to the boss door.",
+      "In the Twinmold fight, shoot arrows at the eyes on the blue Twinmold's underside until it drops, then hit its big eye until it's defeated.",
+      "Run to the chest that appears in the center of the arena and open it to get the Giant's Mask."
+    ]
+  },
+  {
+    id: "m24", type: "mask", day: "Night 3", tod: "Late Night", region: "The Moon",
+    title: "Fierce Deity's Mask",
+    requiresGear: ["g_oath", "g_remains", "g_deku_mask", "g_goron_mask", "g_zora_mask", "g_hookshot", "g_bow"],
+    req: "All 20 non-transformation masks (every mask except Deku, Goron, Zora and Fierce Deity).",
+    guide: GUIDE_LINKS.masks,
+    desc: "On the Moon, four children in boss masks each ask for masks and send you through a trial. Do all four trials and give away all 20 regular masks, and the fifth child, wearing Majora's Mask, gives you the Fierce Deity's Mask. It's a huge power-up that only works in boss fights.",
+    steps: [
+      "Have all 4 Boss Remains and all 20 non-transformation masks.",
+      "At 12:00 AM on Night 3, go to the top of the Clock Tower and play the Oath to Order to reach the Moon.",
+      "Talk to the Odolwa child, give him 1 mask, and finish the Deku trial.",
+      "Talk to the Goht child, give him 2 masks, and finish the Goron trial.",
+      "Talk to the Gyorg child, give him 3 masks, and finish the Zora trial.",
+      "Talk to the Twinmold child, give him 4 masks, and finish the Link (combat) trial.",
+      "Give the rest of your masks to the children so all 20 are handed over.",
+      "Talk to the child wearing Majora's Mask under the tree and agree to play. He gives you the Fierce Deity's Mask."
+    ]
+  },
+
+  // ==================== 4 BOSS HEART CONTAINERS ====================
+  { id: "hc1", type: "container", day: "Anytime", tod: "Anytime", region: "Southern Swamp & Woodfall",
+    title: "Heart Container #1 — Odolwa (Woodfall Temple)",
+    requiresGear: ["g_deku_mask", "g_sonata"],
+    req: "The Hero's Bow is found inside the temple.",
+    guide: GUIDE_LINKS.bosses,
+    desc: "Odolwa, the Masked Jungle Warrior, guards Woodfall Temple in the Southern Swamp. The temple only rises out of the water after you play the Sonata of Awakening on the platform at Woodfall. Beat Odolwa for the Heart Container and his Remains, which also clears the swamp's poisoned water.",
+    steps: [
+      "In Deku Palace, reach the caged Monkey (through the palace gardens and the Magic Bean plants from the Bean Grotto) and learn the Sonata of Awakening from him.",
+      "Hop across the swamp on Deku Flowers and lily pads to Woodfall.",
+      "Stand on the Deku emblem platform in front of the temple and play the Sonata of Awakening. The temple rises.",
+      "Clear the temple: get the Hero's Bow from the Dinolfos room and the Boss Key, then open the boss door.",
+      "Defeat Odolwa: shoot him with arrows or use Deku Bubbles, then slash him while he's stunned. Stay clear of his sword spins and the falling bugs.",
+      "Pick up the Heart Container, then step into the light to get Odolwa's Remains."
+    ]
+  },
+  { id: "hc2", type: "container", day: "Anytime", tod: "Anytime", region: "Snowhead & Mountains",
+    title: "Heart Container #2 — Goht (Snowhead Temple)",
+    requiresGear: ["g_bow", "g_goron_mask", "g_lullaby", "g_magic"],
+    req: "Fire Arrows are found inside the temple.",
+    guide: GUIDE_LINKS.bosses,
+    desc: "Goht, the Masked Mechanical Monster, is frozen inside Snowhead Temple. The giant Goron blocking the path to Snowhead only moves once you sing him to sleep with the full Goron Lullaby. Thaw Goht with a Fire Arrow and chase him around the track as a rolling Goron to bring him down.",
+    steps: [
+      "Learn the start of the Goron Lullaby from the Goron Elder (thaw him with hot spring water or fire), then the full song from his crying son in the Goron Shrine.",
+      "On the Path to Snowhead, play the Goron Lullaby as Goron Link to put the giant Goron to sleep. Roll across the narrow bridges to Snowhead Temple.",
+      "Clear the temple: get the Fire Arrows from the Wizzrobe room, raise the central pillar, and find the Boss Key.",
+      "In the boss room, shoot Goht's ice with a Fire Arrow to thaw him.",
+      "As Goron Link, roll (with magic spikes) after Goht and ram him from behind. Dodge the bombs and falling rocks.",
+      "Pick up the Heart Container and Goht's Remains. Spring comes to the mountains."
+    ]
+  },
+  { id: "hc3", type: "container", day: "Anytime", tod: "Anytime", region: "Great Bay",
+    title: "Heart Container #3 — Gyorg (Great Bay Temple)",
+    requiresGear: ["g_epona", "g_zora_mask", "g_hookshot", "g_bossa"],
+    req: "Ice Arrows are found inside the temple.",
+    guide: GUIDE_LINKS.bosses,
+    desc: "Gyorg, the Gargantuan Masked Fish, lurks under Great Bay Temple. To reach the temple you must return Lulu's seven Zora Eggs, learn the New Wave Bossa Nova from them, and play it for the giant turtle at Zora Cape, who carries you to the temple.",
+    steps: [
+      "Collect all 7 Zora Eggs (4 in the Pirates' Fortress, 3 at Pinnacle Rock) and drop them in the Marine Research Lab tank. Play the song the hatchlings sing — the New Wave Bossa Nova.",
+      "As Zora Link, play the Bossa Nova for Lulu at Zora Cape. The giant turtle wakes up and carries you to Great Bay Temple.",
+      "Clear the temple: get the Ice Arrows, use the color-coded pipes and water wheels, and find the Boss Key.",
+      "In the boss room, shoot Gyorg with arrows when he jumps, then dive in as Zora Link and hit him with the electric barrier. Watch out for the small fish.",
+      "Pick up the Heart Container and Gyorg's Remains."
+    ]
+  },
+  { id: "hc4", type: "container", day: "Anytime", tod: "Anytime", region: "Ikana Canyon",
+    title: "Heart Container #4 — Twinmold (Stone Tower Temple)",
+    requiresGear: ["g_epona", "g_garo_mask", "g_hookshot", "g_ice_arrows", "g_mirror_shield", "g_elegy", "g_deku_mask", "g_goron_mask", "g_zora_mask", "g_bow"],
+    req: "Light Arrows are found inside the temple.",
+    guide: GUIDE_LINKS.bosses,
+    desc: "Twinmold, the Giant Masked Insect, is the boss of Stone Tower Temple at the top of Ikana. You need the Elegy of Emptiness (from Igos du Ikana in Ikana Castle) to climb Stone Tower. In MM3D you defeat the blue Twinmold first, get the Giant's Mask, then defeat the red one as a giant.",
+    steps: [
+      "Get the Mirror Shield Beneath the Well and defeat Igos du Ikana in Ikana Castle to learn the Elegy of Emptiness.",
+      "Climb Stone Tower: play the Elegy of Emptiness to leave statues of Link, Deku, Goron and Zora on switches and blocks.",
+      "Clear Stone Tower Temple: get the Light Arrows, shoot the red emblem to flip the temple, and get the Boss Key.",
+      "In the boss room, defeat the blue Twinmold with arrows to the eyes on its underside, then take the Giant's Mask from the chest that appears.",
+      "Wear the Giant's Mask and beat the red Twinmold with punches.",
+      "Pick up the Heart Container and Twinmold's Remains."
+    ]
+  },
+
+  // ==================== 52 PIECES OF HEART (MM3D) ====================
+  // ---------- Clock Town (16) ----------
+  { id: "hp1", type: "heart", day: "Anytime", tod: "Anytime", region: "Clock Town",
+    title: "South Clock Town — Clock Tower Ledge",
+    requiresGear: ["g_deku_mask"],
+    req: "Moon's Tear (from the Astral Observatory) traded to the South Clock Town Business Scrub in the same cycle.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "A Business Scrub sits next to a Deku Flower beside the Clock Tower in South Clock Town. Trade him the Moon's Tear (he gives you the Land Title Deed) and he leaves the flower behind. As Deku Link, launch from it and glide to the ledge in front of the Clock Tower door, where the Piece of Heart sits.",
+    steps: [
+      "Win the Bombers' hide-and-seek in North Clock Town (catch all 5) to learn the secret code.",
+      "Give the code to the Bomber at the tunnel in East Clock Town and go through the Bombers' Hideout to the Astral Observatory.",
+      "Look through the telescope at the moon until the Moon's Tear falls. Go out the back door and pick it up.",
+      "In South Clock Town, give the Moon's Tear to the Business Scrub by the Clock Tower. He gives you the Land Title Deed and leaves.",
+      "As Deku Link, dive into his Deku Flower, launch, and glide to the ledge in front of the Clock Tower door.",
+      "Grab the Piece of Heart on the ledge."
+    ]
+  },
+  { id: "hp2", type: "heart", day: "Anytime", tod: "Anytime", region: "Clock Town",
+    title: "North Clock Town — Tree Top",
+    requiresGear: ["g_soh"],
+    req: "Human Link (or roll up the slide as Goron Link).",
+    guide: GUIDE_LINKS.hearts,
+    desc: "The big tree in the North Clock Town playground has a Piece of Heart in its branches. Climb the stepping pillars beside the slide and jump across to the tree.",
+    steps: [
+      "Go to the playground in North Clock Town as Human Link.",
+      "Climb the stepping pillars next to the slide, from the lowest to the highest.",
+      "From the top pillar, jump onto the large tree's branch.",
+      "Walk along the branch and grab the Piece of Heart."
+    ]
+  },
+  { id: "hp3", type: "heart", day: "3-Day Cycle", tod: "Multi-Time", region: "Clock Town",
+    title: "North Clock Town — Deku Scrub Playground",
+    requiresGear: ["g_deku_mask"],
+    req: "10 Rupees per play. You must win on Day 1, Day 2 AND Day 3 of the same cycle.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "Behind the fence next to the Great Fairy Fountain is the Deku Scrub Playground, where you hop between Deku Flower platforms collecting rupees against the clock. Beat the record once on each of the three days of one cycle and the Business Scrub gives you a Piece of Heart on the third win.",
+    steps: [
+      "Day 1: as Deku Link, launch from the Deku Flower next to the Great Fairy Fountain to get over the fence into the playground.",
+      "Pay the Business Scrub 10 Rupees and collect every rupee before the timer runs out, beating the posted record.",
+      "Day 2: come back and win again (the course changes each day).",
+      "Day 3: win a third time without playing the Song of Time in between. Collect the Piece of Heart."
+    ]
+  },
+  { id: "hp4", type: "heart", day: "Anytime", tod: "Anytime", region: "Clock Town",
+    title: "Keaton Quiz",
+    requiresGear: ["g_keaton_mask", "g_sword"],
+    req: "Five correct answers in a row.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "A ring of wiggling bushes appears in North Clock Town, on Milk Road, and in Mountain Village once spring comes. Wear the Keaton Mask and cut them to summon the Keaton, a fox spirit who asks five trivia questions about Termina. Get all five right for a Piece of Heart.",
+    steps: [
+      "Put on the Keaton Mask.",
+      "Find the ring of wiggling bushes: in the North Clock Town playground, on Milk Road, or in Mountain Village after Goht is defeated.",
+      "Cut the bushes in the ring with your sword until the Keaton pops out.",
+      "Answer all five questions correctly. One wrong answer ends the quiz, so cut the bushes again to retry (the answers are on the guide link).",
+      "Collect the Piece of Heart."
+    ]
+  },
+  { id: "hp5", type: "heart", day: "Anytime", tod: "Anytime", region: "Clock Town",
+    title: "West Clock Town — Swordsman's School",
+    requiresGear: ["g_sword"],
+    req: "Pay the Expert Course fee. Not available on the Night of the Final Day (the teacher hides).",
+    guide: GUIDE_LINKS.hearts,
+    desc: "The Swordsman's School Expert Course gives you a set time to cut logs that pop up from the floor. A jump attack straight down the middle of a log scores the most points. A perfect 30 earns the Piece of Heart.",
+    steps: [
+      "Go to the Swordsman's School in West Clock Town (any time except Night 3).",
+      "Talk to the instructor and choose the Expert Course.",
+      "For each log, Z/L-target it and press A to do a jump attack that splits it vertically.",
+      "Score a perfect 30 points and collect the Piece of Heart."
+    ]
+  },
+  { id: "hp6", type: "heart", day: "Night 1", tod: "Evening", region: "Clock Town",
+    title: "West Clock Town — Rosa Sisters Dance",
+    requiresGear: ["g_kamaro_mask"],
+    req: "Night 1 or Night 2 (after 6 PM).",
+    guide: GUIDE_LINKS.hearts,
+    desc: "The dancing Rosa Sisters (Judo and Marilla) practice in West Clock Town at night but are missing their spark. Show them Kamaro's dance while wearing Kamaro's Mask and they give you a Piece of Heart.",
+    steps: [
+      "Get Kamaro's Mask (any night after midnight in north Termina Field).",
+      "On Night 1 or Night 2, go to West Clock Town and find the Rosa Sisters dancing.",
+      "Talk to them, then put on Kamaro's Mask and press its button to dance in front of them.",
+      "Collect the Piece of Heart."
+    ]
+  },
+  { id: "hp7", type: "heart", day: "Day 1", tod: "Multi-Time", region: "Clock Town",
+    title: "West Clock Town — Postman's Counting Game",
+    requiresGear: ["g_bunny_hood"],
+    req: "Day 1 from 3:00 PM to 12:00 AM, or Day 2 from 5:00 PM to 12:00 AM (when the Postman is in the Post Office).",
+    guide: GUIDE_LINKS.hearts,
+    desc: "The Postman trains himself to keep perfect time by counting 10 seconds. Try it yourself: start a timer and stop it at exactly 10.00. The timer normally disappears partway through, but the Bunny Hood keeps it visible the whole time.",
+    steps: [
+      "Go to the Post Office in West Clock Town during the opening times above.",
+      "Put on the Bunny Hood.",
+      "Talk to the Postman and agree to try his game.",
+      "Press A to start the timer, watch the numbers, and press A again at exactly 10.00.",
+      "Collect the Piece of Heart."
+    ]
+  },
+  { id: "hp8", type: "heart", day: "Anytime", tod: "Anytime", region: "Clock Town",
+    title: "West Clock Town — Bank (5,000 Rupees)",
+    requiresGear: ["g_wallet"],
+    req: "Your bank balance must reach 5,000 Rupees. Money in the bank is kept when you play the Song of Time.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "The banker in West Clock Town stamps your hand and keeps your rupees safe across time travel. He gives rewards when your balance reaches 200 (Adult Wallet), 1,000 and finally 5,000 Rupees (Piece of Heart). Don't withdraw money while you're saving up.",
+    steps: [
+      "Talk to the banker at the window in West Clock Town and make your first deposit.",
+      "Before every Song of Time, deposit all your rupees so they aren't lost.",
+      "Farm rupees from minigames you've mastered and from Ikana Castle's enemies late in the game.",
+      "Once your balance reaches 5,000 Rupees, talk to the banker and collect the Piece of Heart."
+    ]
+  },
+  { id: "hp9", type: "heart", day: "Anytime", tod: "Anytime", region: "Clock Town",
+    title: "East Clock Town — Town Shooting Gallery",
+    requiresGear: ["g_bow"],
+    req: "20 Rupees per play. Open in the daytime and evening (closed late at night).",
+    guide: GUIDE_LINKS.hearts,
+    desc: "The Town Shooting Gallery has Octoroks that pop up in rows. A score of 40 or more gets you the bigger quiver. A perfect 50, hitting every red Octorok, gets the Piece of Heart.",
+    steps: [
+      "Enter the Town Shooting Gallery in East Clock Town during opening hours.",
+      "Pay 20 Rupees to play.",
+      "Shoot every red Octorok as it pops up and avoid the blue ones. Keep your aim near the middle of the rows.",
+      "Score a perfect 50 and collect the Piece of Heart."
+    ]
+  },
+  { id: "hp10", type: "heart", day: "3-Day Cycle", tod: "Multi-Time", region: "Clock Town",
+    title: "East Clock Town — Honey & Darling's Shop",
+    requiresGear: ["g_bombs", "g_bow"],
+    req: "Win on Day 1, Day 2 AND Day 3 of the same cycle. Small fee per play.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "The couple Honey & Darling run a different minigame each day: Bombchus on Day 1, a Basket Bomb game on Day 2, and target shooting on Day 3. Win all three in one cycle and they give you a Piece of Heart on the Final Day.",
+    steps: [
+      "Day 1: play the Bombchu game in Honey & Darling's Shop (East Clock Town) and hit enough targets to win.",
+      "Day 2: play the Basket Bomb game — throw bombs into the spinning basket — and win.",
+      "Day 3: play the target game with your bow and win, without playing the Song of Time in between.",
+      "Collect the Piece of Heart after the Day 3 win."
+    ]
+  },
+  { id: "hp11", type: "heart", day: "Anytime", tod: "Anytime", region: "Clock Town",
+    title: "East Clock Town — Treasure Chest Shop",
+    requiresGear: ["g_goron_mask"],
+    req: "Play as Goron Link (costs more than playing as Human Link).",
+    guide: GUIDE_LINKS.hearts,
+    desc: "The Treasure Chest Shop is a short timed maze with a chest at the end. The prize depends on your form, and only Goron Link wins a Piece of Heart.",
+    steps: [
+      "Put on the Goron Mask and enter the Treasure Chest Shop in East Clock Town.",
+      "Pay the woman at the counter.",
+      "Find your way through the maze to the chest before time runs out.",
+      "Open the chest to get the Piece of Heart."
+    ]
+  },
+  { id: "hp12", type: "heart", day: "Day 1", tod: "Morning / Day", region: "Clock Town",
+    title: "East Clock Town — Mayor's Meeting",
+    requiresGear: ["g_couples_mask"],
+    req: "Day 1 or Day 2, between 10:00 AM and 8:00 PM, while the meeting is going on.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "Mayor Dotour is stuck in a meeting where Viscen (guard captain) and Mutoh (carpenter) argue about whether to evacuate. Walk in wearing the Couple's Mask and everyone calms down. Then talk to the Mayor and he gives you a Piece of Heart. The Couple's Mask comes at the very end of the Final Day, so you'll do this in a later cycle.",
+    steps: [
+      "Get the Couple's Mask, then start a new cycle.",
+      "On Day 1 or Day 2 between 10:00 AM and 8:00 PM, go to the Mayor's Residence in East Clock Town.",
+      "Enter the Mayor's office where the argument is happening.",
+      "Put on the Couple's Mask and talk to the people arguing — they stop.",
+      "Talk to Mayor Dotour. He gives you the Piece of Heart."
+    ]
+  },
+  { id: "hp13", type: "heart", day: "Night 1", tod: "Late Night", region: "Clock Town",
+    title: "Stock Pot Inn — Hand in the Toilet",
+    requiresGear: [ANY_PAPER],
+    req: "Any night, 12:00 AM–6:00 AM. Any paper item works: a Title Deed, the Letter to Kafei, or the Special Delivery to Mama.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "After midnight, a hand reaches out of the toilet in the Stock Pot Inn's restroom asking for paper. Give it any document and it gives you a Piece of Heart. The Land Title Deed is the easiest paper to have early.",
+    steps: [
+      "Get any paper item (Land Title Deed is easiest — see Clock Tower Ledge).",
+      "On any night between 12:00 AM and 6:00 AM, go to the Stock Pot Inn in East Clock Town (use the upper side door if the front door is locked).",
+      "Go into the restroom on the ground floor and talk to the hand.",
+      "Give it the paper item and collect the Piece of Heart."
+    ]
+  },
+  { id: "hp14", type: "heart", day: "Day 1", tod: "Morning / Day", region: "Clock Town",
+    title: "Stock Pot Inn — Grandma's Story: Carnival of Time",
+    requiresGear: ["g_allnight_mask"],
+    req: "Day 1 or Day 2 (daytime). Without the All-Night Mask Link falls asleep during the story.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "Anju's Grandmother tells long stories that put listeners to sleep. Wear the All-Night Mask to stay awake through 'The Carnival of Time', then answer her question correctly for a Piece of Heart.",
+    steps: [
+      "Put on the All-Night Mask.",
+      "On Day 1 or Day 2, go to Grandma's room in the Stock Pot Inn and talk to her.",
+      "Choose the story 'The Carnival of Time' and listen to the end.",
+      "When she asks her question, pick the first (top) answer.",
+      "Collect the Piece of Heart."
+    ]
+  },
+  { id: "hp15", type: "heart", day: "Day 1", tod: "Morning / Day", region: "Clock Town",
+    title: "Stock Pot Inn — Grandma's Story: The Four Giants",
+    requiresGear: ["g_allnight_mask"],
+    req: "Day 1 or Day 2 (daytime). This story takes much longer in game time.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "The second story, 'The Four Giants', is longer. Stay awake with the All-Night Mask. Her question at the end has no real answer — say 'I dunno' to get the second Piece of Heart.",
+    steps: [
+      "Put on the All-Night Mask.",
+      "On Day 1 or Day 2, talk to Grandma in her room in the Stock Pot Inn.",
+      "Choose the story 'The Four Giants' and listen to the end.",
+      "When she asks her question, answer 'I dunno'.",
+      "Collect the Piece of Heart."
+    ]
+  },
+  { id: "hp16", type: "heart", day: "Anytime", tod: "Anytime", region: "Clock Town",
+    title: "Clock Town Mailbox — Postman's Hat",
+    requiresGear: ["g_postman_hat"],
+    req: "Any red mailbox in Clock Town.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "With the Postman's Hat on, you count as a postman and can open the mailboxes. One of them holds a letter-shaped surprise: a Piece of Heart.",
+    steps: [
+      "Put on the Postman's Hat.",
+      "Walk up to any red mailbox in Clock Town and press A to check it.",
+      "Collect the Piece of Heart."
+    ]
+  },
+
+  // ---------- Termina Field & Romani Ranch (6) ----------
+  { id: "hp17", type: "heart", day: "Anytime", tod: "Anytime", region: "Termina Field & Ranch",
+    title: "Termina Field — Telescope Business Scrub",
+    requiresGear: ["g_wallet"],
+    req: "Moon's Tear must be traded to the South Clock Town Business Scrub first (same cycle). Carry at least 100 Rupees.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "Once the South Clock Town Business Scrub has your Moon's Tear, he flies around Termina Field. Spot him through the Astral Observatory telescope and watch him dive into a hidden grotto. Drop in after him and he sells you a Piece of Heart. He asks for 150 Rupees but goes down to 100 if you say no.",
+    steps: [
+      "Trade the Moon's Tear to the Business Scrub in South Clock Town (see Clock Tower Ledge).",
+      "Make sure you're carrying at least 100 Rupees (you need the Adult Wallet to carry more than 99).",
+      "Go back to the Astral Observatory and look through the telescope. Pan across Termina Field until you see the flying Business Scrub.",
+      "Keep watching until he lands and drops into a hole. Note where it is.",
+      "Go to that spot in Termina Field and drop into the hole.",
+      "He offers the Piece of Heart for 150 Rupees — say No. He drops the price to 100 Rupees — say Yes."
+    ]
+  },
+  { id: "hp18", type: "heart", day: "Anytime", tod: "Anytime", region: "Termina Field & Ranch",
+    title: "Termina Field — Peahat Grotto",
+    requiresGear: ["g_sword", "g_bombs"],
+    req: "Go at night: the giant Peahat is asleep and Bombs work on it.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "In the big grass patch in southwest Termina Field, near the Milk Road entrance, butterflies flutter over a hidden hole. Inside is a giant Peahat. At night it's asleep and easy to bomb. In the daytime it flies around and you have to hit its root underneath.",
+    steps: [
+      "Go to the large grass patch in southwest Termina Field near the Milk Road entrance, at night.",
+      "Find the spot where butterflies are flying, cut the grass there, and drop into the hole.",
+      "Throw or set Bombs next to the sleeping Peahat, and slash it with your sword, until it's defeated.",
+      "Collect the Piece of Heart that appears."
+    ]
+  },
+  { id: "hp19", type: "heart", day: "Anytime", tod: "Anytime", region: "Termina Field & Ranch",
+    title: "Termina Field — Dodongo Grotto",
+    requiresGear: ["g_bombs", "g_sword"],
+    req: "None beyond the gear listed.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "In the snowy north part of Termina Field there's a hole under a mushroom-shaped rock formation. Two Dodongos wait inside. Defeat both and a chest with a Piece of Heart appears.",
+    steps: [
+      "Go to the snowy north part of Termina Field and find the mushroom-shaped rock formation.",
+      "Drop into the hole underneath it.",
+      "Throw Bombs into the Dodongos' mouths when they open them, and slash their tails. Defeat both.",
+      "Open the chest that appears to get the Piece of Heart."
+    ]
+  },
+  { id: "hp20", type: "heart", day: "Anytime", tod: "Anytime", region: "Termina Field & Ranch",
+    title: "Termina Field — Four Gossip Stone Grottos",
+    requiresGear: ["g_bombs", ["g_sonata", "g_lullaby", "g_bossa"]],
+    req: "Play the SAME song (Sonata, Goron Lullaby, or New Wave Bossa Nova) in all four grottos. The song decides the color.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "Four hidden grottos around Termina Field each hold a large Gossip Stone. Playing a transformation song to a stone changes its color. Make all four stones the same color and a Piece of Heart appears in the last grotto. One grotto is behind a boulder you have to bomb.",
+    steps: [
+      "Pick one song to use everywhere (for example the Sonata of Awakening).",
+      "North grotto: northeast of the North Clock Town exit, just before the snowy area. Drop in and play the song to the big Gossip Stone.",
+      "East grotto: to the left of the Astral Observatory when you face it. Drop in and play the same song.",
+      "South grotto: along the wall between the Southern Swamp entrance and the Milk Road entrance. Drop in and play the same song.",
+      "West grotto: behind the boulder north of the West Clock Town exit. Blow up the boulder with a Bomb, drop in, and play the same song.",
+      "When the fourth stone matches the other three, collect the Piece of Heart that appears in that grotto."
+    ]
+  },
+  { id: "hp21", type: "heart", day: "Anytime", tod: "Anytime", region: "Termina Field & Ranch",
+    title: "Termina Field — Beehive Grotto",
+    requiresGear: ["g_bombs", "g_bow", "g_zora_mask"],
+    req: "None beyond the gear listed.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "On the west side of Termina Field, near the stone fence to Great Bay, a boulder covers a grotto. Inside, beehives hang over a pool. Shoot the hives down, beat the Giant Bees, and dive as Zora Link for the Piece of Heart at the bottom.",
+    steps: [
+      "Find the boulder in west Termina Field near the stone fence leading to Great Bay.",
+      "Blow up the boulder with a Bomb and drop into the grotto.",
+      "Shoot the beehives on the ceiling with arrows and defeat the Giant Bees that come out.",
+      "Put on the Zora Mask, dive into the pool, and grab the Piece of Heart at the bottom."
+    ]
+  },
+  { id: "hp22", type: "heart", day: "Anytime", tod: "Morning / Day", region: "Termina Field & Ranch",
+    title: "Romani Ranch — Doggy Racetrack",
+    requiresGear: ["g_truth_mask", "g_powder_keg"],
+    req: "Bet 50 Rupees and win at least 150 Rupees in one race. Daytime.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "Mamamu Yan's Doggy Racetrack is at the entrance of Romani Ranch. With the Mask of Truth you can pick up each dog and read its thoughts. Find the one that feels confident, bet 50 Rupees on it, and win at least 150 Rupees to get the Piece of Heart.",
+    steps: [
+      "Blow up the Milk Road boulder with a Powder Keg if it's blocking the ranch.",
+      "Go into the Doggy Racetrack (on the left as you enter Romani Ranch) in the daytime.",
+      "Put on the Mask of Truth, then pick up the dogs one at a time and read their thoughts. Find the one that says it feels confident.",
+      "Carry that dog to Mamamu Yan and bet 50 Rupees on it.",
+      "If it wins and you get 150 Rupees or more, collect the Piece of Heart. If it loses, bet on the same dog again."
+    ]
+  },
+
+  // ---------- Southern Swamp & Woodfall (6) ----------
+  { id: "hp23", type: "heart", day: "Anytime", tod: "Anytime", region: "Southern Swamp & Woodfall",
+    title: "Road to Southern Swamp — Tall Tree",
+    requiresGear: ["g_sword"],
+    req: "None beyond the gear listed.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "Where the Road to Southern Swamp splits, Bad Bats circle a big tree. Defeat them, climb the vines on the trunk, and pick up the Piece of Heart at the top.",
+    steps: [
+      "Leave Termina Field south onto the Road to Southern Swamp and go to the big tree at the fork.",
+      "Defeat the Bad Bats flying around the tree (Z/L-target and slash).",
+      "Climb the vines on the tree trunk.",
+      "Grab the Piece of Heart on top."
+    ]
+  },
+  { id: "hp24", type: "heart", day: "Anytime", tod: "Anytime", region: "Southern Swamp & Woodfall",
+    title: "Southern Swamp — Swamp Tourist Center Roof",
+    requiresGear: ["g_land_deed", "g_deku_mask"],
+    req: "Trade as Human Link (no mask on).",
+    guide: GUIDE_LINKS.hearts,
+    desc: "A Business Scrub outside the Swamp Tourist Center wants the Land Title Deed from Clock Town. Trade it as Human Link and you get the Swamp Title Deed, the next deed in the chain. Then use his Deku Flower to fly up to the roof, where the Piece of Heart is.",
+    steps: [
+      "Get the Land Title Deed (trade the Moon's Tear in South Clock Town).",
+      "As Human Link, talk to the Business Scrub outside the Swamp Tourist Center and trade the Land Title Deed for the Swamp Title Deed. He leaves.",
+      "Put on the Deku Mask, dive into his Deku Flower, launch, and glide onto the Tourist Center roof.",
+      "Grab the Piece of Heart on the roof."
+    ]
+  },
+  { id: "hp25", type: "heart", day: "Anytime", tod: "Anytime", region: "Southern Swamp & Woodfall",
+    title: "Southern Swamp — Pictograph Contest",
+    requiresGear: ["g_pictograph", "g_deku_mask"],
+    req: "Before Woodfall Temple is cleared in this cycle (the contest ends after that).",
+    guide: GUIDE_LINKS.hearts,
+    desc: "The man at the Swamp Tourist Center runs a photo contest. Bring him a pictograph of the Deku King or of Tingle before Woodfall Temple is cleared and he gives you a Piece of Heart.",
+    steps: [
+      "Get the Pictograph Box: bring Koume a potion in the Woods of Mystery, then talk to the Tourist Center guide.",
+      "Take a clear photo of the Deku King on his throne in Deku Palace (go in as Deku Link), or of Tingle floating on his balloon.",
+      "Before you clear Woodfall Temple, take the photo to the man at the Swamp Tourist Center counter.",
+      "Collect the Piece of Heart."
+    ]
+  },
+  { id: "hp27", type: "heart", day: "Anytime", tod: "Anytime", region: "Southern Swamp & Woodfall",
+    title: "Road to Southern Swamp — Swamp Shooting Gallery",
+    requiresGear: ["g_bow"],
+    req: "20 Rupees per play. Needs a perfect run (hit everything quickly; about 2,120–2,180 points).",
+    guide: GUIDE_LINKS.hearts,
+    desc: "The Swamp Shooting Gallery on the Road to Southern Swamp sends Wolfos, Deku Scrubs and Guays out in waves. Hit everything fast for time bonuses. A near-perfect score (2,120+ points) earns the Piece of Heart.",
+    steps: [
+      "Go into the Swamp Shooting Gallery on the Road to Southern Swamp and pay 20 Rupees.",
+      "Shoot every target that appears: Deku Scrubs, Guays and Wolfos.",
+      "Don't miss any — each one adds time and points.",
+      "Get a perfect score and collect the Piece of Heart."
+    ]
+  },
+  { id: "hp28", type: "heart", day: "Anytime", tod: "Anytime", region: "Southern Swamp & Woodfall",
+    title: "Deku Palace — Inner Garden",
+    requiresGear: ["g_deku_mask", "g_stone_mask"],
+    req: "The Stone Mask is required here so the guards can't see you.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "Deku Palace's inner gardens are patrolled by Deku guards who throw you out if they see you. Wear the Stone Mask and they ignore you. Take the left path through the garden to the Piece of Heart.",
+    steps: [
+      "As Deku Link, talk your way past the palace gate guards and go into the inner courtyard.",
+      "Put on the Stone Mask.",
+      "Take the left-side garden path and hop across the lily pads and platforms through the maze.",
+      "Grab the Piece of Heart at the end of the left garden."
+    ]
+  },
+  { id: "hp29", type: "heart", day: "Anytime", tod: "Anytime", region: "Southern Swamp & Woodfall",
+    title: "Woodfall — Platform Chest",
+    requiresGear: ["g_deku_mask"],
+    req: "None beyond the gear listed.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "In the Woodfall area outside the temple, past the Owl Statue, a chain of Deku Flowers leads across the poisoned water. The last platform has a chest holding a Piece of Heart.",
+    steps: [
+      "Reach Woodfall (top of the Southern Swamp) and go past the Owl Statue.",
+      "As Deku Link, launch from Deku Flower to Deku Flower across the platforms.",
+      "Land on the last platform with the chest.",
+      "Open the chest to get the Piece of Heart."
+    ]
+  },
+
+  // ---------- Snowhead & Mountains (4) ----------
+  { id: "hp30", type: "heart", day: "Anytime", tod: "Anytime", region: "Snowhead & Mountains",
+    title: "Road to Goron Village — Spring Lake Chest",
+    requiresGear: ["g_zora_mask", "g_goron_mask", "g_lullaby", "g_bow"],
+    req: "Goht must be defeated in this cycle (spring).",
+    guide: GUIDE_LINKS.hearts,
+    desc: "Once Goht is defeated and spring comes, the frozen lake on the Road to Goron Village (Twin Islands) melts. A large chest sits at the bottom. Dive down as Zora Link to open it.",
+    steps: [
+      "Defeat Goht in Snowhead Temple in this cycle so the snow melts.",
+      "Go to the Road to Goron Village (Twin Islands) where the lake has thawed.",
+      "Put on the Zora Mask and dive to the bottom of the lake.",
+      "Open the large chest to get the Piece of Heart."
+    ]
+  },
+  { id: "hp31", type: "heart", day: "Anytime", tod: "Anytime", region: "Snowhead & Mountains",
+    title: "Mountain Village — Frog Choir",
+    requiresGear: ["g_don_gero_mask", "g_deku_mask", "g_sonata", "g_zora_mask", "g_bossa", "g_hookshot", "g_goron_mask", "g_lullaby"],
+    req: "Goht defeated (spring), and you must have reached the Gekko in both Woodfall Temple and Great Bay Temple. Do it all in one cycle to be safe.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "Don Gero, the frog conductor, wants his five-frog choir back together in Mountain Village. Find each frog while wearing Don Gero's Mask and tell them about the concert. Two of them are the frogs left behind after you beat the Gekko minibosses in Woodfall and Great Bay Temples. Once all five are home, they sing and give you a Piece of Heart.",
+    steps: [
+      "Laundry Pool frog (Clock Town): wear Don Gero's Mask and talk to it.",
+      "Southern Swamp frog: after the swamp water is clean, find the frog on a log and talk to it with the mask on.",
+      "Woodfall Temple frog: defeat the Gekko miniboss, then talk to the frog that appears, wearing the mask.",
+      "Great Bay Temple frog: defeat the Gekko miniboss, then talk to the frog that appears, wearing the mask.",
+      "Defeat Goht so spring comes. The fifth frog is in the Mountain Village lake.",
+      "In Mountain Village, wear Don Gero's Mask and talk to the frogs to start the choir. Collect the Piece of Heart."
+    ]
+  },
+  { id: "hp32", type: "heart", day: "Anytime", tod: "Anytime", region: "Snowhead & Mountains",
+    title: "Goron Village — Business Scrub Ledge",
+    requiresGear: ["g_swamp_deed", "g_deku_mask"],
+    req: "Trade as Human Link (no mask on).",
+    guide: GUIDE_LINKS.hearts,
+    desc: "On the top ledge of Goron Village, another Business Scrub wants the Swamp Title Deed. Trade it as Human Link to get the Mountain Title Deed, then use his Deku Flower to reach the platform above, where the Piece of Heart waits.",
+    steps: [
+      "Get the Swamp Title Deed from the scrub at the Swamp Tourist Center.",
+      "In Goron Village, go up to the top ledge and talk to the Business Scrub as Human Link. Trade the Swamp Title Deed for the Mountain Title Deed.",
+      "Put on the Deku Mask, launch from his Deku Flower, and glide to the platform above.",
+      "Grab the Piece of Heart."
+    ]
+  },
+  { id: "hp33", type: "heart", day: "Anytime", tod: "Anytime", region: "Snowhead & Mountains",
+    title: "Path to Snowhead — Scarecrow Platform",
+    requiresGear: ["g_scarecrow", "g_lens", "g_magic", "g_hookshot", "g_bow"],
+    req: "Teach Pierre the Scarecrow your song first (Trading Post or Astral Observatory).",
+    guide: GUIDE_LINKS.hearts,
+    desc: "Along the Path to Snowhead, invisible ice blocks lead out over the drop. Cross them with the Lens of Truth. At the far snowy spot, play the Scarecrow's Song so Pierre appears on a distant pillar, then Hookshot to him for the Piece of Heart.",
+    steps: [
+      "Talk to Pierre the Scarecrow in the Trading Post or the Astral Observatory and play him any 8-note song. This is now your Scarecrow's Song.",
+      "Go to the Path to Snowhead and turn on the Lens of Truth to see the invisible ice blocks.",
+      "Cross the blocks carefully and defeat the Ice Keese.",
+      "At the distant snowy platform where Tatl turns green, play the Scarecrow's Song. Pierre appears.",
+      "Hookshot to Pierre and grab the Piece of Heart."
+    ]
+  },
+
+  // ---------- Great Bay (10) ----------
+  { id: "hp34", type: "heart", day: "Anytime", tod: "Anytime", region: "Great Bay",
+    title: "Great Bay Coast — Fisherman's Jumping Game",
+    requiresGear: ["g_epona", "g_hookshot", "g_zora_mask", "g_bossa"],
+    req: "Gyorg must be defeated in this cycle (calm sea).",
+    guide: GUIDE_LINKS.hearts,
+    desc: "MM3D addition: once Gyorg is gone and the sea is calm, a fisherman on a small island off Great Bay Coast runs a jumping game. Torches light up on little platforms and you jump to each lit one. Score 20 or more for a Piece of Heart.",
+    steps: [
+      "Defeat Gyorg in Great Bay Temple in this cycle.",
+      "On Great Bay Coast, northwest of the Termina Field entrance, board the little boat by the sign.",
+      "Hookshot from the boat to Fisherman's Island.",
+      "Talk to the fisherman on the middle island and start the jumping game.",
+      "Jump onto each platform as its torch lights. Score 20 or more and collect the Piece of Heart."
+    ]
+  },
+  { id: "hp35", type: "heart", day: "Anytime", tod: "Anytime", region: "Great Bay",
+    title: "Great Bay Coast — Magic Bean & Scarecrow Ledge",
+    requiresGear: ["g_epona", "g_hookshot", "g_magic_beans", ["g_storms", "g_bottle"], "g_scarecrow"],
+    req: "Water for the bean: Song of Storms, or Spring Water carried in a bottle.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "Near the Pirates' Fortress entrance, a row of pillars leads up to a patch of soft soil. Grow a Magic Bean plant there and ride it up. Then summon Pierre the Scarecrow and Hookshot to him in the rock face to reach the Piece of Heart.",
+    steps: [
+      "Buy Magic Beans from the Bean Seller in Deku Palace's Bean Grotto.",
+      "On Great Bay Coast, go to the pillars near the Pirates' Fortress entrance and Hookshot up them to the top.",
+      "Plant a Magic Bean in the soft soil.",
+      "Water it by playing the Song of Storms, or pour Spring Water from a bottle on it.",
+      "Ride the plant up until you're near the rock face.",
+      "Play the Scarecrow's Song so Pierre appears in the rock face, then Hookshot to him and grab the Piece of Heart."
+    ]
+  },
+  { id: "hp36", type: "heart", day: "Anytime", tod: "Anytime", region: "Great Bay",
+    title: "Great Bay Coast — Marine Research Lab Fish",
+    requiresGear: ["g_epona", "g_bottle", "g_zora_mask"],
+    req: "Four or more Fish in Bottles.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "In the Marine Research Lab, a big fish and a small fish share the aquarium by the door. Feed them bottled fish until one swallows the other and spits out a Piece of Heart.",
+    steps: [
+      "Catch fish with an Empty Bottle (swing the bottle at a fish in the water). Try the shallow sandy water in Termina Field between Great Bay and Milk Road.",
+      "Go into the Marine Research Lab on Great Bay Coast.",
+      "Release a fish into the aquarium by the door. Repeat with more fish.",
+      "After about four fish, the bigger fish eats the other and spits out the Piece of Heart. Collect it."
+    ]
+  },
+  { id: "hp37", type: "heart", day: "Anytime", tod: "Anytime", region: "Great Bay",
+    title: "Oceanside Spider House — Mask Puzzle",
+    requiresGear: ["g_epona", "g_captain_hat", "g_bombs", "g_hookshot", FIRE, "g_bow"],
+    req: "The Captain's Hat is required to read the color order from the Stalchildren.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "In the Library of the Oceanside Spider House on Great Bay Coast, colored masks hang on the wall. Six Stalchildren in the house tell you the order to shoot them in, but they only talk to someone wearing the Captain's Hat. Shoot the masks in the right order, beat the big Skulltula behind the gate, and open the chest.",
+    steps: [
+      "Bomb the cracked wall at the Oceanside Spider House entrance (next to the Fisherman's Hut) and slide down into the house.",
+      "Hookshot the target above the door and burn the cobwebs with a Fire Arrow or lit Deku Stick.",
+      "Put on the Captain's Hat and talk to each Stalchild. Write down the color order they give.",
+      "In the Library, shoot the colored masks on the wall with arrows in that order. The gate opens.",
+      "Defeat the large Skulltula behind the gate.",
+      "Open the chest to get the Piece of Heart."
+    ]
+  },
+  { id: "hp38", type: "heart", day: "Anytime", tod: "Anytime", region: "Great Bay",
+    title: "Pirates' Fortress — Barrel Switch Room",
+    requiresGear: ["g_epona", "g_zora_mask", "g_bunny_hood"],
+    req: "The Bunny Hood is required here so you make it before the door shuts.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "Inside the Pirates' Fortress, barrels at the top of the left stairs hide a floor switch. Stepping on it opens a cage door at the bottom for a short time. Run down with the Bunny Hood on, slip in, and hit the switch inside to reach the Piece of Heart.",
+    steps: [
+      "As Zora Link, swim into the Pirates' Fortress through the underwater entrance and sewer.",
+      "Go up the left-hand stairs and smash the barrels to find a floor switch.",
+      "Put on the Bunny Hood, then step on the switch. A cage door opens below.",
+      "Run straight down the stairs and through the cage door before it shuts.",
+      "Hit the switch inside the room and grab the Piece of Heart."
+    ]
+  },
+  { id: "hp39", type: "heart", day: "Anytime", tod: "Anytime", region: "Great Bay",
+    title: "Pinnacle Rock — Deep Pythons",
+    requiresGear: ["g_epona", "g_zora_mask", "g_pictograph", "g_bottle"],
+    req: "A pictograph of a Gerudo Pirate (to get the Seahorse).",
+    guide: GUIDE_LINKS.hearts,
+    desc: "The Fisherman on Great Bay Coast swaps his captured Seahorse for a picture of a Gerudo Pirate. Release the Seahorse at Pinnacle Rock and it leads you through the murky water. Defeat all eight Deep Pythons hiding in holes and the Seahorse reunites with its partner and gives you a Piece of Heart.",
+    steps: [
+      "Take a pictograph of a Gerudo Pirate at the Pirates' Fortress.",
+      "Show it to the Fisherman in his hut on Great Bay Coast. He gives you the Seahorse in a bottle.",
+      "Swim to Pinnacle Rock as Zora Link and release the Seahorse. Follow it through the murky water.",
+      "Lure each Deep Python out of its hole and hit it with Zora attacks until it dies. Defeat all 8.",
+      "Collect the Piece of Heart when the Seahorses reunite."
+    ]
+  },
+  { id: "hp40", type: "heart", day: "Anytime", tod: "Anytime", region: "Great Bay",
+    title: "Zora Cape — Underwater Like Like",
+    requiresGear: ["g_epona", "g_zora_mask"],
+    req: "None beyond the gear listed.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "At the bottom of the waterfall basin at Zora Cape, a Like Like sits in the middle of the pool. Dive as Zora Link and defeat it for the Piece of Heart.",
+    steps: [
+      "Go to Zora Cape and put on the Zora Mask.",
+      "Dive to the bottom of the waterfall basin and find the Like Like in the middle.",
+      "Defeat it with your electric barrier or boomerang fins.",
+      "Collect the Piece of Heart."
+    ]
+  },
+  { id: "hp41", type: "heart", day: "Anytime", tod: "Anytime", region: "Great Bay",
+    title: "Waterfall Rapids — Beaver Bros. Race",
+    requiresGear: ["g_epona", "g_hookshot", "g_zora_mask"],
+    req: "Win the race once (Empty Bottle), then win the harder rematch.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "At the top of the Zora Cape waterfall, the Beaver Brothers race through rings in the water. Beat them once for a bottle, then race again with less time for the Piece of Heart.",
+    steps: [
+      "At Zora Cape, Hookshot up the trees along the cliff wall to the cave at the top of the waterfall.",
+      "As Zora Link, follow the younger Beaver and swim through every ring before time runs out.",
+      "Race both brothers and win to get an Empty Bottle.",
+      "Talk to them again and win the rematch, which has less time.",
+      "Collect the Piece of Heart."
+    ]
+  },
+  { id: "hp42", type: "heart", day: "Anytime", tod: "Anytime", region: "Great Bay",
+    title: "Zora Hall — Business Scrub Ledge",
+    requiresGear: ["g_epona", "g_mountain_deed", "g_zora_mask", "g_goron_mask", "g_deku_mask"],
+    req: "Trade as Goron Link.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "Inside a room in Zora Hall (the far-left room, where a Zora is peeping in), a Business Scrub wants the Mountain Title Deed, but only from a Goron. He gives you the Ocean Title Deed, and his Deku Flower takes you up to the Piece of Heart.",
+    steps: [
+      "Get the Mountain Title Deed from the scrub in Goron Village.",
+      "As Zora Link, enter the far-left room in Zora Hall (where a Zora is peeping through the door).",
+      "Put on the Goron Mask and trade the Mountain Title Deed to the Business Scrub for the Ocean Title Deed.",
+      "Put on the Deku Mask, launch from his Deku Flower, and glide to the upper ledge.",
+      "Grab the Piece of Heart."
+    ]
+  },
+  { id: "hp43", type: "heart", day: "Anytime", tod: "Anytime", region: "Great Bay",
+    title: "Zora Hall — Jam Session with Japas",
+    requiresGear: ["g_epona", "g_zora_mask"],
+    req: "Learn both note sequences from the diary first.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "Mikau left an unfinished song in the diary in his room in Zora Hall. Read it as Zora Link to learn two note sequences, then jam with Japas, the bassist next door, playing the combined 16 notes on the Zora Guitar.",
+    steps: [
+      "As Zora Link, go into Mikau and Tijo's room in Zora Hall and read the diary. (MM3D notes: L, R, Y, L, then R, Y, X, R.)",
+      "Go to Japas's room next door and talk to him to start a jam session.",
+      "Play along with him: Y, Y, R, L, L, R, Y, L, then X, X, Y, R, R, Y, X, R.",
+      "Collect the Piece of Heart."
+    ]
+  },
+
+  // ---------- Ikana (6) ----------
+  { id: "hp45", type: "heart", day: "Night 2", tod: "Evening", region: "Ikana Canyon",
+    title: "Beneath the Graveyard — Night 2 Iron Knuckle",
+    requiresGear: ["g_epona", "g_captain_hat", "g_lens", "g_magic", "g_bombs", "g_sword"],
+    req: "Only on Night 2 (the grave the Stalchildren guard that night).",
+    guide: GUIDE_LINKS.hearts,
+    desc: "On the second night, the Stalchildren in Ikana Graveyard guard a different grave. Order them to open it with the Captain's Hat and drop in. Use the Lens of Truth to find the hidden path and fake wall, bomb the cracked wall, and defeat the Iron Knuckle to open the chest.",
+    steps: [
+      "On Night 2, ride Epona to Ikana Graveyard.",
+      "Put on the Captain's Hat and tell the Stalchildren to open the grave they're guarding. Drop in.",
+      "Turn on the Lens of Truth to find the invisible path and the fake wall, and go through.",
+      "In the last room, bomb the cracked wall.",
+      "Defeat the Iron Knuckle behind it (hit it, then back off before it swings).",
+      "Open the chest to get the Piece of Heart."
+    ]
+  },
+  { id: "hp53", type: "heart", day: "Night 3", tod: "Evening", region: "Ikana Canyon",
+    title: "Beneath the Graveyard — Night 3 Dampé & Big Poe",
+    requiresGear: ["g_epona", "g_captain_hat", "g_bow"],
+    req: "Only on Night 3. Play the Inverted Song of Time first, because Dampé is very slow.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "MM3D change: in the N64 version this chest held an Empty Bottle, and Koume's boat game gave a heart piece. In MM3D they're swapped. On the Final Night, open the last grave with the Captain's Hat, help Dampé dig up three ghost flames, and defeat the Big Poe that appears.",
+    steps: [
+      "Play the Inverted Song of Time to slow down time.",
+      "On Night 3, go to Ikana Graveyard wearing the Captain's Hat and tell the Stalchildren to open the final grave. Drop in.",
+      "Find Dampé on the lower level and talk to him.",
+      "Lead him to the dirt mounds so he digs them up, until three flames are uncovered.",
+      "Defeat the Big Poe that appears, using arrows and your sword.",
+      "Open the chest to get the Piece of Heart."
+    ]
+  },
+  { id: "hp46", type: "heart", day: "Anytime", tod: "Anytime", region: "Ikana Canyon",
+    title: "Ikana Canyon — Business Scrub Ledge",
+    requiresGear: ["g_epona", "g_garo_mask", "g_hookshot", "g_ocean_deed", "g_zora_mask", "g_deku_mask"],
+    req: "Trade as Zora Link. This is the last trade in the deed chain.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "The last Business Scrub, in lower Ikana Canyon near Sakon's Hideout, buys the Ocean Title Deed from a Zora for 200 Rupees. His Deku Flower takes you across the river to a ledge with the Piece of Heart.",
+    steps: [
+      "Get the Ocean Title Deed from the scrub in Zora Hall.",
+      "Get into Ikana Canyon: wear Garo's Mask, talk to the ghost guard on the Road to Ikana, and Hookshot up the tree.",
+      "Find the Business Scrub near Sakon's Hideout. As Zora Link, sell him the Ocean Title Deed (he pays 200 Rupees).",
+      "Put on the Deku Mask, launch from his Deku Flower, and glide across the river to the ledge.",
+      "Grab the Piece of Heart."
+    ]
+  },
+  { id: "hp47", type: "heart", day: "Anytime", tod: "Anytime", region: "Ikana Canyon",
+    title: "Ikana Canyon — Spirit House Poe Sisters",
+    requiresGear: ["g_epona", "g_garo_mask", "g_hookshot", "g_ice_arrows", "g_bow"],
+    req: "30 Rupees. Defeat all four Poe Sisters in under 3 minutes without dropping to 3 hearts or fewer.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "The Poe Collector runs the Spirit House in upper Ikana Canyon. Inside, you fight the four Poe Sisters (Meg, Jo, Beth and Amy) against the clock. Keep your health above three hearts or you lose. Beat them all in time for the Piece of Heart.",
+    steps: [
+      "Freeze the river Octoroks with Ice Arrows and hop across to reach upper Ikana Canyon.",
+      "Talk to the Poe Collector outside the Spirit House and pay 30 Rupees.",
+      "Fight Amy, Beth and Jo: raise your shield when they attack, then hit back with a jump attack.",
+      "Meg splits into copies — shoot the one that spins.",
+      "Beat all four in under 3 minutes while keeping more than 3 hearts. Collect the Piece of Heart."
+    ]
+  },
+  { id: "hp48", type: "heart", day: "Anytime", tod: "Anytime", region: "Ikana Canyon",
+    title: "Ikana Canyon — Secret Shrine",
+    requiresGear: ["g_epona", "g_garo_mask", "g_hookshot", "g_zora_mask", "g_light_arrows"],
+    req: "Light Arrows (from Stone Tower Temple).",
+    guide: GUIDE_LINKS.hearts,
+    desc: "Hidden up the river in lower Ikana Canyon, the Secret Shrine is sealed by a sun emblem that only a Light Arrow opens. Inside are four rooms, each with a miniboss from earlier in the game. Clear all four and return to the central room for the Piece of Heart.",
+    steps: [
+      "In lower Ikana Canyon, swim upstream as Zora Link past the two Octoroks and climb out onto the ledge.",
+      "Shoot the sun emblem above the door with a Light Arrow and go in.",
+      "Clear the first room by defeating its miniboss.",
+      "Clear the second room.",
+      "Clear the third room.",
+      "Clear the fourth room.",
+      "Go back to the central room and collect the Piece of Heart."
+    ]
+  },
+  { id: "hp54", type: "heart", day: "Anytime", tod: "Anytime", region: "Ikana Canyon",
+    title: "Ancient Castle of Ikana — Rooftop Flame Pillars",
+    requiresGear: ["g_epona", "g_garo_mask", "g_hookshot", "g_ice_arrows", "g_gibdo_mask", "g_mirror_shield", "g_deku_mask", "g_bow"],
+    req: "You must be able to reach the castle roof (through Beneath the Well and the castle).",
+    guide: GUIDE_LINKS.hearts,
+    desc: "On the roof of the Ancient Castle of Ikana, a row of pillars topped with flames leads to a Piece of Heart. Shoot the crystal switch to put the flames out for a short time, then glide across the pillars on Deku Flowers before the fire comes back.",
+    steps: [
+      "Get the Mirror Shield Beneath the Well (with the Gibdo Mask) and come out in the Ancient Castle of Ikana courtyard.",
+      "Go through the castle (use the Mirror Shield on the sun blocks) and climb to the roof.",
+      "On the roof, climb the wall and look right to spot the pillar with the Piece of Heart.",
+      "Shoot the crystal switch with an arrow. The flames on the pillars go out for a short time.",
+      "Quickly drop down and use the Deku Flowers to glide pillar to pillar to the last one.",
+      "Grab the Piece of Heart, then jump down."
+    ]
+  },
+
+  // ---------- The Moon (4) ----------
+  { id: "hp49", type: "heart", day: "Night 3", tod: "Late Night", region: "The Moon",
+    title: "The Moon — Odolwa Child (Deku Trial)",
+    requiresGear: ["g_oath", "g_remains", "g_deku_mask"],
+    req: "Give the child 1 non-transformation mask.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "On the Moon, the child wearing Odolwa's Remains plays hide-and-seek and sends you through a Deku Flower obstacle course. Hop flower to flower to the end for a Piece of Heart.",
+    steps: [
+      "With all 4 Boss Remains, play the Oath to Order on top of the Clock Tower at 12:00 AM on Night 3 to reach the Moon.",
+      "Talk to the child wearing Odolwa's Remains and give him 1 mask.",
+      "As Deku Link, launch across the Deku Flowers to the yellow flower.",
+      "From the yellow flower, glide to the ledge on the far right.",
+      "Collect the Piece of Heart at the end of the trial."
+    ]
+  },
+  { id: "hp50", type: "heart", day: "Night 3", tod: "Late Night", region: "The Moon",
+    title: "The Moon — Goht Child (Goron Trial)",
+    requiresGear: ["g_oath", "g_remains", "g_goron_mask", "g_magic"],
+    req: "Give the child 2 non-transformation masks.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "The child wearing Goht's Remains sends you down a Goron rolling course with gaps and ramps. Roll with magic spikes to clear the jumps and reach the shrine at the end.",
+    steps: [
+      "Talk to the child wearing Goht's Remains and give him 2 masks.",
+      "As Goron Link, roll and build up speed until the spikes come out.",
+      "Roll over the ramps and across the gaps to the end of the course.",
+      "Collect the Piece of Heart in the shrine area at the end."
+    ]
+  },
+  { id: "hp51", type: "heart", day: "Night 3", tod: "Late Night", region: "The Moon",
+    title: "The Moon — Gyorg Child (Zora Trial)",
+    requiresGear: ["g_oath", "g_remains", "g_zora_mask"],
+    req: "Give the child 3 non-transformation masks.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "The child wearing Gyorg's Remains sends you through an underwater maze of currents. The MM3D route differs from the N64 one: Left, Right, Middle.",
+    steps: [
+      "Talk to the child wearing Gyorg's Remains and give him 3 masks.",
+      "As Zora Link, swim into the maze and take the LEFT path.",
+      "At the next split, take the RIGHT path.",
+      "At the last split, take the MIDDLE path.",
+      "Collect the Piece of Heart at the end."
+    ]
+  },
+  { id: "hp52", type: "heart", day: "Night 3", tod: "Late Night", region: "The Moon",
+    title: "The Moon — Twinmold Child (Link Trial)",
+    requiresGear: ["g_oath", "g_remains", "g_sword", "g_bow", "g_hookshot"],
+    req: "Give the child 4 non-transformation masks.",
+    guide: GUIDE_LINKS.heartsAlt,
+    desc: "The child wearing Twinmold's Remains sends you through a combat trial as Human Link. You fight a Dinolfos, a Garo Master and an Iron Knuckle in a row. The final room holds the last Piece of Heart.",
+    steps: [
+      "Talk to the child wearing Twinmold's Remains and give him 4 masks.",
+      "Defeat the Dinolfos.",
+      "Defeat the Garo Master.",
+      "Defeat the Iron Knuckle.",
+      "Collect the Piece of Heart in the final room."
+    ]
+  }
+];
+
+// ==================== EXTRA CATEGORIES: 7 BOTTLES + 4 STRAY FAIRY SETS ====================
+ITEMS.push(
+  { id: "b1", type: "bottle", day: "Anytime", tod: "Anytime", region: "Southern Swamp & Woodfall",
+    title: "Bottle #1 — Kotake's Red Potion",
+    requiresGear: [],
+    req: "None — available from the first cycle.",
+    guide: GUIDE_LINKS.masks,
+    desc: "Koume, one of the potion-shop witches, is lying hurt in the Woods of Mystery. Her sister Kotake, who runs the Magic Hags' Potion Shop in the Southern Swamp, gives you a free Bottle of Red Potion to take to her. Giving Koume the potion opens the swamp boat cruise and gets you the Pictograph Box, and you keep the bottle.",
+    steps: [
+      "Go to the Southern Swamp and enter the Magic Hags' Potion Shop (the hut past the Swamp Tourist Center).",
+      "Talk to Kotake. She is worried about her sister and gives you a Bottle of Red Potion.",
+      "Go into the Woods of Mystery (follow the monkey through the maze; the route changes each day) and find Koume.",
+      "Give Koume the Red Potion. She recovers and returns to the swamp. The empty bottle is yours."
+    ]
+  },
+  { id: "b2", type: "bottle", day: "Night 1", tod: "Late Night", region: "Termina Field & Ranch",
+    title: "Bottle #2 — Romani's Milk",
+    requiresGear: ["g_bow", "g_powder_keg"],
+    req: "Defend the barn from 2:00 AM to 5:15 AM on Night 1.",
+    guide: GUIDE_LINKS.masks,
+    desc: "When you save Romani Ranch's barn and cows from the ghostly 'Them' on the first night, Romani thanks you with a Bottle of Milk. This is the same defense you need for Romani's Mask, so you can get both in one cycle.",
+    steps: [
+      "Enter Romani Ranch on Day 1 (blow up the Milk Road boulder with a Powder Keg) and pass Romani's balloon archery practice.",
+      "Be at the ranch by 2:00 AM on Night 1.",
+      "Shoot every ghost heading toward the barn until 5:15 AM.",
+      "In the morning, talk to Romani. She gives you a Bottle of Milk."
+    ]
+  },
+  { id: "b3", type: "bottle", day: "Anytime", tod: "Anytime", region: "Great Bay",
+    title: "Bottle #3 — Beaver Bros. Race (first win)",
+    requiresGear: ["g_epona", "g_hookshot", "g_zora_mask"],
+    req: "Win the first race against both brothers. (The rematch gives the Piece of Heart.)",
+    guide: GUIDE_LINKS.masks,
+    desc: "At the top of the Zora Cape waterfall, the Beaver Brothers race through rings in the water. The first time you beat both of them they give you an Empty Bottle. The harder rematch is a separate Piece of Heart.",
+    steps: [
+      "At Zora Cape, Hookshot up the trees along the cliff wall to the cave at the top of the waterfall.",
+      "As Zora Link, race the younger Beaver through the rings and win.",
+      "Race both brothers together and win.",
+      "Collect the Empty Bottle."
+    ]
+  },
+  { id: "b4", type: "bottle", day: "Anytime", tod: "Anytime", region: "Southern Swamp & Woodfall",
+    title: "Bottle #4 — Koume's Boat Target Game",
+    requiresGear: ["g_deku_mask", "g_sonata", "g_bow"],
+    req: "Woodfall Temple cleared in this cycle (clean swamp). MM3D: this game gives a Bottle, not a Piece of Heart.",
+    guide: GUIDE_LINKS.hearts,
+    desc: "MM3D change: once the swamp is clean, Koume flies around on her broom during the boat cruise and you shoot targets from the boat. In the N64 version this gave a heart piece. In MM3D it gives an Empty Bottle, and the heart piece moved to the Night 3 grave beneath Ikana Graveyard.",
+    steps: [
+      "Defeat Odolwa so the Southern Swamp water becomes clean.",
+      "Go to the Swamp Tourist Center and talk to Koume to start the boat cruise target game.",
+      "Shoot at least 20 targets during the ride, without hitting Koume 10 times.",
+      "Collect the Empty Bottle."
+    ]
+  },
+  { id: "b5", type: "bottle", day: "Anytime", tod: "Anytime", region: "Snowhead & Mountains",
+    title: "Bottle #5 — Goron Race (Gold Dust)",
+    requiresGear: ["g_goron_mask", "g_powder_keg", "g_lullaby", "g_bow"],
+    req: "Goht defeated in this cycle (spring). A Powder Keg clears the boulder at the racetrack entrance.",
+    guide: GUIDE_LINKS.masks,
+    desc: "After spring comes to the mountains, the Gorons hold a race at the Goron Racetrack on Twin Islands. Win as Goron Link and you get a Bottle of Gold Dust. You can also give the Gold Dust to the Mountain Smithy to make the Gilded Sword.",
+    steps: [
+      "Defeat Goht in this cycle so spring comes.",
+      "On Twin Islands, blow up the boulder blocking the Goron Racetrack entrance with a Powder Keg.",
+      "Enter the race as Goron Link and roll (with magic spikes) to finish first.",
+      "Collect the Bottle of Gold Dust."
+    ]
+  },
+  { id: "b6", type: "bottle", day: "Night 3", tod: "Evening", region: "Clock Town",
+    title: "Bottle #6 — Madame Aroma's Chateau Romani",
+    requiresGear: ["g_express_mail", "g_romani_mask"],
+    req: "Night 3 in the Milk Bar. Use a different cycle from the Postman's Hat (both need the same letter).",
+    guide: GUIDE_LINKS.masks,
+    desc: "Instead of giving the Special Delivery to Mama to the Postman, hand it to Madame Aroma yourself at the Milk Bar on the Final Night. She is so grateful she gives you a Bottle of Chateau Romani. This uses up the letter, so get the Postman's Hat in another cycle.",
+    steps: [
+      "Follow the Anju & Kafei quest to get the Special Delivery to Mama on Day 3 (see Keaton Mask).",
+      "On Night 3, wear Romani's Mask and enter the Milk Bar in East Clock Town.",
+      "Talk to Madame Aroma and give her the Special Delivery to Mama.",
+      "Collect the Bottle of Chateau Romani."
+    ]
+  },
+  { id: "b7", type: "bottle", day: "Day 2", tod: "Multi-Time", region: "Termina Field & Ranch",
+    title: "Bottle #7 — Gorman's Mysterious Milk",
+    requiresGear: ["g_troupe_mask", "g_bunny_hood", "g_bottle", "g_epona"],
+    req: "Day 2: Gorman is in the Stock Pot Inn from 8:00 AM; the Gorman Brothers hand out milk after 12:00 PM. The milk goes bad after 2 minutes.",
+    guide: GUIDE_LINKS.masks,
+    desc: "MM3D addition: Gorman, the hungover Troupe Leader, is sick in bed at the Stock Pot Inn on Day 2. Wearing the Troupe Leader's Mask, you get his brothers at Gorman Track to give you Mysterious Milk. Rush it back before it spoils and he gives you a Bottle.",
+    steps: [
+      "Get the Troupe Leader's Mask (Milk Bar sound check, Night 1 or 2).",
+      "Day 2, after 8:00 AM: go upstairs in the Stock Pot Inn to the last room. Wear the Troupe Leader's Mask and talk to Gorman — he asks for Mysterious Milk.",
+      "After 12:00 PM, go to Gorman Track on Milk Road wearing the Troupe Leader's Mask and talk to the Gorman Brothers. They give you Mysterious Milk.",
+      "Put on the Bunny Hood and hurry back to Gorman in the Stock Pot Inn within 2 minutes (warping with the Song of Soaring is fastest).",
+      "Give him the milk and collect the Bottle."
+    ]
+  },
+
+  { id: "f1", type: "fairy", day: "Anytime", tod: "Anytime", region: "Southern Swamp & Woodfall",
+    title: "Woodfall Temple — 15 Stray Fairies (Great Spin Attack)",
+    requiresGear: ["g_deku_mask", "g_sonata", "g_great_fairy_mask"],
+    req: "All 15 must be collected in one trip through the temple (they reset with the Song of Time).",
+    guide: "https://www.zeldadungeon.net/wiki/Stray_Fairy",
+    desc: "The Great Fairy of Woodfall has been broken into 15 Stray Fairies scattered through Woodfall Temple. Some are in chests, some float in bubbles, and some are hidden. The Great Fairy's Mask makes your hair glow when one is near and pulls loose fairies to you. Return all 15 and the Great Fairy upgrades your spin attack.",
+    steps: [
+      "Wear the Great Fairy's Mask while exploring the temple — it pulls nearby fairies to you.",
+      "Collect fairies from chests, and pop the bubble-trapped ones with an arrow or Deku Bubble.",
+      "Check the temple map: rooms with uncollected fairies are marked. Get all 15.",
+      "Leave the temple and enter the Great Fairy Fountain in Woodfall.",
+      "Collect the Great Spin Attack upgrade."
+    ]
+  },
+  { id: "f2", type: "fairy", day: "Anytime", tod: "Anytime", region: "Snowhead & Mountains",
+    title: "Snowhead Temple — 15 Stray Fairies (Extended Magic)",
+    requiresGear: ["g_goron_mask", "g_lullaby", "g_bow", "g_great_fairy_mask"],
+    req: "All 15 in one trip through the temple.",
+    guide: "https://www.zeldadungeon.net/wiki/Stray_Fairy",
+    desc: "The Snowhead Great Fairy's 15 Stray Fairies are spread through Snowhead Temple. Several are in ice or high places that need Fire Arrows. Return them all to her fountain near the temple and she doubles your magic meter.",
+    steps: [
+      "Wear the Great Fairy's Mask while exploring Snowhead Temple.",
+      "Collect the fairies in chests, and melt ice around hidden ones with Fire Arrows once you have them.",
+      "Use the temple map to find rooms with fairies left. Get all 15.",
+      "Go to the Great Fairy Fountain near the Snowhead Temple entrance.",
+      "Collect the Extended Magic upgrade."
+    ]
+  },
+  { id: "f3", type: "fairy", day: "Anytime", tod: "Anytime", region: "Great Bay",
+    title: "Great Bay Temple — 15 Stray Fairies (Double Defense)",
+    requiresGear: ["g_epona", "g_zora_mask", "g_hookshot", "g_bossa", "g_great_fairy_mask"],
+    req: "All 15 in one trip through the temple.",
+    guide: "https://www.zeldadungeon.net/wiki/Stray_Fairy",
+    desc: "The Great Bay Great Fairy's 15 Stray Fairies are in Great Bay Temple, many underwater or behind the pipe puzzles. Return them to the fountain at Zora Cape and she halves the damage you take.",
+    steps: [
+      "Wear the Great Fairy's Mask while exploring Great Bay Temple.",
+      "Collect fairies from chests, and dive as Zora Link for the underwater ones.",
+      "Use the temple map to find rooms with fairies left. Get all 15.",
+      "Go to the Great Fairy Fountain at Zora Cape.",
+      "Collect the Double Defense upgrade."
+    ]
+  },
+  { id: "f4", type: "fairy", day: "Anytime", tod: "Anytime", region: "Ikana Canyon",
+    title: "Stone Tower Temple — 15 Stray Fairies (Great Fairy's Sword)",
+    requiresGear: ["g_elegy", "g_mirror_shield", "g_hookshot", "g_deku_mask", "g_goron_mask", "g_zora_mask", "g_great_fairy_mask"],
+    req: "All 15 in one trip; some are only reachable with the temple flipped upside down.",
+    guide: "https://www.zeldadungeon.net/wiki/Stray_Fairy",
+    desc: "The Ikana Great Fairy's 15 Stray Fairies are split between the normal and the inverted Stone Tower Temple. Return all of them to her fountain in Ikana Canyon and she gives you the Great Fairy's Sword, the strongest sword in the game.",
+    steps: [
+      "Wear the Great Fairy's Mask while exploring Stone Tower Temple.",
+      "Collect the fairies in the normal temple first.",
+      "Get the Light Arrows, flip the temple, and collect the fairies in the inverted temple.",
+      "Use the temple map to make sure you have all 15.",
+      "Go to the Great Fairy Fountain in Ikana Canyon and collect the Great Fairy's Sword."
+    ]
+  }
+);
+
+// Per-item wiki links for masks and bottles (instead of one shared overview page)
+const WIKI = "https://zeldawiki.wiki/wiki/";
+for (const item of ITEMS) {
+  if (item.type === "mask") item.guide = WIKI + encodeURIComponent(item.title.replace(/ /g, "_"));
+  if (item.type === "bottle") item.guide = WIKI + "Bottle";
+}
+
+// ==================== TIME WINDOWS (for Cycle Planner & Right Now) ====================
+// d = day (1–3). s/e = hours on a 6 AM-based clock: 6 = 6:00 AM, 18 = 6:00 PM, 24 = midnight, 30 = 6:00 AM next morning.
+const W = (d, s, e, l) => ({ d, s, e, l });
+const SCHEDULES = {
+  m1: [W(3, 24, 30, "Clock Tower opens at midnight — knock the Ocarina away from Skull Kid")],
+  m3: [W(1, 23.75, 24.25, "Be in North Clock Town — Sakon robs the Bomb Shop Lady at 12:00 AM")],
+  m4: [W(1, 18, 30, "Talk to Guru-Guru in the Laundry Pool"), W(2, 18, 30, "Talk to Guru-Guru in the Laundry Pool")],
+  m5: [W(1, 10, 20, "Madame Aroma, Mayor's Residence"), W(2, 10, 20, "Madame Aroma, Mayor's Residence")],
+  m6: [W(1, 23.75, 24.25, "Save the Bomb Shop Lady (unlocks the All-Night Mask this cycle)"), W(3, 22, 30, "Buy the All-Night Mask at the Curiosity Shop (500 Rupees)")],
+  m7: [
+    W(1, 10, 18, "Show Kafei's Mask to Anju at the Stock Pot Inn desk (daytime)"),
+    W(1, 23.5, 23.75, "Meet Anju in the Inn kitchen at 11:30 PM — get the Letter to Kafei"),
+    W(1, 23.75, 30, "Post the Letter to Kafei in any mailbox before morning"),
+    W(2, 13, 18, "Ring the bell at the Laundry Pool — Kafei gives the Pendant of Memories"),
+    W(3, 12, 13, "Be in the Curiosity Shop back room by 1:00 PM — Keaton Mask")
+  ],
+  m8: [W(3, 18, 30, "Give the Special Delivery to Mama to the Postman")],
+  m9: [
+    W(1, 23.5, 23.75, "Meet Anju in the Inn kitchen at 11:30 PM"),
+    W(2, 13, 18, "Get the Pendant from Kafei at the Laundry Pool"),
+    W(2, 13, 20, "Give Anju the Pendant of Memories"),
+    W(3, 12, 13, "Curiosity Shop back room by 1:00 PM"),
+    W(3, 17, 20, "Meet Kafei at Sakon's Hideout in Ikana Canyon (evening)"),
+    W(3, 27, 30, "Wait in Anju's room at the Stock Pot Inn for Kafei (before dawn)")
+  ],
+  m10: [W(1, 22, 30, "Milk Bar sound check with Toto"), W(2, 22, 30, "Milk Bar sound check with Toto")],
+  m11: [W(1, 24, 30, "Kamaro dances in north Termina Field"), W(2, 24, 30, "Kamaro dances in north Termina Field"), W(3, 24, 30, "Kamaro dances in north Termina Field")],
+  m12: [W(1, 6, 18, "Grog's Cucco Shack (daytime)"), W(2, 6, 18, "Grog's Cucco Shack (daytime)"), W(3, 6, 18, "Grog's Cucco Shack (daytime)")],
+  m13: [
+    W(1, 6, 18, "Romani's balloon archery practice (Epona's Song)"),
+    W(1, 26, 29.25, "Defend the barn from Them, 2:00–5:15 AM"),
+    W(2, 17.5, 18, "Meet Cremia — the milk wagon leaves at 6:00 PM")
+  ],
+  m14: [W(1, 6, 18, "Gorman Track race"), W(2, 6, 18, "Gorman Track race"), W(3, 6, 18, "Gorman Track race")],
+  hp3: [W(1, 6, 18, "Deku Scrub Playground — Day 1 win"), W(2, 6, 18, "Deku Scrub Playground — Day 2 win"), W(3, 6, 18, "Deku Scrub Playground — Day 3 win")],
+  hp6: [W(1, 18, 30, "Dance for the Rosa Sisters"), W(2, 18, 30, "Dance for the Rosa Sisters")],
+  hp7: [W(1, 15, 24, "Postman's counting game"), W(2, 17, 24, "Postman's counting game")],
+  hp10: [W(1, 6, 18, "Honey & Darling — Bombchu game"), W(2, 6, 18, "Honey & Darling — Basket Bomb game"), W(3, 6, 18, "Honey & Darling — Target game")],
+  hp12: [W(1, 10, 20, "Mayor's meeting (Couple's Mask)"), W(2, 10, 20, "Mayor's meeting (Couple's Mask)")],
+  hp13: [W(1, 24, 30, "Hand in the Stock Pot Inn toilet"), W(2, 24, 30, "Hand in the Stock Pot Inn toilet"), W(3, 24, 30, "Hand in the Stock Pot Inn toilet")],
+  hp14: [W(1, 6, 18, "Grandma's story: Carnival of Time"), W(2, 6, 18, "Grandma's story: Carnival of Time")],
+  hp15: [W(1, 6, 18, "Grandma's story: The Four Giants"), W(2, 6, 18, "Grandma's story: The Four Giants")],
+  hp45: [W(2, 18, 30, "Night 2 grave beneath Ikana Graveyard")],
+  hp53: [W(3, 18, 30, "Night 3 grave beneath Ikana Graveyard (Dampé)")],
+  hp49: [W(3, 24, 30, "On the Moon (Oath to Order after midnight)")],
+  hp50: [W(3, 24, 30, "On the Moon (Oath to Order after midnight)")],
+  hp51: [W(3, 24, 30, "On the Moon (Oath to Order after midnight)")],
+  hp52: [W(3, 24, 30, "On the Moon (Oath to Order after midnight)")],
+  m24: [W(3, 24, 30, "On the Moon (Oath to Order after midnight)")],
+  b2: [W(1, 26, 29.25, "Defend the barn from Them, 2:00–5:15 AM")],
+  b6: [W(3, 18, 30, "Give Madame Aroma the letter yourself at the Milk Bar")],
+  b7: [W(2, 8, 12, "Talk to Gorman upstairs in the Stock Pot Inn"), W(2, 12, 18, "Get Mysterious Milk from the Gorman Brothers, rush it back in 2 min")]
+};
+
+// Items that only work if every timed step happens in ONE 3-day cycle
+const SAME_CYCLE = new Set(["m6", "m7", "m9", "m13", "hp3", "hp10", "b7"]);
+
+// Non-gear dependencies (item must be done first)
+const EXTRA_NEEDS = { hp17: ["hp1"] };
+
+// Where each piece of gear comes from: text + checklist items that give it
+const GEAR_SOURCE = {
+  g_ocarina: { text: "Taken back from Skull Kid on Night 3 of the first cycle", items: ["m1"] },
+  g_sot: { text: "Learned in the prologue", items: ["m1"] },
+  g_soh: { text: "Happy Mask Salesman, end of the prologue", items: ["m1"] },
+  g_epona: { text: "Romani at Romani Ranch, Day 1 (balloon archery)", items: ["m13"] },
+  g_sonata: { text: "Caged Monkey in Deku Palace", items: ["hc1"] },
+  g_lullaby: { text: "Goron Elder and his son, Goron Village", items: ["hc2"] },
+  g_bossa: { text: "Zora Eggs hatched in the Marine Research Lab", items: ["hc3"] },
+  g_elegy: { text: "Defeat Igos du Ikana in Ikana Castle", items: ["hc4"] },
+  g_storms: { text: "Flat, beneath Ikana Graveyard on Night 1", items: ["m22"] },
+  g_oath: { text: "Taught by the Giant after defeating Odolwa", items: ["hc1"] },
+  g_scarecrow: { text: "Teach Pierre a song in the Trading Post or Astral Observatory", items: ["hp33"] },
+  g_sword: { text: "You start with the Kokiri Sword" },
+  g_magic: { text: "Clock Town Great Fairy (prologue, as Deku Link)", items: ["m1"] },
+  g_bow: { text: "Woodfall Temple", items: ["hc1"] },
+  g_fire_arrows: { text: "Snowhead Temple", items: ["hc2"] },
+  g_ice_arrows: { text: "Great Bay Temple", items: ["hc3"] },
+  g_light_arrows: { text: "Stone Tower Temple", items: ["hc4"] },
+  g_bombs: { text: "Buy a Bomb Bag at the Bomb Shop in West Clock Town" },
+  g_powder_keg: { text: "Goron in Goron Village — pass his Powder Keg test as Goron Link" },
+  g_deku_sticks: { text: "Dropped by Mad Scrubs and Deku Babas, or bought in shops" },
+  g_magic_beans: { text: "Bean Seller in Deku Palace's Bean Grotto" },
+  g_lens: { text: "Lens Cave in Goron Village", items: ["m17"] },
+  g_hookshot: { text: "Inside the Pirates' Fortress (enter as Zora Link)" },
+  g_mirror_shield: { text: "Beneath the Well in Ikana Canyon (needs the Gibdo Mask)", items: ["m22"] },
+  g_bottle: { text: "See the Bottles category", items: ["b1", "b2", "b3", "b4", "b5", "b6", "b7"] },
+  g_pictograph: { text: "Swamp Tourist Center, after you help Koume", items: ["b1"] },
+  g_wallet: { text: "Bank in West Clock Town: deposit 200 Rupees", items: ["hp8"] },
+  g_giant_wallet: { text: "Oceanside Spider House: all 30 Gold Skulltulas", items: ["m6"] },
+  g_remains: { text: "Defeat all four temple bosses", items: ["hc1", "hc2", "hc3", "hc4"] },
+  g_moons_tear: { text: "Astral Observatory telescope", items: ["hp1"] },
+  g_land_deed: { text: "Trade the Moon's Tear to the South Clock Town Business Scrub", items: ["hp1"] },
+  g_swamp_deed: { text: "Trade the Land Title Deed at the Swamp Tourist Center", items: ["hp24"] },
+  g_mountain_deed: { text: "Trade the Swamp Title Deed in Goron Village", items: ["hp32"] },
+  g_ocean_deed: { text: "Trade the Mountain Title Deed in Zora Hall", items: ["hp42"] },
+  g_letter_kafei: { text: "Anju, Stock Pot Inn kitchen, 11:30 PM Night 1", items: ["m7"] },
+  g_pendant: { text: "Kafei, Laundry Pool, Day 2", items: ["m7"] },
+  g_express_mail: { text: "Curiosity Shop back room, Day 3", items: ["m7"] }
+};
+
+function gearSourceItems(gearId) {
+  if (GEAR_TO_MASK[gearId]) return [GEAR_TO_MASK[gearId]];
+  return (GEAR_SOURCE[gearId] && GEAR_SOURCE[gearId].items) || [];
+}
+function gearSourceText(gearId) {
+  if (GEAR_TO_MASK[gearId]) {
+    const m = ITEMS.find(i => i.id === GEAR_TO_MASK[gearId]);
+    return m ? `Get it from the checklist entry: ${m.title}` : "";
+  }
+  return (GEAR_SOURCE[gearId] && GEAR_SOURCE[gearId].text) || "";
+}
+
+const ITEM_BY_ID = Object.fromEntries(ITEMS.map(i => [i.id, i]));
+
+// Starting/prologue gear everyone has early — not worth linking from every item
+const BASIC_GEAR = new Set(["g_ocarina", "g_sot", "g_soh", "g_magic", "g_sword"]);
+const expandedUnlocks = new Set();
+function toggleUnlocks(id) { if (expandedUnlocks.has(id)) expandedUnlocks.delete(id); else expandedUnlocks.add(id); render(); }
+
+// "Needs first": checklist items that give a required single piece of gear, plus explicit needs
+function needsFirst(item) {
+  const ids = new Set(EXTRA_NEEDS[item.id] || []);
+  for (const r of item.requiresGear || []) {
+    if (Array.isArray(r) || BASIC_GEAR.has(r)) continue;
+    for (const src of gearSourceItems(r)) ids.add(src);
+  }
+  ids.delete(item.id);
+  return [...ids].filter(id => ITEM_BY_ID[id]);
+}
+const UNLOCKS = {};
+for (const item of ITEMS) {
+  for (const dep of needsFirst(item)) {
+    (UNLOCKS[dep] = UNLOCKS[dep] || []).push(item.id);
+  }
+}
+
+// ==================== STATE ====================
+const STORAGE_KEY = "mm3d_checklist_v4";
+const SUB_STORAGE_KEY = "mm3d_substeps_v3";      // v3 = steps keyed by text hash
+const OLD_SUB_STORAGE_KEY = "mm3d_substeps_v2";  // v2 = steps keyed by position
+const OPEN_STORAGE_KEY = "mm3d_open_steps_v1";
+const GEAR_STORAGE_KEY = "mm3d_owned_gear_v1";
+const INV_OPEN_KEY = "mm3d_inv_open_v1";
+const HIDE_DONE_KEY = "mm3d_hide_completed_v1";
+const NOTES_KEY = "mm3d_notes_v1";
+const FAIRY_KEY = "mm3d_fairy_counts_v1";
+const UI_KEY = "mm3d_ui_v1";
+
+function loadSet(key) {
+  try { return new Set(JSON.parse(localStorage.getItem(key) || "[]")); } catch (e) { return new Set(); }
+}
+function loadObj(key, fallback) {
+  try { const v = JSON.parse(localStorage.getItem(key) || "null"); return v && typeof v === "object" ? v : fallback; } catch (e) { return fallback; }
+}
+
+// Sub-steps are keyed by a hash of their text, so adding or reordering steps
+// in the data doesn't move saved checkmarks onto the wrong step.
+function hashText(t) {
+  let h = 5381;
+  for (let i = 0; i < t.length; i++) h = ((h * 33) ^ t.charCodeAt(i)) >>> 0;
+  return h.toString(36);
+}
+function stepKey(item, idx) { return `${item.id}~${hashText(item.steps[idx])}`; }
+// Convert old position-based keys ("hp1_s2") to text-based keys
+function migrateStepKeys(keys) {
+  const out = new Set();
+  for (const k of keys) {
+    if (typeof k !== "string") continue;
+    const m = /^(.+)_s(\d+)$/.exec(k);
+    if (m) {
+      const item = ITEMS.find(i => i.id === m[1]);
+      const idx = Number(m[2]);
+      if (item && item.steps && idx < item.steps.length) out.add(stepKey(item, idx));
+    } else out.add(k);
+  }
+  return out;
+}
+
+let checkedSet = loadSet(STORAGE_KEY);
+let subCheckedSet = localStorage.getItem(SUB_STORAGE_KEY) !== null
+  ? loadSet(SUB_STORAGE_KEY)
+  : migrateStepKeys(loadSet(OLD_SUB_STORAGE_KEY));
+let openStepsSet = loadSet(OPEN_STORAGE_KEY);
+let ownedGearSet = loadSet(GEAR_STORAGE_KEY);
+let notes = loadObj(NOTES_KEY, {});
+let fairyCounts = loadObj(FAIRY_KEY, {});
+let ui = loadObj(UI_KEY, {});
+let invOpen = true;
+try { invOpen = JSON.parse(localStorage.getItem(INV_OPEN_KEY) ?? "true"); } catch (e) {}
+let hideCompleted = true; // default on
+try { hideCompleted = JSON.parse(localStorage.getItem(HIDE_DONE_KEY) ?? "true"); } catch (e) {}
+
+const notesOpen = new Set();
+let forceShowId = null;
+let jumpFilterSig = null;
+
+// Rebuild every piece of state from known-good values only. Used on load AND on import,
+// so a hand-edited or malicious save file can't inject HTML/script into the page.
+const VALID_VIEWS = new Set(["checklist", "planner", "now"]);
+const VALID_SORTS = new Set(["default", "closest"]);
+function cleanUi(raw) {
+  const r = raw && typeof raw === "object" ? raw : {};
+  const day = Number(r.nowDay), hour = Number(r.nowHour);
+  return {
+    view: VALID_VIEWS.has(r.view) ? r.view : "checklist",
+    sort: VALID_SORTS.has(r.sort) ? r.sort : "default",
+    nowDay: [1, 2, 3].includes(day) ? day : 1,
+    nowHour: Number.isFinite(hour) && hour >= 6 && hour < 30 && hour * 2 === Math.floor(hour * 2) ? hour : 6,
+    nowAnytime: r.nowAnytime === true
+  };
+}
+function cleanStringSet(set, isValid) { return new Set([...set].filter(x => typeof x === "string" && isValid(x))); }
+
+function sanitizeState() {
+  const validItems = new Set(ITEMS.map(i => i.id));
+  const validSteps = new Set(ITEMS.flatMap(i => (i.steps || []).map((_, idx) => stepKey(i, idx))));
+  checkedSet = cleanStringSet(checkedSet, id => validItems.has(id));
+  ownedGearSet = cleanStringSet(ownedGearSet, id => Boolean(GEAR_BY_ID[id]));
+  openStepsSet = cleanStringSet(openStepsSet, id => validItems.has(id));
+  subCheckedSet = cleanStringSet(subCheckedSet, k => validSteps.has(k));
+  const cleanNotes = {};
+  for (const [id, v] of Object.entries(notes && typeof notes === "object" ? notes : {})) {
+    if (validItems.has(id) && typeof v === "string" && v.trim()) cleanNotes[id] = v.slice(0, 5000);
+  }
+  notes = cleanNotes;
+  const cleanFairies = {};
+  for (const item of ITEMS) {
+    if (item.type !== "fairy") continue;
+    const n = Math.floor(Number(fairyCounts && fairyCounts[item.id]));
+    if (Number.isFinite(n) && n > 0) cleanFairies[item.id] = Math.min(15, n);
+  }
+  fairyCounts = cleanFairies;
+  ui = cleanUi(ui);
+  hideCompleted = hideCompleted !== false;
+  invOpen = invOpen !== false;
+  // Masks sync both ways between checklist and gear
+  for (const id of checkedSet) if (MASK_TO_GEAR[id]) ownedGearSet.add(MASK_TO_GEAR[id]);
+  for (const id of ownedGearSet) if (GEAR_TO_MASK[id]) checkedSet.add(GEAR_TO_MASK[id]);
+}
+sanitizeState();
+
+function save() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([...checkedSet]));
+    localStorage.setItem(SUB_STORAGE_KEY, JSON.stringify([...subCheckedSet]));
+    localStorage.setItem(OPEN_STORAGE_KEY, JSON.stringify([...openStepsSet]));
+    localStorage.setItem(GEAR_STORAGE_KEY, JSON.stringify([...ownedGearSet]));
+    localStorage.setItem(INV_OPEN_KEY, JSON.stringify(invOpen));
+    localStorage.setItem(HIDE_DONE_KEY, JSON.stringify(hideCompleted));
+    localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
+    localStorage.setItem(FAIRY_KEY, JSON.stringify(fairyCounts));
+    localStorage.setItem(UI_KEY, JSON.stringify(ui));
+  } catch (e) {}
+}
+
+// ==================== HELPERS ====================
+function reqOwned(r) { return Array.isArray(r) ? r.some(id => ownedGearSet.has(id)) : ownedGearSet.has(r); }
+function gearName(id) { return GEAR_BY_ID[id] ? GEAR_BY_ID[id].label : id; }
+function reqLabel(r) { return Array.isArray(r) ? r.map(gearName).join(" or ") : gearName(r); }
+function hasAllRequiredGear(item) { return (item.requiresGear || []).every(reqOwned); }
+function missingCount(item) { return (item.requiresGear || []).filter(r => !reqOwned(r)).length; }
+function escAttr(s) { return String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;"); }
+function escHtml(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+function fmtHour(h) {
+  const total = Math.round(h * 60);
+  let hr = Math.floor(total / 60) % 24;
+  const min = total % 60;
+  const ampm = hr >= 12 ? "PM" : "AM";
+  const h12 = hr % 12 === 0 ? 12 : hr % 12;
+  return `${h12}:${String(min).padStart(2, "0")} ${ampm}`;
+}
+function periodName(d, h) { return h >= 6 && h < 18 ? `Day ${d}` : `Night ${d}`; }
+function fmtWindow(w) { return `${periodName(w.d, w.s)} · ${fmtHour(w.s)}–${fmtHour(w.e)}`; }
+
+function stepProgress(item) {
+  const steps = item.steps || [];
+  if (!steps.length) return 0;
+  return steps.filter((_, idx) => subCheckedSet.has(stepKey(item, idx))).length / steps.length;
+}
+// Ready items first, then most sub-steps done, then fewest missing; ties keep game order
+const ORDER = Object.fromEntries(ITEMS.map((i, n) => [i.id, n]));
+function compareClosest(a, b) {
+  const ma = missingCount(a), mb = missingCount(b);
+  if ((ma === 0) !== (mb === 0)) return ma === 0 ? -1 : 1;
+  const pa = stepProgress(a), pb = stepProgress(b);
+  if (pa !== pb) return pb - pa;
+  if (ma !== mb) return ma - mb;
+  return ORDER[a.id] - ORDER[b.id];
+}
+function sortItems(list) { return ui.sort === "closest" ? [...list].sort(compareClosest) : list; }
+
+// ==================== ACTIONS ====================
+function markItemChecked(id, checked) {
+  if (checked) checkedSet.add(id); else checkedSet.delete(id);
+  const gearId = MASK_TO_GEAR[id];
+  if (gearId) { if (checked) ownedGearSet.add(gearId); else ownedGearSet.delete(gearId); }
+}
+
+function toggleGear(gearId) {
+  const nowOwned = !ownedGearSet.has(gearId);
+  if (nowOwned) ownedGearSet.add(gearId); else ownedGearSet.delete(gearId);
+  const maskId = GEAR_TO_MASK[gearId];
+  if (maskId) { if (nowOwned) checkedSet.add(maskId); else checkedSet.delete(maskId); }
+  save(); render();
+}
+
+function setAllGear(checked) {
+  if (!checked && !confirm("Clear all gear? This also un-completes every mask in the checklist, because masks are synced with the gear list.")) return;
+  if (checked) GEAR_ITEMS.forEach(g => ownedGearSet.add(g.id)); else ownedGearSet.clear();
+  for (const maskId of Object.values(GEAR_TO_MASK)) { if (checked) checkedSet.add(maskId); else checkedSet.delete(maskId); }
+  save(); render();
+}
+
+function toggleInventoryPanel() { invOpen = !invOpen; save(); renderInventory(); }
+
+function toggleItem(id) {
+  const nowChecked = !checkedSet.has(id);
+  markItemChecked(id, nowChecked);
+  save(); render();
+  if (nowChecked && hideCompleted && ui.view === "checklist") showUndoToast(id);
+}
+
+let toastTimer = null;
+function showUndoToast(id) {
+  const t = document.getElementById("toast");
+  if (!t) return;
+  t.innerHTML = `Marked <strong>${ITEM_BY_ID[id].title}</strong> complete (hidden). <button type="button" onclick="undoComplete('${id}')">Undo</button>`;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 6000);
+}
+function undoComplete(id) {
+  markItemChecked(id, false);
+  document.getElementById("toast").classList.remove("show");
+  save(); render();
+}
+
+function toggleSubStep(subId, parentId) {
+  const nowDone = !subCheckedSet.has(subId);
+  if (nowDone) subCheckedSet.add(subId); else subCheckedSet.delete(subId);
+  const parent = ITEM_BY_ID[parentId];
+  if (parent && parent.steps && parent.steps.length) {
+    const allDone = parent.steps.every((_, idx) => subCheckedSet.has(stepKey(parent, idx)));
+    if (allDone) markItemChecked(parentId, true);
+    // Unticking a step means the item isn't finished any more
+    else if (!nowDone && checkedSet.has(parentId)) markItemChecked(parentId, false);
+  }
+  save(); render();
+}
+
+function toggleStepsPanel(id) { if (openStepsSet.has(id)) openStepsSet.delete(id); else openStepsSet.add(id); save(); render(); }
+function toggleAllSteps(expand) { if (expand) ITEMS.forEach(i => openStepsSet.add(i.id)); else openStepsSet.clear(); save(); render(); }
+
+function toggleNotes(id) { if (notesOpen.has(id)) notesOpen.delete(id); else notesOpen.add(id); render(); }
+function setNote(id, value) {
+  if (value.trim()) notes[id] = value; else delete notes[id];
+  save(); // no full re-render, so typing isn't interrupted
+  const badge = document.getElementById(`note-tag-${id}`);
+  if (badge) badge.style.display = notes[id] ? "" : "none";
+}
+
+function changeFairy(id, delta) {
+  const v = Math.max(0, Math.min(15, (fairyCounts[id] || 0) + delta));
+  fairyCounts[id] = v;
+  save(); render();
+}
+
+function onHideCompletedChange() { hideCompleted = document.getElementById("hide-completed-filter").checked; forceShowId = null; save(); render(); }
+function onSortChange() { ui.sort = document.getElementById("sort-mode").value; save(); render(); }
+function setView(v) { ui.view = v; forceShowId = null; save(); render(); }
+function onNowChange() {
+  ui.nowDay = Number(document.getElementById("now-day").value);
+  ui.nowHour = Number(document.getElementById("now-hour").value);
+  ui.nowAnytime = document.getElementById("now-anytime").checked;
+  save(); render();
+}
+
+function jumpTo(id) {
+  if (!ITEM_BY_ID[id]) return;
+  ui.view = "checklist";
+  forceShowId = id;
+  jumpFilterSig = JSON.stringify(readFilters());
+  save(); render();
+  const el = document.getElementById(`item-${id}`);
+  if (el && el.scrollIntoView) {
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
+  }
+}
+
+function resetProgress() {
+  if (confirm("Reset all checked masks, heart pieces, bottles, fairies, collected gear, and sub-steps? (Notes are kept.)")) {
+    checkedSet.clear(); subCheckedSet.clear(); ownedGearSet.clear(); fairyCounts = {};
+    save(); render();
+  }
+}
+
+// ==================== EXPORT / IMPORT ====================
+function buildExport() {
+  return {
+    app: "mm3d-tracker", version: 3, exportedAt: new Date().toISOString(),
+    checked: [...checkedSet], substeps: [...subCheckedSet], openSteps: [...openStepsSet],
+    gear: [...ownedGearSet], notes, fairyCounts, hideCompleted, invOpen, ui
+  };
+}
+function exportProgress() {
+  const blob = new Blob([JSON.stringify(buildExport(), null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `mm3d-progress-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+function applyImport(data) {
+  if (!data || data.app !== "mm3d-tracker") throw new Error("This file isn't a Majora's Mask tracker save.");
+  const arr = v => (Array.isArray(v) ? v : []);
+  checkedSet = new Set(arr(data.checked));
+  subCheckedSet = migrateStepKeys(arr(data.substeps)); // also converts version-2 exports
+  openStepsSet = new Set(arr(data.openSteps));
+  ownedGearSet = new Set(arr(data.gear));
+  notes = data.notes;
+  fairyCounts = data.fairyCounts;
+  if (typeof data.hideCompleted === "boolean") hideCompleted = data.hideCompleted;
+  if (typeof data.invOpen === "boolean") invOpen = data.invOpen;
+  ui = data.ui; // validated field by field in sanitizeState()
+  sanitizeState(); save(); render();
+}
+function importProgress(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (confirm("Replace your current progress with the imported file?")) applyImport(data);
+    } catch (e) { alert("Couldn't import: " + e.message); }
+    input.value = "";
+  };
+  reader.onerror = () => { alert("Couldn't read that file."); input.value = ""; };
+  reader.readAsText(file);
+}
+
+// ==================== RENDERING ====================
+function renderInventory() {
+  const panel = document.getElementById("inventory-panel");
+  const container = document.getElementById("inventory-grid-container");
+  const summary = document.getElementById("owned-summary");
+  panel.style.display = invOpen ? "block" : "none";
+  summary.textContent = `${ownedGearSet.size} / ${GEAR_ITEMS.length} on hand`;
+
+  const groups = {};
+  for (const g of GEAR_ITEMS) (groups[g.group] = groups[g.group] || []).push(g);
+
+  let html = "";
+  for (const [groupName, list] of Object.entries(groups)) {
+    html += `<div class="inv-group-title">${groupName}</div><div class="inv-grid">`;
+    for (const g of list) {
+      const isOwned = ownedGearSet.has(g.id);
+      const src = gearSourceText(g.id);
+      html += `
+        <label class="inv-item ${isOwned ? "owned" : ""}" title="${escAttr(src)}">
+          <input type="checkbox" ${isOwned ? "checked" : ""} onchange="toggleGear('${g.id}')" />
+          <span>${g.label}</span>
+        </label>`;
+    }
+    html += `</div>`;
+  }
+  container.innerHTML = html;
+}
+
+function updateStats() {
+  let hp = 0, hc = 0, masks = 0, bottles = 0, fairies = 0, totalSteps = 0, doneSteps = 0;
+  for (const item of ITEMS) {
+    if (checkedSet.has(item.id)) {
+      if (item.type === "heart") hp++;
+      else if (item.type === "container") hc++;
+      else if (item.type === "mask") masks++;
+      else if (item.type === "bottle") bottles++;
+      else if (item.type === "fairy") fairies++;
+    }
+    (item.steps || []).forEach((_, idx) => { totalSteps++; if (subCheckedSet.has(stepKey(item, idx))) doneSteps++; });
+  }
+  const totalHearts = 3 + hc + Math.floor(hp / 4);
+  const remainder = hp % 4;
+  const set = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
+  set("heart-meter", `${totalHearts}${remainder ? ` (+${remainder}/4)` : ""} / 20 Hearts`);
+  set("hp-count", `${hp} / 52`);
+  set("hc-count", `${hc} / 4`);
+  set("mask-count", `${masks} / 24`);
+  set("bottle-count", `${bottles} / 7`);
+  set("fairy-count", `${fairies} / 4`);
+  set("gear-count", `${ownedGearSet.size} / ${GEAR_ITEMS.length}`);
+  set("step-count", `${doneSteps} / ${totalSteps}`);
+}
+
+function itemLink(id) {
+  const it = ITEM_BY_ID[id];
+  if (!it) return "";
+  return `<span class="link-chip ${checkedSet.has(id) ? "done" : ""}" role="button" tabindex="0" onclick="jumpTo('${id}')">${it.title}</span>`;
+}
+
+function renderCard(item, opts = {}) {
+  const isChecked = checkedSet.has(item.id);
+  const isOpen = openStepsSet.has(item.id) || Boolean(opts.query);
+  const missing = missingCount(item);
+  const tagLabel = { mask: "Mask", container: "Heart Container", heart: "Piece of Heart", bottle: "Bottle", fairy: "Great Fairy" }[item.type];
+  const steps = item.steps || [];
+  const doneCount = steps.filter((_, idx) => subCheckedSet.has(stepKey(item, idx))).length;
+
+  const gearChips = (item.requiresGear || []).map(r => {
+    const own = reqOwned(r);
+    const ids = Array.isArray(r) ? r : [r];
+    const srcItem = ids.map(gearSourceItems).flat()[0];
+    const tip = ids.map(id => `${gearName(id)}: ${gearSourceText(id)}`).join(" | ");
+    const click = !own && srcItem ? ` clickable" role="button" tabindex="0" onclick="jumpTo('${srcItem}')` : "";
+    return `<span class="gear-chip ${own ? "have" : "need"}${click}" title="${escAttr(tip)}">${own ? "✓" : "✗"} ${reqLabel(r)}</span>`;
+  }).join("");
+
+  const needs = needsFirst(item);
+  const unlocks = UNLOCKS[item.id] || [];
+  const sched = SCHEDULES[item.id] || [];
+  const nowBadge = opts.nowWindows && opts.nowWindows.length
+    ? opts.nowWindows.map(w => `<span class="tag now">Now: ${w.l} (until ${fmtHour(w.e)})</span>`).join("") : "";
+
+  let subHtml = "";
+  if (steps.length) {
+    subHtml = `<div class="sub-checklist ${isOpen ? "open" : ""}">`;
+    steps.forEach((stepText, idx) => {
+      const subId = stepKey(item, idx);
+      const subDone = subCheckedSet.has(subId);
+      subHtml += `
+        <label class="sub-item ${subDone ? "done" : ""}" onclick="event.stopPropagation()">
+          <input type="checkbox" class="sub-check" ${subDone ? "checked" : ""} onchange="toggleSubStep('${subId}', '${item.id}')" />
+          <span class="step-num">${idx + 1}.</span>
+          <span class="step-text">${stepText}</span>
+        </label>`;
+    });
+    subHtml += `</div>`;
+  }
+
+  const fairyCounter = item.type === "fairy" ? `
+    <span class="counter">Stray Fairies:
+      <button type="button" onclick="changeFairy('${item.id}', -1)">−</button>
+      <span>${fairyCounts[item.id] || 0} / 15</span>
+      <button type="button" onclick="changeFairy('${item.id}', 1)">+</button>
+    </span>` : "";
+
+  const hasNote = Boolean(notes[item.id]);
+  const notesHtml = notesOpen.has(item.id)
+    ? `<textarea class="notes-box" placeholder="Your notes for this item (saved automatically)..." oninput="setNote('${item.id}', this.value)">${escHtml(notes[item.id] || "")}</textarea>` : "";
+
+  return `
+    <div class="item ${isChecked ? "checked" : ""}" id="item-${item.id}">
+      <input type="checkbox" class="main-check" ${isChecked ? "checked" : ""} onchange="toggleItem('${item.id}')" />
+      <div class="item-body">
+        <div class="item-header">
+          <span class="item-title" role="button" tabindex="0" title="Show or hide steps" onclick="toggleStepsPanel('${item.id}')">${item.title}</span>
+          <span class="tag ${item.type}">${tagLabel}</span>
+          <span class="tag day">${item.day}</span>
+          <span class="tag tod">${item.tod}</span>
+          ${missing === 0 ? `<span class="tag ready">Have Gear</span>` : `<span class="tag missing">Missing ${missing}</span>`}
+          ${SAME_CYCLE.has(item.id) ? `<span class="tag cycle">One cycle</span>` : ""}
+<span class="tag note" id="note-tag-${item.id}" style="${hasNote ? "" : "display:none"}">📝 Note</span>
+          ${nowBadge}
+        </div>
+        <div class="item-desc">${item.desc}</div>
+        <div class="req-block">
+          ${gearChips ? `<div class="req-row"><span class="req-label">Required</span>${gearChips}</div>` : ""}
+          ${item.req ? `<div class="req-row"><span class="req-label">Conditions</span><span class="cond-text">${item.req}</span></div>` : ""}
+          ${sched.length ? `<div class="req-row"><span class="req-label">When</span>${sched.map(w => `<span class="when-chip" title="${escAttr(w.l)}">${fmtWindow(w)}</span>`).join("")}</div>` : ""}
+          ${needs.length ? `<div class="req-row"><span class="req-label">Needs first</span>${needs.map(itemLink).join("")}</div>` : ""}
+          ${unlocks.length ? `<div class="req-row"><span class="req-label">Unlocks</span>${(expandedUnlocks.has(item.id) ? unlocks : unlocks.slice(0, 6)).map(itemLink).join("")}${unlocks.length > 6 ? `<span class="link-chip" role="button" tabindex="0" onclick="toggleUnlocks('${item.id}')">${expandedUnlocks.has(item.id) ? "Show less" : `+${unlocks.length - 6} more`}</span>` : ""}</div>` : ""}
+        </div>
+        <div class="item-meta">
+          <a href="${item.guide}" target="_blank" rel="noopener noreferrer">Guide Link ↗</a>
+          ${steps.length ? `<button type="button" class="toggle-steps-btn" onclick="toggleStepsPanel('${item.id}')">${isOpen ? "Hide Steps" : "Steps"} (${doneCount}/${steps.length})</button>` : ""}
+          <button type="button" class="toggle-steps-btn" onclick="toggleNotes('${item.id}')">${notesOpen.has(item.id) ? "Close Notes" : hasNote ? "Edit Notes" : "Add Notes"}</button>
+          ${fairyCounter}
+        </div>
+        ${notesHtml}
+        ${subHtml}
+      </div>
+    </div>`;
+}
+
+function baseFilter(item, f) {
+  if (item.id === forceShowId) return true;
+  if (f.typeFilter !== "all" && item.type !== f.typeFilter) return false;
+  if (f.regionFilter !== "all" && item.region !== f.regionFilter) return false;
+  if (f.ownedOnly && !hasAllRequiredGear(item)) return false;
+  if (f.query) {
+    const gearText = (item.requiresGear || []).map(reqLabel).join(" ");
+    const hay = `${item.title} ${item.desc} ${item.region} ${item.day} ${item.tod} ${item.req} ${gearText} ${(item.steps || []).join(" ")} ${notes[item.id] || ""}`.toLowerCase();
+    if (!hay.includes(f.query)) return false;
+  }
+  return true;
+}
+
+function readFilters() {
+  return {
+    query: document.getElementById("search").value.trim().toLowerCase(),
+    typeFilter: document.getElementById("type-filter").value,
+    dayFilter: document.getElementById("day-filter").value,
+    todFilter: document.getElementById("tod-filter").value,
+    regionFilter: document.getElementById("region-filter").value,
+    statusFilter: document.getElementById("status-filter").value,
+    ownedOnly: document.getElementById("owned-only-filter").checked
+  };
+}
+
+function renderChecklist(f) {
+  const filtered = ITEMS.filter(item => {
+    if (item.id === forceShowId) return true;
+    if (!baseFilter(item, f)) return false;
+    const isChecked = checkedSet.has(item.id);
+    if (f.dayFilter !== "all" && item.day !== f.dayFilter) return false;
+    if (f.todFilter !== "all" && item.tod !== f.todFilter) return false;
+    if (f.statusFilter === "checked" && !isChecked) return false;
+    if (f.statusFilter === "unchecked" && isChecked) return false;
+    if (hideCompleted && isChecked && f.statusFilter !== "checked") return false;
+    return true;
+  });
+
+  if (!filtered.length) {
+    return `<div class="empty-state">No matching items found.${hideCompleted ? " (Completed items are hidden — untick “Hide Completed” to see them.)" : ""}</div>`;
+  }
+
+  const groups = {};
+  for (const item of filtered) (groups[item.region] = groups[item.region] || []).push(item);
+
+  let html = "";
+  for (const [region, list] of Object.entries(groups)) {
+    const regionAll = ITEMS.filter(i => i.region === region && (f.typeFilter === "all" || i.type === f.typeFilter));
+    const doneInRegion = regionAll.filter(i => checkedSet.has(i.id)).length;
+    const pct = regionAll.length ? Math.round((doneInRegion / regionAll.length) * 100) : 0;
+    html += `
+      <div class="section-title">
+        <span>${region === "Ikana Canyon" ? "Ikana" : region}</span>
+        <span class="section-count">${doneInRegion} / ${regionAll.length} collected · ${pct}%</span>
+      </div>
+      <div class="region-progress"><div style="width:${pct}%"></div></div>
+      <div class="checklist">${sortItems(list).map(i => renderCard(i, { query: f.query })).join("")}</div>`;
+  }
+  return html;
+}
+
+function renderPlanner(f) {
+  const events = [];
+  for (const item of ITEMS) {
+    if (checkedSet.has(item.id) || !baseFilter(item, f)) continue;
+    for (const w of SCHEDULES[item.id] || []) events.push({ ...w, item });
+  }
+  if (!events.length) return `<div class="empty-state">No timed events left for the current filters — everything else can be done at any time.</div>`;
+  events.sort((a, b) => a.d - b.d || a.s - b.s || a.e - b.e);
+
+  let html = `<p class="planner-intro">Every timed event you still need, in the order it happens across one 3-day cycle. Items tagged <span class="tag cycle">One cycle</span> fail if you play the Song of Time partway through. Click a title to open it in the checklist.</p>`;
+  let current = "";
+  for (const ev of events) {
+    const period = periodName(ev.d, ev.s);
+    if (period !== current) {
+      current = period;
+      html += `<div class="section-title planner-period"><span>${period} ${period.startsWith("Day") ? "☀️" : "🌙"}</span></div>`;
+    }
+    const missing = missingCount(ev.item);
+    html += `
+      <div class="planner-row">
+        <div class="planner-time">${fmtHour(ev.s)} – ${fmtHour(ev.e)}</div>
+        <div>
+          <div class="planner-title" role="button" tabindex="0" onclick="jumpTo('${ev.item.id}')">${ev.item.title}</div>
+          <div class="planner-label">${ev.l}</div>
+        </div>
+        <div class="planner-tags">
+          ${SAME_CYCLE.has(ev.item.id) ? `<span class="tag cycle">One cycle</span>` : ""}
+          ${missing === 0 ? `<span class="tag ready">Have Gear</span>` : `<span class="tag missing">Missing ${missing}</span>`}
+        </div>
+      </div>`;
+  }
+  return html;
+}
+
+function windowsNow(item, d, h) {
+  return (SCHEDULES[item.id] || []).filter(w => w.d === d && h >= w.s && h < w.e);
+}
+
+function renderNow(f) {
+  const d = ui.nowDay, h = ui.nowHour;
+  const timed = [], anytime = [];
+  for (const item of ITEMS) {
+    if (checkedSet.has(item.id) || !baseFilter(item, f)) continue;
+    const ws = windowsNow(item, d, h);
+    if (ws.length) timed.push({ item, ws });
+    else if (ui.nowAnytime && !SCHEDULES[item.id] && item.day === "Anytime" && hasAllRequiredGear(item)) anytime.push(item);
+  }
+  let html = `<p class="planner-intro">${periodName(d, h)}, ${fmtHour(h)} — what you can do right now.</p>`;
+  if (timed.length) {
+    const sorted = ui.sort === "closest"
+      ? timed.sort((a, b) => compareClosest(a.item, b.item))
+      : timed.sort((a, b) => Math.min(...a.ws.map(w => w.e)) - Math.min(...b.ws.map(w => w.e)));
+    html += `<div class="section-title"><span>Happening now</span><span class="section-count">${timed.length} (${ui.sort === "closest" ? "closest to done first" : "ending soonest first"})</span></div>`;
+    html += `<div class="checklist">${sorted.map(t => renderCard(t.item, { query: f.query, nowWindows: t.ws })).join("")}</div>`;
+  } else {
+    html += `<div class="empty-state">Nothing time-limited is happening at this moment.</div>`;
+  }
+  if (anytime.length) {
+    html += `<div class="section-title"><span>Anytime — you have the gear</span><span class="section-count">${anytime.length}</span></div>`;
+    html += `<div class="checklist">${sortItems(anytime).map(i => renderCard(i, { query: f.query })).join("")}</div>`;
+  }
+  return html;
+}
+
+function syncControls() {
+  document.querySelectorAll("#view-tabs button").forEach(b => b.classList.toggle("active", b.dataset.view === ui.view));
+  document.getElementById("now-controls").classList.toggle("show", ui.view === "now");
+  document.getElementById("hide-completed-filter").checked = hideCompleted;
+  document.getElementById("sort-mode").value = ui.sort;
+  document.getElementById("now-day").value = String(ui.nowDay);
+  document.getElementById("now-hour").value = String(ui.nowHour);
+  document.getElementById("now-anytime").checked = ui.nowAnytime;
+  // Day/time/status filters only apply to the checklist view
+  ["day-filter", "tod-filter", "status-filter"].forEach(id => { document.getElementById(id).disabled = ui.view !== "checklist"; });
+}
+
+function render() {
+  // A jumped-to item stays visible only until the user changes a filter or search
+  if (forceShowId && JSON.stringify(readFilters()) !== jumpFilterSig) forceShowId = null;
+  const scrollY = window.scrollY;
+  renderInventory();
+  updateStats();
+  syncControls();
+  const f = readFilters();
+  const app = document.getElementById("app");
+  if (ui.view === "planner") app.innerHTML = renderPlanner(f);
+  else if (ui.view === "now") app.innerHTML = renderNow(f);
+  else app.innerHTML = renderChecklist(f);
+  if (window.scrollY !== scrollY) window.scrollTo(0, scrollY); // keep your place after clicks
+}
+
+// Keyboard support: Enter/Space activates anything marked role="button"
+document.addEventListener("keydown", e => {
+  const el = e.target;
+  if ((e.key === "Enter" || e.key === " ") && el && el.getAttribute && el.getAttribute("role") === "button") {
+    e.preventDefault();
+    el.click();
+  }
+});
+
+// Build the half-hour options for the Right Now clock (6:00 AM → 5:30 AM next morning)
+(function buildHourOptions() {
+  const sel = document.getElementById("now-hour");
+  let html = "";
+  for (let h = 6; h < 30; h += 0.5) html += `<option value="${h}">${fmtHour(h)}</option>`;
+  sel.innerHTML = html;
+})();
+
+render();
+
+</script>
+</body>
+</html>
