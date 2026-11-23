@@ -314,7 +314,6 @@
       <div class="stat-card"><div class="stat-label">Bottles</div><div class="stat-value gear" id="bottle-count">0 / 7</div></div>
       <div class="stat-card"><div class="stat-label">Great Fairy Rewards</div><div class="stat-value masks" id="fairy-count">0 / 4</div></div>
       <div class="stat-card"><div class="stat-label">Collected Gear</div><div class="stat-value gear" id="gear-count">0 / 0</div></div>
-      <div class="stat-card"><div class="stat-label">Sub-Steps Done</div><div class="stat-value steps" id="step-count">0 / 0</div></div>
     </div>
 
     <div class="view-tabs" id="view-tabs">
@@ -523,7 +522,7 @@ const ITEMS = [
     steps: [
       "As Deku Link, find the Clock Town Stray Fairy: by day it floats in the Laundry Pool (South Clock Town, down the stairs on the east side); by night it hovers over crates in East Clock Town (reach it with the nearby Deku Flower).",
       "Take the fairy to the Great Fairy Fountain in North Clock Town — she gives you magic, which powers Deku Bubbles.",
-      "In North Clock Town, talk to Jim (the Bombers' leader) and win hide-and-seek by catching all 5 Bombers around town before the timer ends. He tells you the secret code.",
+      "In North Clock Town, talk to Jim (the Bombers' leader) and win hide-and-seek by catching all 5 Bombers around town before the timer ends (you must finish before the morning of Day 2). He tells you the secret code.",
       "In East Clock Town, tell the code to the Bomber guarding the hideout tunnel, crawl through (pop the balloon in your way with a Deku Bubble), and come out in the Astral Observatory.",
       "Look through the telescope at the moon — watch the Moon's Tear fall, then go out the back door and pick it up in Termina Field.",
       "Back in South Clock Town, give the Moon's Tear to the Business Scrub next to the Clock Tower to get the Land Title Deed (keep it — it starts a heart piece trading chain).",
@@ -611,11 +610,11 @@ const ITEMS = [
     guide: GUIDE_LINKS.masks,
     desc: "Kafei is hiding in the back room of the Curiosity Shop, reached from the Laundry Pool. If you deliver Anju's letter to him, then come to the back room on the afternoon of the Final Day, Kafei leaves to chase Sakon. The Curiosity Shop owner then gives you the Keaton Mask and Kafei's letter to his mother.",
     steps: [
-      "Day 1, daytime: wear Kafei's Mask and talk to Anju at the front desk of the Stock Pot Inn (East Clock Town). She asks you to meet her in the kitchen at 11:30 PM.",
+      "Day 1, 2:10 PM–8:00 PM: wear Kafei's Mask and talk to Anju at the front desk of the Stock Pot Inn (East Clock Town). She asks you to meet her in the kitchen at 11:30 PM.",
       "Night 1, 11:30 PM: go to the Stock Pot Inn kitchen (ground floor) and talk to Anju. She gives you the Letter to Kafei.",
-      "Before the morning of Day 2, put the Letter to Kafei in any red mailbox in Clock Town. The Postman will deliver it on Day 2.",
-      "Day 2, afternoon: go to the Laundry Pool, ring the bell next to the door at the back, and talk to Kafei when he opens it. He gives you the Pendant of Memories (keep it for the Couple's Mask).",
-      "Day 3, by 1:00 PM: ring the bell again and go into the back room. Watch the scene — Kafei sees Sakon and runs off to chase him.",
+      "Before 9:00 AM on Day 2, put the Letter to Kafei in any red mailbox in Clock Town. The Postman will deliver it on Day 2.",
+      "Day 2, 4:10 PM–6:00 PM: go to the Laundry Pool, ring the bell next to the door at the back, and talk to Kafei when he opens it. He gives you the Pendant of Memories (keep it for the Couple's Mask).",
+      "Day 3, between 1:00 PM and 6:00 PM: ring the bell again and go into the back room. Watch the scene — Kafei sees Sakon and runs off to chase him.",
       "Talk to the Curiosity Shop owner in the back room. He gives you the Keaton Mask and the Special Delivery to Mama."
     ]
   },
@@ -628,9 +627,9 @@ const ITEMS = [
     desc: "On the Final Day the Postman panics about the moon but won't leave until his work is done. Give him the Special Delivery to Mama and he rushes it to Madame Aroma at the Milk Bar. When he comes out he is finally free to flee and gives you his hat. (Handing the letter to Madame Aroma yourself instead gives a Bottle of Chateau Romani — do that in a different cycle, see Bottles.)",
     steps: [
       "Get the Special Delivery to Mama on Day 3 (Keaton Mask steps 1–6).",
-      "Go to the Post Office in West Clock Town on Night 3 and talk to the panicking Postman.",
+      "Go to the Post Office in West Clock Town on Day 3 before 6:00 PM (he leaves at 6:00 PM to deliver the letter) and talk to the panicking Postman.",
       "Give him the Special Delivery to Mama. He runs off to deliver it.",
-      "Follow him to the Milk Bar in East Clock Town and wait outside.",
+      "Follow him to the Milk Bar in East Clock Town (Day 3, after 6:00 PM) and wait outside.",
       "When he comes out, he stops near the East Clock Town exit. Talk to him and he gives you the Postman's Hat."
     ]
   },
@@ -643,12 +642,12 @@ const ITEMS = [
     desc: "The final reward of the Anju & Kafei quest. Anju must decide to wait for Kafei (give her the Pendant of Memories), and you must help Kafei get his stolen Sun's Mask back from Sakon's Hideout. Kafei then returns to the Stock Pot Inn just before dawn on the Final Day and the two make the Couple's Mask, which they give to you.",
     steps: [
       "Do Keaton Mask steps 1–4 to get the Letter to Kafei delivered and receive the Pendant of Memories on Day 2.",
-      "Day 2: give the Pendant of Memories to Anju at the Stock Pot Inn. She decides to stay and wait for Kafei.",
-      "Day 3, by 1:00 PM: be in the Curiosity Shop back room so Kafei sees Sakon and heads to Ikana (also get the Keaton Mask and the Special Delivery to Mama).",
+      "Day 2 or Day 3, between 10:00 AM and 7:00 PM: give the Pendant of Memories to Anju at the Stock Pot Inn. She decides to stay and wait for Kafei.",
+      "Day 3, between 1:00 PM and 6:00 PM: be in the Curiosity Shop back room so Kafei sees Sakon and heads to Ikana (also get the Keaton Mask and the Special Delivery to Mama).",
       "Ride Epona into the Road to Ikana. Wear Garo's Mask and talk to the ghost guard so he makes a tree appear, then Hookshot up into Ikana Canyon.",
-      "Go to Sakon's Hideout (lower Ikana Canyon) and meet Kafei at the entrance. Wait for Sakon to arrive in the evening and open the hideout.",
+      "Go to Sakon's Hideout (lower Ikana Canyon) and meet Kafei at the entrance at 6:00 PM on Day 3. Wait for Sakon to arrive and open the hideout.",
       "Inside, you switch between Link and Kafei. Step on the switches and push the blocks in each room so the other character can move on. Kafei grabs the Sun's Mask at the end.",
-      "Use the Song of Soaring (or travel) back to Clock Town. On Night 3, go into Anju's room (the Employees' Room) at the Stock Pot Inn.",
+      "Use the Song of Soaring (or travel) back to Clock Town. On Night 3 (after 6:00 PM), go into Anju's room (the Employees' Room) at the Stock Pot Inn.",
       "Stay in the room until Kafei arrives shortly before dawn. Watch the reunion and receive the Couple's Mask."
     ]
   },
@@ -661,7 +660,7 @@ const ITEMS = [
     desc: "The Indigo-Go's need someone to stand in for their band members in a sound check at the Latte Milk Bar. Play each part of the song as Human, Deku, Goron and Zora Link. Gorman, the Troupe Leader drinking at the bar, is moved to tears and gives you his mask.",
     steps: [
       "Go to the Milk Bar in East Clock Town after 10:00 PM on Night 1 or Night 2, wearing Romani's Mask so the doorman lets you in.",
-      "Talk to Toto, the Zora manager standing near the stage.",
+      "Talk to Toto, the Zora manager standing near the stage (he is there from 10:00 PM to 6:00 AM).",
       "Step onto the stage and play the part he asks for as Human Link (Ocarina).",
       "Put on the Deku Mask and play the Deku Pipes part, then the Goron Mask (Goron Drums), then the Zora Mask (Zora Guitar).",
       "After the sound check, Gorman at the bar tells his story and gives you the Troupe Leader's Mask."
@@ -1131,7 +1130,7 @@ const ITEMS = [
     desc: "Anju's Grandmother tells long stories that put listeners to sleep. Wear the All-Night Mask to stay awake through 'The Carnival of Time', then answer her question correctly for a Piece of Heart.",
     steps: [
       "Put on the All-Night Mask.",
-      "On Day 1 or Day 2, go to Grandma's room in the Stock Pot Inn and talk to her.",
+      "On Day 1 or Day 2, between 8:00 AM and 12:00 AM, go to Grandma's room in the Stock Pot Inn and talk to her.",
       "Choose the story 'The Carnival of Time' and listen to the end.",
       "When she asks her question, pick the first (top) answer.",
       "Collect the Piece of Heart."
@@ -1145,7 +1144,7 @@ const ITEMS = [
     desc: "The second story, 'The Four Giants', is longer. Stay awake with the All-Night Mask. Her question at the end has no real answer — say 'I dunno' to get the second Piece of Heart.",
     steps: [
       "Put on the All-Night Mask.",
-      "On Day 1 or Day 2, talk to Grandma in her room in the Stock Pot Inn.",
+      "On Day 1 or Day 2, between 8:00 AM and 12:00 AM, talk to Grandma in her room in the Stock Pot Inn.",
       "Choose the story 'The Four Giants' and listen to the end.",
       "When she asks her question, answer 'I dunno'.",
       "Collect the Piece of Heart."
@@ -1751,7 +1750,7 @@ ITEMS.push(
     desc: "Instead of giving the Special Delivery to Mama to the Postman, hand it to Madame Aroma yourself at the Milk Bar on the Final Night. She is so grateful she gives you a Bottle of Chateau Romani. This uses up the letter, so get the Postman's Hat in another cycle.",
     steps: [
       "Follow the Anju & Kafei quest to get the Special Delivery to Mama on Day 3 (see Keaton Mask).",
-      "On Night 3, wear Romani's Mask and enter the Milk Bar in East Clock Town.",
+      "On Night 3, after 6:00 PM, wear Romani's Mask and enter the Milk Bar in East Clock Town.",
       "Talk to Madame Aroma and give her the Special Delivery to Mama.",
       "Collect the Bottle of Chateau Romani."
     ]
@@ -1781,7 +1780,22 @@ ITEMS.push(
       "Wear the Great Fairy's Mask while exploring the temple — it pulls nearby fairies to you.",
       "Collect fairies from chests, and pop the bubble-trapped ones with an arrow or Deku Bubble.",
       "Check the temple map: rooms with uncollected fairies are marked. Get all 15.",
-      "Leave the temple and enter the Great Fairy Fountain in Woodfall.",
+            "Stray Fairy 1/15 — Entrance room: the fairy floats right inside the entrance. Wear the Great Fairy's Mask to draw it over.",
+      "Stray Fairy 2/15 — Deku Flower float room: float right to a small platform with a chest.",
+      "Stray Fairy 3/15 — Poisoned-water room: kill the Deku Baba at the bottom of the ramp and the fairy appears.",
+      "Stray Fairy 4/15 — Flower-hopping room: break the pot closest to the corner of the five-pot platform.",
+      "Stray Fairy 5/15 — Beehive over the water near the key ledge: spit a Deku Bubble at it.",
+      "Stray Fairy 6/15 — Ceiling beehive behind the locked door past the stone block: spit a Deku Bubble at it.",
+      "Stray Fairy 7/15 — Bubble under the bridge by the stone block: pop it with a bomb or the Blast Mask.",
+      "Stray Fairy 8/15 — Narrow wooden bridges past the mask-symbol stone: kill the Skulltula.",
+      "Stray Fairy 9/15 — Dark room with Black Boes: kill them all and a chest with the fairy appears.",
+      "Stray Fairy 10/15 — Moving-platform room: pop the bubble (take the stairs down on the right).",
+      "Stray Fairy 11/15 — Chest reached by pressing a switch on a tree branch: float there as Deku, then switch to human form to press it.",
+      "Stray Fairy 12/15 — Dragonfly room (wooden torch puzzle): shoot the bubble near the middle with the Hero's Bow.",
+      "Stray Fairy 13/15 — Ladder side of the Dragonfly room, alcove 1 of 3: pop the bubble with an arrow or reach it with a Deku float.",
+      "Stray Fairy 14/15 — Ladder side of the Dragonfly room, alcove 2 of 3: pop the bubble with an arrow or reach it with a Deku float.",
+      "Stray Fairy 15/15 — Ladder side of the Dragonfly room, alcove 3 of 3: pop the bubble with an arrow or reach it with a Deku float.",
+"Leave the temple and enter the Great Fairy Fountain in Woodfall.",
       "Collect the Great Spin Attack upgrade."
     ]
   },
@@ -1795,7 +1809,22 @@ ITEMS.push(
       "Wear the Great Fairy's Mask while exploring Snowhead Temple.",
       "Collect the fairies in chests, and melt ice around hidden ones with Fire Arrows once you have them.",
       "Use the temple map to find rooms with fairies left. Get all 15.",
-      "Go to the Great Fairy Fountain near the Snowhead Temple entrance.",
+            "Stray Fairy 1/15 — First lava room: use the Lens of Truth to spot the bubble high on the column, shoot it with an arrow, then draw it in with the Great Fairy's Mask.",
+      "Stray Fairy 2/15 — First lava room: shoot the bubble under the ledge to the left of that column.",
+      "Stray Fairy 3/15 — 2F Real Bombchu room: the fairy floats just right of the door.",
+      "Stray Fairy 4/15 — Hidden opening in the southeast wall (Lens of Truth): open the chest from behind.",
+      "Stray Fairy 5/15 — Room with the brown and green switches and snow pit: Lens of Truth shows a bubble in the ceiling; shoot it.",
+      "Stray Fairy 6/15 — B1, after the Wizzrobe room: step on the switch as Goron Link and a chest appears.",
+      "Stray Fairy 7/15 — Northwest room of 1F: kill the three Freezards and a chest appears.",
+      "Stray Fairy 8/15 — Northwest ice room: bomb the crate on the pillar.",
+      "Stray Fairy 9/15 — Ice room: melt the ice with Fire Arrows, push the stone block, and climb to the chest on top.",
+      "Stray Fairy 10/15 — Push the stone blocks to climb to the chest on the stacked blocks.",
+      "Stray Fairy 11/15 — Real Bombchu room: hit the frozen diamond eye with a Fire Arrow, use the Lens of Truth to find the platforms, and open the ledge chest in the wall.",
+      "Stray Fairy 12/15 — Eeno room: a bubble hides in the south wall (Lens of Truth); shoot it.",
+      "Stray Fairy 13/15 — Dinolfos fight, fairy 1 of 2: defeat the Dinolfos.",
+      "Stray Fairy 14/15 — Dinolfos fight, fairy 2 of 2: defeat the second Dinolfos.",
+      "Stray Fairy 15/15 — 2F northwest wall (Lens of Truth): find the hidden alcove and reach it by rolling as Goron or floating as Deku.",
+"Go to the Great Fairy Fountain near the Snowhead Temple entrance.",
       "Collect the Extended Magic upgrade."
     ]
   },
@@ -1809,7 +1838,22 @@ ITEMS.push(
       "Wear the Great Fairy's Mask while exploring Great Bay Temple.",
       "Collect fairies from chests, and dive as Zora Link for the underwater ones.",
       "Use the temple map to find rooms with fairies left. Get all 15.",
-      "Go to the Great Fairy Fountain at Zora Cape.",
+            "Stray Fairy 1/15 — Turtle room: light all four torches (Deku Sticks or Fire Arrows) and a chest appears.",
+      "Stray Fairy 2/15 — Waterwheel room past the turtle door: kill the Skulltula on the rising platform.",
+      "Stray Fairy 3/15 — Start of the waterwheel room: swim into the bubble under the ledge as Zora Link.",
+      "Stray Fairy 4/15 — Bottom of the ladder past the spout: punch the barrel as Goron Link.",
+      "Stray Fairy 5/15 — Spinning-water room: break the pot at the bottom center with the Zora fin boomerangs.",
+      "Stray Fairy 6/15 — Platform across from the Map chest: break the pot with an arrow, the Hookshot or fin boomerangs.",
+      "Stray Fairy 7/15 — Bio Deku Baba room: kill the last Bio Deku Baba hanging from the ceiling and a chest appears.",
+      "Stray Fairy 8/15 — Near the flowing water (Dexihands nearby): break the jar with the Hookshot.",
+      "Stray Fairy 9/15 — Hole in the ceiling: use the ice platforms and the Hookshot to reach the chest.",
+      "Stray Fairy 10/15 — Small room with a torch: Hookshot the torch and open the chest.",
+      "Stray Fairy 11/15 — Small room in the north wall, reached from the water wheel: open the chest.",
+      "Stray Fairy 12/15 — Hidden small room under the see-saw: sink as Zora Link and break the barrel.",
+      "Stray Fairy 13/15 — Enclosed area at the end of the green pipe: Hookshot across and open the chest.",
+      "Stray Fairy 14/15 — Map room passageway: break the bubble with the fin boomerangs.",
+      "Stray Fairy 15/15 — Room before the boss: pop the bubble under the central platform (between the wooden pillars) while standing on the green pipe.",
+"Go to the Great Fairy Fountain at Zora Cape.",
       "Collect the Double Defense upgrade."
     ]
   },
@@ -1824,16 +1868,50 @@ ITEMS.push(
       "Collect the fairies in the normal temple first.",
       "Get the Light Arrows, flip the temple, and collect the fairies in the inverted temple.",
       "Use the temple map to make sure you have all 15.",
-      "Go to the Great Fairy Fountain in Ikana Canyon and collect the Great Fairy's Sword."
+            "Stray Fairy 1/15 — Entrance room: shoot the diamond-eye switch on the stone face opposite the entrance, then Hookshot the chest that appears.",
+      "Stray Fairy 2/15 — Room through the left door: bomb the floor, roll into the hole as Goron, Hookshot the ceiling target, and open the chest.",
+      "Stray Fairy 3/15 — Black Boe room: punch out the pillar as Goron, light the correct sun face, and a chest appears.",
+      "Stray Fairy 4/15 — Mirror room: light the mirrors and Sun Blocks, then open the chest at the end of the path.",
+      "Stray Fairy 5/15 — Lava room: ground-pound the switch as Goron, roll slowly, then float up the air flow as Deku to the chest on a rupee ledge.",
+      "Stray Fairy 6/15 — Ledge chest reached with the Deku Flower air vents, past the Bombchu rails.",
+      "Stray Fairy 7/15 — Eyegore fight (after the Garo Master and the Light Arrows): shoot the eye with Light Arrows and the chest appears.",
+      "Stray Fairy 8/15 — Inverted: shoot the sun symbol on the wall with a Light Arrow after flipping the temple, and a chest appears.",
+      "Stray Fairy 9/15 — Water and air-vent room: hit the frozen diamond eye with a Fire Arrow and float down the air vent as Deku to the chest under the bridge.",
+      "Stray Fairy 10/15 — East-wall ledge chest ringed by flames: needs the temple flipped to clear the flames, then flip back and float up the air vent.",
+      "Stray Fairy 11/15 — After the Wizzrobe fight: Hookshot to the chest.",
+      "Stray Fairy 12/15 — Pit chest on the floor: reached after flipping the temple back upright (Song of Soaring and statues on switches).",
+      "Stray Fairy 13/15 — Water room: kill the Beamos with a bomb, then hit the crystal switch through the fence with the Zora Mask trick to make a chest appear.",
+      "Stray Fairy 14/15 — Water room: swim past the Dexihand to a chest on a small underwater platform.",
+      "Stray Fairy 15/15 — Lower lava area: shoot the sun face with a Light Arrow, climb the ladder, and open the chest below.",
+"Go to the Great Fairy Fountain in Ikana Canyon and collect the Great Fairy's Sword."
     ]
   }
 );
 
-// Per-item wiki links for masks and bottles (instead of one shared overview page)
-const WIKI = "https://zeldawiki.wiki/wiki/";
+// Step-by-step "how to get it" guides (Thonky walkthrough) instead of wiki description pages
+const THONKY = "https://www.thonky.com/zelda-majoras-mask/";
+const TEMPLE_GUIDE = {
+  hc1: "woodfall-temple", f1: "woodfall-temple",
+  hc2: "snowhead-temple", f2: "snowhead-temple",
+  hc3: "great-bay-temple", f3: "great-bay-temple",
+  hc4: "stone-tower-temple", f4: "stone-tower-temple"
+};
+// Section anchors on Thonky's pages, so each link jumps to that item
+const MASK_ANCHOR = {
+  m1: "deku-scrub-mask", m2: "great-fairy-mask", m3: "blast-mask", m4: "bremen-mask", m5: "kafeis-mask",
+  m6: "allnight-mask", m7: "keaton-mask", m9: "couples-mask", m10: "circus-leaders-mask", m11: "kamaros-mask",
+  m12: "bunny-hood", m13: "romanis-mask", m14: "garos-mask", m15: "mask-of-truth", m16: "mask-of-scents",
+  m17: "goron-mask", m18: "don-geros-mask", m19: "zora-mask", m20: "stone-mask", m21: "captains-hat",
+  m22: "gibdo-mask", m23: "giants-mask", m24: "fierce-deitys-mask"
+};
+const BOTTLE_ANCHOR = {
+  b1: "reward-for-rescuing-koume", b2: "reward-for-saving-the-cows", b3: "reward-for-winning-the-beaver-race",
+  b5: "reward-for-winning-the-goron-race", b6: "reward-for-giving-madame-aroma-the-special-delivery"
+};
 for (const item of ITEMS) {
-  if (item.type === "mask") item.guide = WIKI + encodeURIComponent(item.title.replace(/ /g, "_"));
-  if (item.type === "bottle") item.guide = WIKI + "Bottle";
+  if (item.type === "mask") item.guide = item.id === "m8" ? THONKY + "anju-kafei-quest" : THONKY + "masks-guide#" + MASK_ANCHOR[item.id];
+  if (item.type === "bottle") item.guide = THONKY + "bottles" + (BOTTLE_ANCHOR[item.id] ? "#" + BOTTLE_ANCHOR[item.id] : "");
+  if (TEMPLE_GUIDE[item.id]) item.guide = THONKY + TEMPLE_GUIDE[item.id];
 }
 
 // ==================== TIME WINDOWS (for Cycle Planner & Right Now) ====================
@@ -2309,7 +2387,7 @@ function renderInventory() {
 }
 
 function updateStats() {
-  let hp = 0, hc = 0, masks = 0, bottles = 0, fairies = 0, totalSteps = 0, doneSteps = 0;
+  let hp = 0, hc = 0, masks = 0, bottles = 0, fairies = 0;
   for (const item of ITEMS) {
     if (checkedSet.has(item.id)) {
       if (item.type === "heart") hp++;
@@ -2318,7 +2396,6 @@ function updateStats() {
       else if (item.type === "bottle") bottles++;
       else if (item.type === "fairy") fairies++;
     }
-    (item.steps || []).forEach((_, idx) => { totalSteps++; if (subCheckedSet.has(stepKey(item, idx))) doneSteps++; });
   }
   const totalHearts = 3 + hc + Math.floor(hp / 4);
   const remainder = hp % 4;
@@ -2330,7 +2407,6 @@ function updateStats() {
   set("bottle-count", `${bottles} / 7`);
   set("fairy-count", `${fairies} / 4`);
   set("gear-count", `${ownedGearSet.size} / ${GEAR_ITEMS.length}`);
-  set("step-count", `${doneSteps} / ${totalSteps}`);
 }
 
 function itemLink(id) {
