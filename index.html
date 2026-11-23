@@ -752,17 +752,17 @@ const ITEMS = [
   {
     id: "m16", type: "mask", day: "Anytime", tod: "Anytime", region: "Southern Swamp & Woodfall",
     title: "Mask of Scents",
-    requiresGear: ["g_deku_mask", "g_sonata", "g_bottle", "g_bunny_hood"],
-    req: "Odolwa defeated and the Deku Princess returned in the same cycle.",
+    requiresGear: ["g_deku_mask", "g_sonata", "g_bottle"],
+    req: "Defeat Odolwa and rescue the Deku Princess (return her to the Deku Palace) in the same cycle.",
     guide: GUIDE_LINKS.masks,
-    desc: "After you rescue the Deku Princess from Woodfall Temple and bring her home, the Deku Butler challenges you to a race through the Deku Shrine. Keep up with him to the end and he gives you the Mask of Scents. The Bunny Hood keeps you from falling behind.",
+    desc: "After you rescue the Deku Princess from Woodfall Temple and bring her home, the Deku Butler leads you through the cave next to the Deku Palace. Follow him to the end of the course and he gives you the Mask of Scents.",
     steps: [
       "Clear Woodfall Temple and defeat Odolwa.",
       "In the temple's rescue room, catch the Deku Princess in an Empty Bottle.",
       "Take her to the Deku King in the throne room of Deku Palace and release her. Watch the scene.",
-      "Talk to the Deku Butler; follow him to the Deku Shrine next to the palace.",
-      "Wear the Bunny Hood and race him through the shrine's corridors, avoiding the fire and rolling obstacles.",
-      "Reach the end with him and he gives you the Mask of Scents."
+      "Go into the cave next to the Deku Palace and talk to the Deku Butler.",
+      "Follow the Deku Butler to the end of the course.",
+      "At the end he gives you the Mask of Scents."
     ]
   },
   {
@@ -827,7 +827,7 @@ const ITEMS = [
   {
     id: "m21", type: "mask", day: "Anytime", tod: "Anytime", region: "Ikana Canyon",
     title: "Captain's Hat",
-    requiresGear: ["g_epona", "g_sonata", "g_bow", "g_sword"],
+    requiresGear: ["g_epona", "g_sonata", "g_bow", "g_sword", ["g_hookshot", "g_bunny_hood"]],
     req: "Epona is needed to jump the fence onto the Road to Ikana.",
     guide: GUIDE_LINKS.masks,
     desc: "Captain Keeta, the giant skeleton leader of Ikana's soldiers, lies at the top of Ikana Graveyard. Wake him with the Sonata of Awakening, keep up with him as he runs, then beat him in a fight. He leaves a chest with the Captain's Hat, which lets you give orders to the Stalchildren in the graveyard.",
@@ -837,7 +837,7 @@ const ITEMS = [
       "Play the Sonata of Awakening in front of it. Captain Keeta wakes up and runs away.",
       "Chase him and catch up before he gets too far (arrows and sword hits slow him down).",
       "Fight him: hit him with your sword until he falls.",
-      "Open the chest he leaves behind to get the Captain's Hat."
+      "Reach the chest he leaves behind (use the Hookshot, or jump up with the Bunny Hood) and open it to get the Captain's Hat."
     ]
   },
   {
@@ -1684,12 +1684,12 @@ const ITEMS = [
 ITEMS.push(
   { id: "b1", type: "bottle", day: "Anytime", tod: "Anytime", region: "Southern Swamp & Woodfall",
     title: "Bottle #1 — Kotake's Red Potion",
-    requiresGear: [],
-    req: "None — available from the first cycle.",
+    requiresGear: ["g_deku_mask"],
+    req: "Deku Mask, to hop across the lily pads to the potion shop.",
     guide: GUIDE_LINKS.masks,
     desc: "Koume, one of the potion-shop witches, is lying hurt in the Woods of Mystery. Her sister Kotake, who runs the Magic Hags' Potion Shop in the Southern Swamp, gives you a free Bottle of Red Potion to take to her. Giving Koume the potion opens the swamp boat cruise and gets you the Pictograph Box, and you keep the bottle.",
     steps: [
-      "Go to the Southern Swamp and enter the Magic Hags' Potion Shop (the hut past the Swamp Tourist Center).",
+      "Go to the Southern Swamp and, as Deku Link, hop across the lily pads to the Magic Hags' Potion Shop (the hut past the Swamp Tourist Center).",
       "Talk to Kotake. She is worried about her sister and gives you a Bottle of Red Potion.",
       "Go into the Woods of Mystery (follow the monkey through the maze; the route changes each day) and find Koume.",
       "Give Koume the Red Potion. She recovers and returns to the swamp. The empty bottle is yours."
@@ -1776,11 +1776,11 @@ ITEMS.push(
   },
 
   { id: "f1", type: "fairy", day: "Anytime", tod: "Anytime", region: "Southern Swamp & Woodfall",
-    title: "Woodfall Temple — 15 Stray Fairies (Great Spin Attack)",
+    title: "Woodfall Temple — 15 Stray Fairies (Extended Magic)",
     requiresGear: ["g_deku_mask", "g_sonata", "g_great_fairy_mask"],
     req: "All 15 must be collected in one trip through the temple (they reset with the Song of Time).",
     guide: "https://www.zeldadungeon.net/wiki/Stray_Fairy",
-    desc: "The Great Fairy of Woodfall has been broken into 15 Stray Fairies scattered through Woodfall Temple. Some are in chests, some float in bubbles, and some are hidden. The Great Fairy's Mask makes your hair glow when one is near and pulls loose fairies to you. Return all 15 and the Great Fairy upgrades your spin attack.",
+    desc: "The Great Fairy of Woodfall has been broken into 15 Stray Fairies scattered through Woodfall Temple. Some are in chests, some float in bubbles, and some are hidden. The Great Fairy's Mask makes your hair glow when one is near and pulls loose fairies to you. Return all 15 and the Great Fairy increases your magic meter.",
     steps: [
       "Wear the Great Fairy's Mask while exploring the temple — it pulls nearby fairies to you.",
       "Collect fairies from chests, and pop the bubble-trapped ones with an arrow or Deku Bubble.",
@@ -1801,15 +1801,15 @@ ITEMS.push(
       "Stray Fairy 14/15 — Ladder side of the Dragonfly room, alcove 2 of 3: pop the bubble with an arrow or reach it with a Deku float.",
       "Stray Fairy 15/15 — Ladder side of the Dragonfly room, alcove 3 of 3: pop the bubble with an arrow or reach it with a Deku float.",
 "Leave the temple and enter the Great Fairy Fountain in Woodfall.",
-      "Collect the Great Spin Attack upgrade."
+      "Collect the Extended Magic upgrade."
     ]
   },
   { id: "f2", type: "fairy", day: "Anytime", tod: "Anytime", region: "Snowhead & Mountains",
-    title: "Snowhead Temple — 15 Stray Fairies (Extended Magic)",
+    title: "Snowhead Temple — 15 Stray Fairies (Great Spin Attack)",
     requiresGear: ["g_goron_mask", "g_lullaby", "g_bow", "g_great_fairy_mask"],
     req: "All 15 in one trip through the temple.",
     guide: "https://www.zeldadungeon.net/wiki/Stray_Fairy",
-    desc: "The Snowhead Great Fairy's 15 Stray Fairies are spread through Snowhead Temple. Several are in ice or high places that need Fire Arrows. Return them all to her fountain near the temple and she doubles your magic meter.",
+    desc: "The Snowhead Great Fairy's 15 Stray Fairies are spread through Snowhead Temple. Several are in ice or high places that need Fire Arrows. Return them all to her fountain near the temple and she upgrades your spin attack.",
     steps: [
       "Wear the Great Fairy's Mask while exploring Snowhead Temple.",
       "Collect the fairies in chests, and melt ice around hidden ones with Fire Arrows once you have them.",
@@ -1830,7 +1830,7 @@ ITEMS.push(
       "Stray Fairy 14/15 — Dinolfos fight, fairy 2 of 2: defeat the second Dinolfos.",
       "Stray Fairy 15/15 — 2F northwest wall (Lens of Truth): find the hidden alcove and reach it by rolling as Goron or floating as Deku.",
 "Go to the Great Fairy Fountain near the Snowhead Temple entrance.",
-      "Collect the Extended Magic upgrade."
+      "Collect the Great Spin Attack upgrade."
     ]
   },
   { id: "f3", type: "fairy", day: "Anytime", tod: "Anytime", region: "Great Bay",
