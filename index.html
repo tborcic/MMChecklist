@@ -132,7 +132,12 @@
       font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted);
       margin: 0.75rem 0 0.45rem; font-weight: 700;
     }
-    .inv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 0.45rem; }
+    .inv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.45rem; }
+    .inv-text { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+    .inv-label { font-weight: 600; }
+    .inv-how { font-size: 0.74rem; color: var(--muted); line-height: 1.3; }
+    .inv-jump { font-size: 0.72rem; }
+    .inv-jump a { color: var(--accent); text-decoration: underline dotted; }
     .inv-item {
       display: flex; align-items: center; gap: 0.55rem; background: #151124;
       border: 1px solid #2b2247; border-radius: 8px; padding: 0.5rem 0.65rem;
@@ -244,6 +249,20 @@
     }
     .link-chip:hover { border-color: var(--accent); background: rgba(168, 85, 247, 0.25); }
     .link-chip.done { opacity: 0.55; text-decoration: line-through; }
+    .bottle-tracker {
+      margin-top: 0.75rem; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 0.55rem 0.8rem;
+    }
+    .bottle-tracker-head { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 700; margin-bottom: 0.45rem; }
+    .bottle-slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.4rem; }
+    .bottle-slot {
+      display: flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0.55rem; border-radius: 8px; cursor: pointer;
+      font-size: 0.82rem; color: var(--muted); background: #141022; border: 1px dashed #433670; text-align: left;
+    }
+    .bottle-slot:hover { border-color: var(--accent); }
+    .bottle-slot .bottle-mark { font-weight: 800; min-width: 1rem; }
+    .bottle-slot.have { color: var(--text); border-style: solid; border-color: var(--green); background: rgba(34, 197, 94, 0.1); }
+    .bottle-slot.have .bottle-mark { color: var(--green); }
     .gear-chip.clickable { cursor: pointer; text-decoration: underline dotted; }
     .when-chip { padding: 0.1rem 0.45rem; border-radius: 5px; font-size: 0.76rem; background: rgba(56, 189, 248, 0.1); color: #bae6fd; border: 1px solid rgba(56, 189, 248, 0.3); }
 
@@ -317,6 +336,8 @@
       <div class="stat-card"><div class="stat-label">Great Fairy Rewards</div><div class="stat-value masks" id="fairy-count">0 / 4</div></div>
       <div class="stat-card"><div class="stat-label">Collected Gear</div><div class="stat-value gear" id="gear-count">0 / 0</div></div>
     </div>
+
+    <div class="bottle-tracker" id="bottle-tracker"></div>
 
     <div class="view-tabs" id="view-tabs">
       <button type="button" data-view="checklist" onclick="setView('checklist')">Checklist</button>
@@ -419,7 +440,7 @@
 
 <script>
 // Bump this on each release; it is shown next to the title.
-const APP_VERSION = "1.1.0";
+const APP_VERSION = "1.2.0";
 { const v = document.getElementById("app-version"); if (v) v.textContent = "v" + APP_VERSION; }
 const GUIDE_LINKS = {
   masks: "https://www.zeldadungeon.net/Zelda06Masks.php",
@@ -442,6 +463,9 @@ const GEAR_ITEMS = [
   { id: "g_storms", group: "Songs", label: "Song of Storms" },
   { id: "g_oath", group: "Songs", label: "Oath to Order" },
   { id: "g_scarecrow", group: "Songs", label: "Scarecrow's Song (taught to Pierre)" },
+  { id: "g_soaring", group: "Songs", label: "Song of Soaring" },
+  { id: "g_double_time", group: "Songs", label: "Song of Double Time" },
+  { id: "g_inverted", group: "Songs", label: "Inverted Song of Time" },
 
   { id: "g_sword", group: "Equipment & Items", label: "Sword" },
   { id: "g_magic", group: "Equipment & Items", label: "Magic Meter" },
@@ -461,6 +485,12 @@ const GEAR_ITEMS = [
   { id: "g_wallet", group: "Equipment & Items", label: "Adult Wallet (200 Rupees)" },
   { id: "g_giant_wallet", group: "Equipment & Items", label: "Giant's Wallet (500 Rupees)" },
   { id: "g_remains", group: "Equipment & Items", label: "All 4 Boss Remains" },
+  { id: "g_notebook", group: "Equipment & Items", label: "Bombers' Notebook" },
+  { id: "g_large_quiver", group: "Equipment & Items", label: "Large Quiver" },
+  { id: "g_ext_magic", group: "Equipment & Items", label: "Extended Magic (Woodfall Great Fairy)" },
+  { id: "g_spin", group: "Equipment & Items", label: "Great Spin Attack (Snowhead Great Fairy)" },
+  { id: "g_double_def", group: "Equipment & Items", label: "Double Defense (Great Bay Great Fairy)" },
+  { id: "g_gf_sword", group: "Equipment & Items", label: "Great Fairy's Sword (Stone Tower Great Fairy)" },
 
   { id: "g_moons_tear", group: "Trade Items & Letters", label: "Moon's Tear" },
   { id: "g_land_deed", group: "Trade Items & Letters", label: "Land Title Deed" },
@@ -1298,12 +1328,12 @@ const ITEMS = [
     requiresGear: ["g_bow"],
     req: "20 Rupees per play. Needs a perfect run (hit everything quickly; about 2,120–2,180 points).",
     guide: GUIDE_LINKS.hearts,
-    desc: "The Swamp Shooting Gallery on the Road to Southern Swamp sends Wolfos, Deku Scrubs and Guays out in waves. Hit everything fast for time bonuses. A near-perfect score (2,120+ points) earns the Piece of Heart.",
+    desc: "The Swamp Shooting Gallery on the Road to Southern Swamp sends Wolfos, Deku Scrubs and Guays out in waves. Hit everything fast for time bonuses. The first good score only earns the Large Quiver; a near-perfect score (2,120+ points) earns the Piece of Heart.",
     steps: [
       "Go into the Swamp Shooting Gallery on the Road to Southern Swamp and pay 20 Rupees.",
       "Shoot every target that appears: Deku Scrubs, Guays and Wolfos.",
       "Don't miss any — each one adds time and points.",
-      "Get a perfect score and collect the Piece of Heart."
+      "A good first score gives you the Large Quiver instead of the Piece of Heart. Play again and aim for a near-perfect score (2,120+) to collect the Piece of Heart."
     ]
   },
   { id: "hp28", type: "heart", day: "Anytime", tod: "Anytime", region: "Southern Swamp & Woodfall",
@@ -1982,14 +2012,14 @@ const EXTRA_NEEDS = { hp17: ["hp1"] };
 // Where each piece of gear comes from: text + checklist items that give it
 const GEAR_SOURCE = {
   g_ocarina: { text: "Taken back from Skull Kid on Night 3 of the first cycle", items: ["m1"] },
-  g_sot: { text: "Learned in the prologue", items: ["m1"] },
-  g_soh: { text: "Happy Mask Salesman, end of the prologue", items: ["m1"] },
+  g_sot: { text: "Zelda teaches it on top of the Clock Tower in the prologue, after Skull Kid drops the Ocarina", items: ["m1"] },
+  g_soh: { text: "Happy Mask Salesman in the Clock Tower, after you return to the Dawn of the First Day (also gives the Deku Mask)", items: ["m1"] },
   g_epona: { text: "Romani at Romani Ranch, Day 1 (balloon archery)", items: ["m13"] },
   g_sonata: { text: "Caged Monkey in Deku Palace", items: ["hc1"] },
   g_lullaby: { text: "Goron Elder and his son, Goron Village", items: ["hc2"] },
   g_bossa: { text: "Zora Eggs hatched in the Marine Research Lab", items: ["hc3"] },
   g_elegy: { text: "Defeat Igos du Ikana in Ikana Castle", items: ["hc4"] },
-  g_storms: { text: "Flat, beneath Ikana Graveyard on Night 1", items: ["m22"] },
+  g_storms: { text: "Ikana Graveyard, Night 1, wearing the Captain's Hat: have a Stalchild open the grave with three Stalchildren, beat the Iron Knuckle, then check the revealed gravestone", items: ["m21"] },
   g_oath: { text: "Taught by the Giant after defeating Odolwa", items: ["hc1"] },
   g_scarecrow: { text: "Teach Pierre a song in the Trading Post or Astral Observatory", items: ["hp33"] },
   g_sword: { text: "You start with the Kokiri Sword" },
@@ -2017,8 +2047,34 @@ const GEAR_SOURCE = {
   g_ocean_deed: { text: "Trade the Mountain Title Deed in Zora Hall", items: ["hp42"] },
   g_letter_kafei: { text: "Anju, Stock Pot Inn kitchen, 11:30 PM Night 1", items: ["m7"] },
   g_pendant: { text: "Kafei, Laundry Pool, Day 2", items: ["m7"] },
-  g_express_mail: { text: "Curiosity Shop back room, Day 3", items: ["m7"] }
+  g_express_mail: { text: "Curiosity Shop back room, Day 3", items: ["m7"] },
+  g_soaring: { text: "Kaepora Gaebora, on a platform reached by a Deku flower route near the Deku Palace (Southern Swamp). Hit an owl statue with your sword to activate it" },
+  g_double_time: { text: "Scarecrow hint (Clock Town Observatory or Trading Post), then play the Song of Time with every note played twice" },
+  g_inverted: { text: "Same Scarecrow hint: play the Song of Time backward" },
+  g_notebook: { text: "Jim, after you find all five Bombers in Clock Town and enter the Bombers' hideout (needs the Great Fairy's bubble magic to pop his balloon)" },
+  g_large_quiver: { text: "Swamp Shooting Gallery: first good score as Human Link (the Heart Piece needs a later near-perfect score)", items: ["hp27"] },
+  g_ext_magic: { text: "Return all 15 Woodfall Stray Fairies to the Woodfall Great Fairy", items: ["f1"] },
+  g_spin: { text: "Return all 15 Snowhead Stray Fairies to the Snowhead Great Fairy", items: ["f2"] },
+  g_double_def: { text: "Return all 15 Great Bay Stray Fairies to the Great Bay Great Fairy", items: ["f3"] },
+  g_gf_sword: { text: "Return all 15 Stone Tower Stray Fairies to the Ikana Great Fairy", items: ["f4"] }
 };
+
+// Checklist items that grant gear: ticking the item ticks the gear (trade items are consumed, so excluded)
+const GEAR_ALL_OF = new Set(["g_remains"]);
+// Gear whose linked checklist item is only an approximate prerequisite: never auto-ticked
+const GEAR_NO_AUTO = new Set(["g_sonata", "g_lullaby", "g_bossa", "g_storms", "g_epona"]);
+function gearGrantedBy(itemId) {
+  return GEAR_ITEMS.filter(g => g.group !== "Trade Items & Letters" && !GEAR_TO_MASK[g.id] && !GEAR_NO_AUTO.has(g.id) &&
+    GEAR_SOURCE[g.id] && (GEAR_SOURCE[g.id].items || []).includes(itemId)).map(g => g.id);
+}
+function gearSatisfied(gearId) {
+  const src = GEAR_SOURCE[gearId].items || [];
+  return GEAR_ALL_OF.has(gearId) ? src.every(i => checkedSet.has(i)) : src.some(i => checkedSet.has(i));
+}
+function syncGearFromItems(itemId) {
+  const ids = itemId ? gearGrantedBy(itemId) : GEAR_ITEMS.filter(g => g.group !== "Trade Items & Letters" && !GEAR_TO_MASK[g.id] && !GEAR_NO_AUTO.has(g.id) && GEAR_SOURCE[g.id] && (GEAR_SOURCE[g.id].items || []).length).map(g => g.id);
+  for (const g of ids) { if (gearSatisfied(g)) ownedGearSet.add(g); else if (itemId) ownedGearSet.delete(g); }
+}
 
 function gearSourceItems(gearId) {
   if (GEAR_TO_MASK[gearId]) return [GEAR_TO_MASK[gearId]];
@@ -2160,6 +2216,7 @@ function sanitizeState() {
   for (const id of ownedGearSet) if (GEAR_TO_MASK[id]) checkedSet.add(GEAR_TO_MASK[id]);
 }
 sanitizeState();
+syncGearFromItems();
 
 function save() {
   try {
@@ -2217,6 +2274,7 @@ function markItemChecked(id, checked) {
   if (checked) checkedSet.add(id); else checkedSet.delete(id);
   const gearId = MASK_TO_GEAR[id];
   if (gearId) { if (checked) ownedGearSet.add(gearId); else ownedGearSet.delete(gearId); }
+  syncGearFromItems(id);
 }
 
 function toggleGear(gearId) {
@@ -2380,10 +2438,11 @@ function renderInventory() {
     for (const g of list) {
       const isOwned = ownedGearSet.has(g.id);
       const src = gearSourceText(g.id);
+      const srcIds = GEAR_TO_MASK[g.id] ? [] : gearSourceItems(g.id).slice(0, 4);
       html += `
         <label class="inv-item ${isOwned ? "owned" : ""}" title="${escAttr(src)}">
           <input type="checkbox" ${isOwned ? "checked" : ""} onchange="toggleGear('${g.id}')" />
-          <span>${g.label}</span>
+          <span class="inv-text"><span class="inv-label">${g.label}</span><span class="inv-how">${escAttr(src)}</span>${srcIds.length ? `<span class="inv-jump">${srcIds.map(id => `<a href="#" onclick="event.preventDefault();event.stopPropagation();jumpTo('${id}')">${ITEM_BY_ID[id] ? escAttr(ITEM_BY_ID[id].title) : id}</a>`).join(" · ")}</span>` : ""}</span>
         </label>`;
     }
     html += `</div>`;
@@ -2641,12 +2700,26 @@ function syncControls() {
   ["day-filter", "tod-filter", "status-filter"].forEach(id => { document.getElementById(id).disabled = ui.view !== "checklist"; });
 }
 
+function renderBottleTracker() {
+  const el = document.getElementById("bottle-tracker");
+  if (!el) return;
+  const bottles = ITEMS.filter(i => i.type === "bottle");
+  const have = bottles.filter(b => checkedSet.has(b.id)).length;
+  el.innerHTML = `<div class="bottle-tracker-head">Bottle Tracker — ${have} / ${bottles.length}</div><div class="bottle-slots">` +
+    bottles.map((b, i) => {
+      const got = checkedSet.has(b.id);
+      const label = b.title.replace(/^Bottle #\d+\s*—\s*/, "");
+      return `<button type="button" class="bottle-slot ${got ? "have" : ""}" onclick="jumpTo('${b.id}')" title="Jump to this bottle"><span class="bottle-mark">${got ? "✓" : i + 1}</span><span>${label}</span></button>`;
+    }).join("") + `</div>`;
+}
+
 function render() {
   // A jumped-to item stays visible only until the user changes a filter or search
   if (forceShowId && JSON.stringify(readFilters()) !== jumpFilterSig) forceShowId = null;
   const scrollY = window.scrollY;
   renderInventory();
   updateStats();
+  renderBottleTracker();
   syncControls();
   const f = readFilters();
   const app = document.getElementById("app");
