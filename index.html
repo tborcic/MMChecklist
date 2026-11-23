@@ -59,6 +59,8 @@
       text-transform: uppercase; letter-spacing: 0.05em;
     }
 
+    h1 span.version { font-size: 0.75rem; font-weight: 600; color: var(--muted); margin-left: 0.35rem; }
+
     .top-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
 
     button.btn-secondary {
@@ -294,7 +296,7 @@
 <header>
   <div class="container">
     <div class="top-bar">
-      <h1>Majora's Mask 3D <span class="badge">Checklist</span></h1>
+      <h1>Majora's Mask 3D <span class="badge">Checklist</span> <span class="version" id="app-version"></span></h1>
       <div class="top-actions">
         <button class="btn-secondary" onclick="toggleInventoryPanel()">Toggle Collected Gear</button>
         <button class="btn-secondary" onclick="toggleAllSteps(true)">Expand All Steps</button>
@@ -416,6 +418,9 @@
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script>
+// Bump this on each release; it is shown next to the title.
+const APP_VERSION = "1.1.0";
+{ const v = document.getElementById("app-version"); if (v) v.textContent = "v" + APP_VERSION; }
 const GUIDE_LINKS = {
   masks: "https://www.zeldadungeon.net/Zelda06Masks.php",
   hearts: "https://www.zeldadungeon.net/Zelda06HeartPieces.php",
