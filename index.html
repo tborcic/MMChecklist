@@ -428,7 +428,7 @@
 
 <script>
 // Bump this on each release; it is shown next to the title.
-const APP_VERSION = "1.4.2";
+const APP_VERSION = "1.4.5";
 { const v = document.getElementById("app-version"); if (v) v.textContent = "v" + APP_VERSION; }
 const GUIDE_LINKS = {
   masks: "https://www.zeldadungeon.net/Zelda06Masks.php",
@@ -2001,6 +2001,13 @@ const SCHEDULES = {
   b7: [W(2, 8, 12, "Talk to Gorman upstairs in the Stock Pot Inn"), W(2, 12, 18, "Get Mysterious Milk from the Gorman Brothers, rush it back in 2 min")]
 };
 
+// Multi-step quests: you only HAVE the reward once the last step is done, and some gear arrives mid-quest.
+// The planner uses these (instead of the first window) when it asks "when do I get this gear?".
+// Derived from SCHEDULES so the times can't drift; m7's windows are, in order: Anju at the desk, kitchen
+// (Letter), mailbox, Laundry Pool (Pendant), Curiosity Shop (Express Mail / Keaton Mask).
+const ITEM_DONE_WINDOW = { m7: SCHEDULES.m7[SCHEDULES.m7.length - 1], m9: SCHEDULES.m9[SCHEDULES.m9.length - 1] };
+const GEAR_WINDOW = { g_letter_kafei: SCHEDULES.m7[1], g_pendant: SCHEDULES.m7[3], g_express_mail: SCHEDULES.m7[4] };
+
 // Items that only work if every timed step happens in ONE 3-day cycle
 const SAME_CYCLE = new Set(["m6", "m7", "m9", "m13", "hp3", "hp10", "b7"]);
 
@@ -2030,7 +2037,7 @@ const GEAR_SOURCE = {
   g_powder_keg: { text: "Goron in Goron Village — pass his Powder Keg test as Goron Link" },
   g_deku_sticks: { text: "Dropped by Mad Scrubs and Deku Babas, or bought in shops" },
   g_magic_beans: { text: "Bean Seller in Deku Palace's Bean Grotto" },
-  g_lens: { text: "Lens Cave in Goron Village", items: ["m17"] },
+  g_lens: { text: "Lens Cave in Goron Village" },
   g_hookshot: { text: "Inside the Pirates' Fortress (enter as Zora Link)" },
   g_mirror_shield: { text: "Beneath the Well in Ikana Canyon (needs the Gibdo Mask)", items: ["m22"] },
   g_bottle: { text: "See the Bottles category", items: ["b1", "b2", "b3", "b4", "b5", "b6", "b7"] },
@@ -2349,8 +2356,7 @@ function toggleSubStep(subId, parentId) {
   if (parent && parent.steps && parent.steps.length) {
     const allDone = parent.steps.every((_, idx) => subCheckedSet.has(stepKey(parent, idx)));
     if (allDone) markItemChecked(parentId, true);
-    // Unticking a step means the item isn't finished any more
-    else if (!nowDone && checkedSet.has(parentId)) markItemChecked(parentId, false);
+    // Unticking a single step deliberately leaves the item (and its mask/bottle gear) checked
   }
   save(); render();
 }
@@ -2432,7 +2438,8 @@ function applyImport(data) {
   if (typeof data.invOpen === "boolean") invOpen = data.invOpen;
   ui = data.ui; // validated field by field in sanitizeState()
   sanitizeState(); syncGearFromItems(); save(); render();
-  const dropped = importedSteps.size - subCheckedSet.size;
+  const rawSteps = arr(data.substeps);
+  const dropped = rawSteps.filter(k => { const m = [...migrateStepKeys([k])][0]; return !m || !subCheckedSet.has(m); }).length;
   if (dropped > 0) alert(`Imported. ${dropped} ticked sub-step(s) were skipped because those steps were reworded or removed since the save was exported.`);
 }
 function importProgress(input) {
@@ -2655,7 +2662,10 @@ function evKey(w) { return (w.d - 1) * 24 + w.s; }
 function evEnd(w) { return (w.d - 1) * 24 + w.e; }
 // Which still-missing gear for `item` can be picked up from another timed item that fits earlier in
 // the same cycle (and whose own gear can be sorted the same way). Returns {missing, via}.
+const planCache = new Map(); // cleared at the start of every planner render
 function planGear(item, deadline, visited) {
+  const cacheKey = item.id + "|" + deadline + "|" + [...visited].sort().join(",");
+  if (planCache.has(cacheKey)) return planCache.get(cacheKey);
   const seen = new Set(visited).add(item.id);
   let missing = 0; const via = [];
   for (const r of item.requiresGear || []) {
@@ -2667,7 +2677,9 @@ function planGear(item, deadline, visited) {
         const src = ITEM_BY_ID[srcId];
         if (!src || srcId === "m1" || BASIC_GEAR.has(gid) || seen.has(srcId) || checkedSet.has(srcId)) continue;
         // Items with no time limit can be done from the start of Day 1
-        const w = SCHEDULES[srcId] ? SCHEDULES[srcId].find(x => evKey(x) < deadline) : { d: 1, s: 6, e: 30, anytime: true };
+        const fixed = GEAR_WINDOW[gid] || ITEM_DONE_WINDOW[srcId];
+        const w = fixed ? (evKey(fixed) < deadline ? { ...fixed, done: true } : null)
+          : SCHEDULES[srcId] ? SCHEDULES[srcId].find(x => evKey(x) < deadline) : { d: 1, s: 6, e: 30, anytime: true };
         if (!w) continue;
         const sub = planGear(src, w.anytime ? deadline : evEnd(w), seen);
         if (sub.missing === 0) { found = { gid, src, w, sub }; break; }
@@ -2676,7 +2688,9 @@ function planGear(item, deadline, visited) {
     }
     if (found) via.push(found); else missing++;
   }
-  return { missing, via };
+  const result = { missing, via };
+  planCache.set(cacheKey, result);
+  return result;
 }
 function chainText(via, depth = 0) {
   return via.map(v => `${gearName(v.gid)} <- <a onclick="jumpTo('${v.src.id}')">${v.src.title}</a> (${fmtWindow(v.w)})` + (v.sub.via.length ? ` [first: ${chainText(v.sub.via, depth + 1)}]` : "")).join("; ");
@@ -2688,14 +2702,16 @@ function readyInfo(item, seen = new Set()) {
   let key = 6, depth = 0, src = null;
   for (const v of plan.via) {
     let k, dp;
-    if (v.w.anytime) { const r = readyInfo(v.src, new Set(seen).add(item.id)); k = r.key; dp = r.depth + 1; }
-    else { k = evKey(v.w); dp = 1; }
+    // an untimed prerequisite is done on its own day, so what it unlocks moves to the next day (Day 3 at most)
+    if (v.w.anytime) { const r = readyInfo(v.src, new Set(seen).add(item.id)); k = Math.max(r.key, Math.min(r.key + 24, 54)); dp = r.depth + 1; }
+    else { k = v.w.done ? Math.min(evEnd(v.w), 77.5) : evKey(v.w); dp = 1; } // a finished quest step is only usable after its window
     if (k > key || (k === key && dp > depth)) { key = k; depth = dp; src = v.src; }
   }
   return { key, depth, src };
 }
 
 function renderPlanner(f) {
+  planCache.clear();
   const events = [];
   for (const item of ITEMS) {
     if (checkedSet.has(item.id) || !baseFilter(item, f)) continue;
