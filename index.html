@@ -428,7 +428,7 @@
 
 <script>
 // Bump this on each release; it is shown next to the title.
-const APP_VERSION = "1.4.0";
+const APP_VERSION = "1.4.2";
 { const v = document.getElementById("app-version"); if (v) v.textContent = "v" + APP_VERSION; }
 const GUIDE_LINKS = {
   masks: "https://www.zeldadungeon.net/Zelda06Masks.php",
@@ -2060,9 +2060,11 @@ const GEAR_SOURCE = {
 // Checklist items that grant gear: ticking the item ticks the gear (trade items are consumed, so excluded)
 const GEAR_ALL_OF = new Set(["g_remains"]);
 // Gear whose linked checklist item is only an approximate prerequisite: never auto-ticked
+// Letters/pendant arrive mid-quest from an item that is only finished later, so they are never auto-ticked (the title deeds are)
+const PARTIAL_QUEST_GEAR = new Set(["g_letter_kafei", "g_pendant", "g_express_mail"]);
 const GEAR_NO_AUTO = new Set(["g_sonata", "g_lullaby", "g_bossa", "g_storms", "g_epona"]);
 function gearGrantedBy(itemId) {
-  return GEAR_ITEMS.filter(g => g.group !== "Trade Items & Letters" && !GEAR_TO_MASK[g.id] && !GEAR_NO_AUTO.has(g.id) &&
+  return GEAR_ITEMS.filter(g => !GEAR_NO_AUTO.has(g.id) && !PARTIAL_QUEST_GEAR.has(g.id) && !GEAR_TO_MASK[g.id] && !GEAR_NO_AUTO.has(g.id) &&
     GEAR_SOURCE[g.id] && (GEAR_SOURCE[g.id].items || []).includes(itemId)).map(g => g.id);
 }
 function gearSatisfied(gearId) {
@@ -2070,7 +2072,7 @@ function gearSatisfied(gearId) {
   return GEAR_ALL_OF.has(gearId) ? src.every(i => checkedSet.has(i)) : src.some(i => checkedSet.has(i));
 }
 function syncGearFromItems(itemId) {
-  const ids = itemId ? gearGrantedBy(itemId) : GEAR_ITEMS.filter(g => g.group !== "Trade Items & Letters" && !GEAR_TO_MASK[g.id] && !GEAR_NO_AUTO.has(g.id) && GEAR_SOURCE[g.id] && (GEAR_SOURCE[g.id].items || []).length).map(g => g.id);
+  const ids = itemId ? gearGrantedBy(itemId) : GEAR_ITEMS.filter(g => !GEAR_NO_AUTO.has(g.id) && !PARTIAL_QUEST_GEAR.has(g.id) && !GEAR_TO_MASK[g.id] && !GEAR_NO_AUTO.has(g.id) && GEAR_SOURCE[g.id] && (GEAR_SOURCE[g.id].items || []).length).map(g => g.id);
   // Add-only: unticking a step/item must never take away gear you already marked as on hand
   for (const g of ids) if (gearSatisfied(g)) ownedGearSet.add(g);
 }
@@ -2680,6 +2682,19 @@ function chainText(via, depth = 0) {
   return via.map(v => `${gearName(v.gid)} <- <a onclick="jumpTo('${v.src.id}')">${v.src.title}</a> (${fmtWindow(v.w)})` + (v.sub.via.length ? ` [first: ${chainText(v.sub.via, depth + 1)}]` : "")).join("; ");
 }
 
+// When an untimed item first becomes doable: after the latest earlier item it needs (timed or not)
+function readyInfo(item, seen = new Set()) {
+  const plan = planGear(item, 96, seen);
+  let key = 6, depth = 0, src = null;
+  for (const v of plan.via) {
+    let k, dp;
+    if (v.w.anytime) { const r = readyInfo(v.src, new Set(seen).add(item.id)); k = r.key; dp = r.depth + 1; }
+    else { k = evKey(v.w); dp = 1; }
+    if (k > key || (k === key && dp > depth)) { key = k; depth = dp; src = v.src; }
+  }
+  return { key, depth, src };
+}
+
 function renderPlanner(f) {
   const events = [];
   for (const item of ITEMS) {
@@ -2689,10 +2704,12 @@ function renderPlanner(f) {
   // Items with no time limit can be done from the start, so they go at the top of Day 1
   for (const item of ITEMS) {
     if (checkedSet.has(item.id) || SCHEDULES[item.id] || !baseFilter(item, f)) continue;
-    events.push({ d: 1, s: 6, e: 30, l: "No time limit — do it whenever", anytime: true, item });
+    const r = readyInfo(item);
+    const d = Math.floor((r.key - 6) / 24) + 1, st = r.key - (d - 1) * 24;
+    events.push({ d, s: st, e: 30, l: r.src ? `No time limit — once you have done ${r.src.title}` : "No time limit — do it whenever", anytime: true, depth: r.depth, item });
   }
   if (!events.length) return `<div class="empty-state">Nothing left for the current filters.</div>`;
-  events.sort((a, b) => a.d - b.d || a.s - b.s || (b.anytime ? 1 : 0) - (a.anytime ? 1 : 0) || a.e - b.e);
+  events.sort((a, b) => a.d - b.d || a.s - b.s || (b.anytime ? 1 : 0) - (a.anytime ? 1 : 0) || (a.depth || 0) - (b.depth || 0) || a.e - b.e);
 
   let html = `<p class="planner-intro">Every item you still need, in the order it happens across one 3-day cycle. Items with no time limit sit at the top of Day 1. Items tagged <span class="tag cycle">One cycle</span> fail if you play the Song of Time partway through. Gear you don’t have yet counts as available if you can get it from an earlier timed item in the same cycle (shown under “Get first”). Click a title to open it in the checklist.</p>`;
   let current = "";
