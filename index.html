@@ -323,6 +323,7 @@
       <div class="stat-card"><div class="stat-label">Masks Collected</div><div class="stat-value masks" id="mask-count">0 / 24</div></div>
       <div class="stat-card"><div class="stat-label">Bottles</div><div class="stat-value gear" id="bottle-count">0 / 7</div></div>
       <div class="stat-card"><div class="stat-label">Great Fairy Rewards</div><div class="stat-value masks" id="fairy-count">0 / 4</div></div>
+      <div class="stat-card"><div class="stat-label">Songs Learned</div><div class="stat-value gear" id="song-count">0 / 10</div></div>
       <div class="stat-card"><div class="stat-label">Collected Gear</div><div class="stat-value gear" id="gear-count">0 / 0</div></div>
     </div>
 
@@ -350,12 +351,13 @@
     <div class="controls">
       <input type="search" id="search" placeholder="Search mask, location, day, time, step, or required item..." oninput="render()" />
       <select id="type-filter" onchange="render()">
-        <option value="all">All Categories (91)</option>
+        <option value="all">All Categories (101)</option>
         <option value="mask">Masks Only (24)</option>
         <option value="heart">Pieces of Heart Only (52)</option>
         <option value="container">Boss Heart Containers (4)</option>
         <option value="bottle">Bottles (7)</option>
         <option value="fairy">Stray Fairies / Great Fairies (4)</option>
+        <option value="song">Songs (10)</option>
       </select>
       <select id="sort-mode" onchange="onSortChange()">
         <option value="default">Sort: Game order</option>
@@ -428,7 +430,7 @@
 
 <script>
 // Bump this on each release; it is shown next to the title.
-const APP_VERSION = "1.4.7";
+const APP_VERSION = "1.5.0";
 { const v = document.getElementById("app-version"); if (v) v.textContent = "v" + APP_VERSION; }
 const GUIDE_LINKS = {
   masks: "https://www.zeldadungeon.net/Zelda06Masks.php",
@@ -456,6 +458,8 @@ const GEAR_ITEMS = [
   { id: "g_inverted", group: "Songs", label: "Inverted Song of Time" },
 
   { id: "g_sword", group: "Equipment & Items", label: "Sword" },
+  { id: "g_razor_sword", group: "Equipment & Items", label: "Razor Sword" },
+  { id: "g_gilded_sword", group: "Equipment & Items", label: "Gilded Sword" },
   { id: "g_magic", group: "Equipment & Items", label: "Magic Meter" },
   { id: "g_bow", group: "Equipment & Items", label: "Hero's Bow" },
   { id: "g_fire_arrows", group: "Equipment & Items", label: "Fire Arrows" },
@@ -532,6 +536,7 @@ const MASK_TO_GEAR = {
   m17: "g_goron_mask", m18: "g_don_gero_mask", m19: "g_zora_mask", m20: "g_stone_mask",
   m21: "g_captain_hat", m22: "g_gibdo_mask", m23: "g_giant_mask", m24: "g_fierce_deity_mask",
   // Bottles sync the same way (checklist entry <-> gear entry); "Empty Bottle" below is derived from them
+  s1: "g_epona", s2: "g_sonata", s3: "g_soaring", s4: "g_lullaby", s5: "g_bossa", s6: "g_elegy", s7: "g_storms", s8: "g_oath", s9: "g_double_time", s10: "g_inverted",
   b1: "g_bottle_1", b2: "g_bottle_2", b3: "g_bottle_3", b4: "g_bottle_4", b5: "g_bottle_5", b6: "g_bottle_6", b7: "g_bottle_7"
 };
 const GEAR_TO_MASK = Object.fromEntries(Object.entries(MASK_TO_GEAR).map(([m, g]) => [g, m]));
@@ -1921,6 +1926,126 @@ ITEMS.push(
   }
 );
 
+ITEMS.push(
+  { id: "s1", type: "song", day: "Day 1", tod: "Morning / Day", region: "Termina Field & Ranch",
+    title: "Epona's Song",
+    requiresGear: ["g_goron_mask", "g_powder_keg"],
+    req: "Reach Romani Ranch on Day 1, before 6:00 PM.",
+    guide: "https://www.thonky.com/zelda-majoras-mask/great-bay-coast#meet-an-old-friend",
+    desc: "Romani teaches you Epona's Song at Romani Ranch after her balloon archery practice. You only need the song here; the rest of Romani's Mask quest is separate. The ranch is only open on Day 1 before 6:00 PM unless you reset.",
+    steps: [
+      "As a Goron, blow up the boulder on Milk Road with a Powder Keg and enter Romani Ranch before 6:00 PM on Day 1.",
+      "Talk to Romani in the field and pass her balloon archery practice. She teaches you Epona's Song."
+    ]
+  },
+  { id: "s2", type: "song", day: "Anytime", tod: "Anytime", region: "Southern Swamp & Woodfall",
+    title: "Sonata of Awakening",
+    requiresGear: ["g_deku_mask"],
+    req: "Go in as Deku Link.",
+    guide: "https://www.thonky.com/zelda-majoras-mask/southern-swamp#reach-the-monkeys-brother",
+    desc: "In the Deku Palace area of the Southern Swamp, the caged monkey asks for a loud instrument. Play your Ocarina as Deku Link after you free him and he teaches you the Sonata of Awakening. You need it to raise Woodfall Temple and to wake the sleeping giant skeleton in Ikana.",
+    steps: [
+      "Get into the Deku Palace area as Deku Link (bean sprout and flower route).",
+      "Cut the monkey's rope, then play the Ocarina as a Deku Scrub for him.",
+      "Learn the Sonata of Awakening."
+    ]
+  },
+  { id: "s3", type: "song", day: "Anytime", tod: "Anytime", region: "Southern Swamp & Woodfall",
+    title: "Song of Soaring",
+    requiresGear: ["g_deku_mask", "g_sonata"],
+    req: "Deku Mask and the Sonata of Awakening lesson come first.",
+    guide: "https://www.thonky.com/zelda-majoras-mask/southern-swamp#reach-the-monkeys-brother",
+    desc: "Kaepora Gaebora teaches you the Song of Soaring on the Deku shortcut in the Southern Swamp. Once you know it you can warp to any owl statue you have already hit with your sword.",
+    steps: [
+      "Reach the Deku shortcut platform in Southern Swamp as Deku Link.",
+      "Let Kaepora Gaebora finish talking, then read the stone engraving he leaves behind.",
+      "Learn the Song of Soaring."
+    ]
+  },
+  { id: "s4", type: "song", day: "Anytime", tod: "Anytime", region: "Snowhead & Mountains",
+    title: "Goron Lullaby",
+    requiresGear: ["g_goron_mask", "g_bottle"],
+    req: "Needs an empty bottle for hot spring water.",
+    guide: "https://www.thonky.com/zelda-majoras-mask/mountain-village#learn-the-lullaby",
+    desc: "Thaw the frozen Goron Elder in Mountain Village with hot spring water, and he teaches you the Lullaby Intro. Play the intro for his son in the Goron Shrine, and the boy teaches you the full Goron Lullaby.",
+    steps: [
+      "Fill an empty bottle with hot spring water under the Mountain Village bridges (revive the hot spring first).",
+      "Thaw the Goron Elder with the hot water and talk to him as a Goron to learn the Lullaby Intro.",
+      "In the Goron Shrine, play the Lullaby Intro for the Elder's son as a Goron to learn the Goron Lullaby."
+    ]
+  },
+  { id: "s5", type: "song", day: "Anytime", tod: "Anytime", region: "Great Bay",
+    title: "New Wave Bossa Nova",
+    requiresGear: ["g_zora_mask"],
+    req: "Rescue the Zora Eggs first.",
+    guide: "https://www.thonky.com/zelda-majoras-mask/great-bay-temple",
+    desc: "After you have the Zora Mask and rescue the Zora Eggs, you learn the New Wave Bossa Nova. Play it for Lulu behind the Zora Hall in Zora Cape, then Hookshot a palm tree to reach the turtle's back for Great Bay Temple.",
+    steps: [
+      "Get the Zora Mask from Mikau.",
+      "Rescue the Zora Eggs and return them to the Marine Research Lab.",
+      "Learn the New Wave Bossa Nova."
+    ]
+  },
+  { id: "s6", type: "song", day: "Anytime", tod: "Anytime", region: "Ikana Canyon",
+    title: "Elegy of Emptiness",
+    requiresGear: ["g_gibdo_mask"],
+    req: "Learned inside Ikana Castle; the Gibdo Mask comes first.",
+    guide: "https://www.thonky.com/zelda-majoras-mask/ikana-castle",
+    desc: "You learn the Elegy of Emptiness in Ikana Castle after you have the Gibdo Mask. It makes a statue of yourself that can stand on switches in Stone Tower Temple. The exact steps weren't on the Thonky pages checked, so double check them in your game.",
+    steps: [
+      "Get the Gibdo Mask in Ikana Canyon (Song of Healing for the mummy in the Music Box House closet).",
+      "Enter Ikana Castle and work through to the throne room.",
+      "Learn the Elegy of Emptiness."
+    ]
+  },
+  { id: "s7", type: "song", day: "Anytime", tod: "Evening", region: "Ikana Canyon",
+    title: "Song of Storms",
+    requiresGear: ["g_captain_hat", "g_sword"],
+    req: "Night only; wear the Captain's Hat.",
+    guide: "https://www.thonky.com/zelda-majoras-mask/ikana-valley#learn-a-new-song",
+    desc: "In Ikana Graveyard at night, wear the Captain's Hat and talk to a Stalchild so he opens the grave. Drop into the hole, defeat the Iron Knuckle, then check the revealed gravestone to learn the Song of Storms.",
+    steps: [
+      "Go to Ikana Graveyard at night (Captain's Hat on; you get the hat by waking the giant skeleton with the Sonata of Awakening).",
+      "Talk to a Stalchild to open the grave and drop into the hole.",
+      "Defeat the Iron Knuckle.",
+      "Check the revealed gravestone to learn the Song of Storms."
+    ]
+  },
+  { id: "s8", type: "song", day: "Anytime", tod: "Anytime", region: "Southern Swamp & Woodfall",
+    title: "Oath to Order",
+    requiresGear: ["g_deku_mask", "g_sonata"],
+    req: "Defeat Odolwa in Woodfall Temple.",
+    guide: "https://www.thonky.com/zelda-majoras-mask/woodfall-temple#learn-the-oath-to-order",
+    desc: "You learn the Oath to Order during the cutscene after you defeat Odolwa in Woodfall Temple. Play it at the top of the Clock Tower at midnight on the final day to summon the Giants.",
+    steps: [
+      "Clear Woodfall Temple and defeat Odolwa.",
+      "Watch the cutscene to learn the Oath to Order."
+    ]
+  },
+  { id: "s9", type: "song", day: "Anytime", tod: "Anytime", region: "Clock Town",
+    title: "Song of Double Time",
+    requiresGear: ["g_sot"],
+    req: "Taught by the Scarecrow in Clock Town.",
+    guide: "https://www.thonky.com/zelda-majoras-mask/clock-town#how-to-skip-forward",
+    desc: "The Scarecrow in the Astral Observatory or the Trading Post (West Clock Town) teaches you the Song of Double Time. Play every note of the Song of Time twice. It skips ahead from day to night, or night to the dawn of the next day, and is not recorded on the Quest Status screen.",
+    steps: [
+      "Talk to the Scarecrow in the Astral Observatory or the Trading Post.",
+      "Play each note of the Song of Time twice."
+    ]
+  },
+  { id: "s10", type: "song", day: "Anytime", tod: "Anytime", region: "Clock Town",
+    title: "Inverted Song of Time",
+    requiresGear: ["g_sot"],
+    req: "Taught by the Scarecrow in Clock Town.",
+    guide: "https://www.thonky.com/zelda-majoras-mask/clock-town#how-to-slow-time",
+    desc: "The same Scarecrow tells you to play the Song of Time backward. It slows time (a blue diamond appears on the clock), and playing it again restores normal speed.",
+    steps: [
+      "Talk to the Scarecrow in the Astral Observatory or the Trading Post.",
+      "Play the Song of Time backward."
+    ]
+  }
+);
+
 // Step-by-step "how to get it" guides (Thonky walkthrough) instead of wiki description pages
 const THONKY = "https://www.thonky.com/zelda-majoras-mask/";
 const TEMPLE_GUIDE = {
@@ -1972,6 +2097,8 @@ const SCHEDULES = {
     W(3, 17, 20, "Meet Kafei at Sakon's Hideout in Ikana Canyon (evening)"),
     W(3, 27, 30, "Wait in Anju's room at the Stock Pot Inn for Kafei (before dawn)")
   ],
+  s1: [W(1, 6, 18, "Learn Epona's Song from Romani (balloon archery practice)")],
+  s7: [W(1, 18, 30, "Ikana Graveyard grave (night only)"), W(2, 18, 30, "Ikana Graveyard grave (night only)"), W(3, 18, 30, "Ikana Graveyard grave (night only)")],
   m10: [W(1, 22, 30, "Milk Bar sound check with Toto"), W(2, 22, 30, "Milk Bar sound check with Toto")],
   m11: [W(1, 24, 30, "Kamaro dances in north Termina Field"), W(2, 24, 30, "Kamaro dances in north Termina Field"), W(3, 24, 30, "Kamaro dances in north Termina Field")],
   m12: [W(1, 6, 18, "Grog's Cucco Shack (daytime)"), W(2, 6, 18, "Grog's Cucco Shack (daytime)"), W(3, 6, 18, "Grog's Cucco Shack (daytime)")],
@@ -2021,15 +2148,17 @@ const GEAR_SOURCE = {
   g_ocarina: { text: "Taken back from Skull Kid on Night 3 of the first cycle", items: ["m1"] },
   g_sot: { text: "Zelda teaches it on top of the Clock Tower in the prologue, after Skull Kid drops the Ocarina", items: ["m1"] },
   g_soh: { text: "Happy Mask Salesman in the Clock Tower, after you return to the Dawn of the First Day (also gives the Deku Mask)", items: ["m1"] },
-  g_epona: { text: "Romani at Romani Ranch, Day 1 (balloon archery)", items: ["m13"] },
-  g_sonata: { text: "Caged Monkey in Deku Palace", items: ["hc1"] },
-  g_lullaby: { text: "Goron Elder and his son, Goron Village", items: ["hc2"] },
-  g_bossa: { text: "Zora Eggs hatched in the Marine Research Lab", items: ["hc3"] },
-  g_elegy: { text: "Defeat Igos du Ikana in Ikana Castle", items: ["hc4"] },
-  g_storms: { text: "Ikana Graveyard, Night 1, wearing the Captain's Hat: have a Stalchild open the grave with three Stalchildren, beat the Iron Knuckle, then check the revealed gravestone", items: ["m21"] },
-  g_oath: { text: "Taught by the Giant after defeating Odolwa", items: ["hc1"] },
+  g_epona: { text: "Romani at Romani Ranch, Day 1 (balloon archery)" },
+  g_sonata: { text: "Caged Monkey in Deku Palace" },
+  g_lullaby: { text: "Goron Elder and his son, Goron Village" },
+  g_bossa: { text: "Zora Eggs hatched in the Marine Research Lab" },
+  g_elegy: { text: "Defeat Igos du Ikana in Ikana Castle" },
+  g_storms: { text: "Ikana Graveyard, Night 1, wearing the Captain's Hat: have a Stalchild open the grave with three Stalchildren, beat the Iron Knuckle, then check the revealed gravestone" },
+  g_oath: { text: "Taught by the Giant after defeating Odolwa" },
   g_scarecrow: { text: "Teach Pierre a song in the Trading Post or Astral Observatory", items: ["hp33"] },
   g_sword: { text: "You start with the Kokiri Sword" },
+  g_razor_sword: { text: "Mountain Smithy in Mountain Village: after Snowhead is cleared and the snow melts, leave your Kokiri Sword with the smithy and pay 100 Rupees. It is ready the next morning (pick it up before the cycle resets)" },
+  g_gilded_sword: { text: "Mountain Smithy: needs the Razor Sword and the Bottle of Gold Dust from the Goron Race (Bottle #5). Pay 200 Rupees; it is ready the next morning" },
   g_magic: { text: "Clock Town Great Fairy (prologue, as Deku Link)", items: ["m1"] },
   g_bow: { text: "Woodfall Temple", items: ["hc1"] },
   g_fire_arrows: { text: "Snowhead Temple", items: ["hc2"] },
@@ -2071,7 +2200,7 @@ const GEAR_ALL_OF = new Set(["g_remains"]);
 // Gear whose linked checklist item is only an approximate prerequisite: never auto-ticked
 // Letters/pendant arrive mid-quest from an item that is only finished later, so they are never auto-ticked (the title deeds are)
 const PARTIAL_QUEST_GEAR = new Set(["g_letter_kafei", "g_pendant", "g_express_mail"]);
-const GEAR_NO_AUTO = new Set(["g_sonata", "g_lullaby", "g_bossa", "g_storms", "g_epona"]);
+const GEAR_NO_AUTO = new Set([]);
 function gearGrantedBy(itemId) {
   return GEAR_ITEMS.filter(g => !GEAR_NO_AUTO.has(g.id) && !PARTIAL_QUEST_GEAR.has(g.id) && !GEAR_TO_MASK[g.id] && !GEAR_NO_AUTO.has(g.id) &&
     GEAR_SOURCE[g.id] && (GEAR_SOURCE[g.id].items || []).includes(itemId)).map(g => g.id);
@@ -2320,7 +2449,7 @@ function toggleGear(gearId) {
 }
 
 function setAllGear(checked) {
-  if (!checked && !confirm("Clear all gear? This also un-completes every mask in the checklist, because masks are synced with the gear list.")) return;
+  if (!checked && !confirm("Clear all gear? This also un-completes every mask in the checklist, because masks, bottles and songs are synced with the gear list.")) return;
   if (checked) GEAR_ITEMS.forEach(g => ownedGearSet.add(g.id)); else ownedGearSet.clear();
   for (const maskId of Object.values(GEAR_TO_MASK)) { if (checked) checkedSet.add(maskId); else checkedSet.delete(maskId); }
   syncGearFromItems();
@@ -2489,7 +2618,7 @@ function renderInventory() {
 }
 
 function updateStats() {
-  let hp = 0, hc = 0, masks = 0, bottles = 0, fairies = 0;
+  let hp = 0, hc = 0, masks = 0, bottles = 0, fairies = 0, songs = 0;
   for (const item of ITEMS) {
     if (checkedSet.has(item.id)) {
       if (item.type === "heart") hp++;
@@ -2497,6 +2626,7 @@ function updateStats() {
       else if (item.type === "mask") masks++;
       else if (item.type === "bottle") bottles++;
       else if (item.type === "fairy") fairies++;
+      else if (item.type === "song") songs++;
     }
   }
   const totalHearts = 3 + hc + Math.floor(hp / 4);
@@ -2508,6 +2638,7 @@ function updateStats() {
   set("mask-count", `${masks} / 24`);
   set("bottle-count", `${bottles} / 7`);
   set("fairy-count", `${fairies} / 4`);
+  set("song-count", `${songs} / 10`);
   set("gear-count", `${ownedGearSet.size} / ${GEAR_ITEMS.length}`);
 }
 
@@ -2521,7 +2652,7 @@ function renderCard(item, opts = {}) {
   const isChecked = checkedSet.has(item.id);
   const isOpen = openStepsSet.has(item.id) || Boolean(opts.query);
   const missing = missingCount(item);
-  const tagLabel = { mask: "Mask", container: "Heart Container", heart: "Piece of Heart", bottle: "Bottle", fairy: "Great Fairy" }[item.type];
+  const tagLabel = { mask: "Mask", container: "Heart Container", heart: "Piece of Heart", bottle: "Bottle", fairy: "Great Fairy", song: "Song" }[item.type];
   const steps = item.steps || [];
   const doneCount = steps.filter((_, idx) => subCheckedSet.has(stepKey(item, idx))).length;
 
