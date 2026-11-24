@@ -428,7 +428,7 @@
 
 <script>
 // Bump this on each release; it is shown next to the title.
-const APP_VERSION = "1.4.5";
+const APP_VERSION = "1.4.6";
 { const v = document.getElementById("app-version"); if (v) v.textContent = "v" + APP_VERSION; }
 const GUIDE_LINKS = {
   masks: "https://www.zeldadungeon.net/Zelda06Masks.php",
@@ -2713,19 +2713,27 @@ function readyInfo(item, seen = new Set()) {
 function renderPlanner(f) {
   planCache.clear();
   const events = [];
+  // "Items I Have On Me" here also keeps items whose missing gear comes from an earlier item in the cycle
+  const pf = { ...f, ownedOnly: false };
   for (const item of ITEMS) {
-    if (checkedSet.has(item.id) || !baseFilter(item, f)) continue;
-    for (const w of SCHEDULES[item.id] || []) events.push({ ...w, item });
+    if (checkedSet.has(item.id) || !baseFilter(item, pf)) continue;
+    for (const w of SCHEDULES[item.id] || []) {
+      if (f.ownedOnly && planGear(item, evEnd(w), new Set()).missing > 0) continue;
+      events.push({ ...w, item });
+    }
   }
   // Items with no time limit can be done from the start, so they go at the top of Day 1
   for (const item of ITEMS) {
-    if (checkedSet.has(item.id) || SCHEDULES[item.id] || !baseFilter(item, f)) continue;
+    if (checkedSet.has(item.id) || SCHEDULES[item.id] || !baseFilter(item, pf)) continue;
+    if (f.ownedOnly && planGear(item, 96, new Set()).missing > 0) continue;
     const r = readyInfo(item);
     const d = Math.floor((r.key - 6) / 24) + 1, st = r.key - (d - 1) * 24;
     events.push({ d, s: st, e: 30, l: r.src ? `No time limit — once you have done ${r.src.title}` : "No time limit — do it whenever", anytime: true, depth: r.depth, item });
   }
   if (!events.length) return `<div class="empty-state">Nothing left for the current filters.</div>`;
-  events.sort((a, b) => a.d - b.d || a.s - b.s || (b.anytime ? 1 : 0) - (a.anytime ? 1 : 0) || (a.depth || 0) - (b.depth || 0) || a.e - b.e);
+  // at the same start: free items first, then timed items, then untimed items that depend on something earlier
+  const rank = ev => ev.anytime ? (ev.depth ? 2 : 0) : 1;
+  events.sort((a, b) => a.d - b.d || a.s - b.s || rank(a) - rank(b) || (a.depth || 0) - (b.depth || 0) || a.e - b.e);
 
   let html = `<p class="planner-intro">Every item you still need, in the order it happens across one 3-day cycle. Items with no time limit sit at the top of Day 1. Items tagged <span class="tag cycle">One cycle</span> fail if you play the Song of Time partway through. Gear you don’t have yet counts as available if you can get it from an earlier timed item in the same cycle (shown under “Get first”). Click a title to open it in the checklist.</p>`;
   let current = "";
