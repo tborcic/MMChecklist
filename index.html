@@ -428,7 +428,7 @@
 
 <script>
 // Bump this on each release; it is shown next to the title.
-const APP_VERSION = "1.3.5";
+const APP_VERSION = "1.4.0";
 { const v = document.getElementById("app-version"); if (v) v.textContent = "v" + APP_VERSION; }
 const GUIDE_LINKS = {
   masks: "https://www.zeldadungeon.net/Zelda06Masks.php",
@@ -2273,7 +2273,7 @@ function fmtHour(h) {
   return `${h12}:${String(min).padStart(2, "0")} ${ampm}`;
 }
 function periodName(d, h) { return h >= 6 && h < 18 ? `Day ${d}` : `Night ${d}`; }
-function fmtWindow(w) { return `${periodName(w.d, w.s)} · ${fmtHour(w.s)}–${fmtHour(w.e)}`; }
+function fmtWindow(w) { if (w.anytime) return "any time, from Day 1"; return `${periodName(w.d, w.s)} · ${fmtHour(w.s)}–${fmtHour(w.e)}`; }
 
 function stepProgress(item) {
   const steps = item.steps || [];
@@ -2660,12 +2660,14 @@ function planGear(item, deadline, visited) {
     if (reqOwned(r)) continue;
     let found = null;
     for (const gid of (Array.isArray(r) ? r : [r])) {
+      if (GEAR_ALL_OF.has(gid)) continue; // needs every source item, not just one
       for (const srcId of gearSourceItems(gid)) {
         const src = ITEM_BY_ID[srcId];
-        if (!src || srcId === "m1" || BASIC_GEAR.has(gid) || seen.has(srcId) || checkedSet.has(srcId) || !SCHEDULES[srcId]) continue;
-        const w = SCHEDULES[srcId].find(x => evKey(x) < deadline);
+        if (!src || srcId === "m1" || BASIC_GEAR.has(gid) || seen.has(srcId) || checkedSet.has(srcId)) continue;
+        // Items with no time limit can be done from the start of Day 1
+        const w = SCHEDULES[srcId] ? SCHEDULES[srcId].find(x => evKey(x) < deadline) : { d: 1, s: 6, e: 30, anytime: true };
         if (!w) continue;
-        const sub = planGear(src, evEnd(w), seen);
+        const sub = planGear(src, w.anytime ? deadline : evEnd(w), seen);
         if (sub.missing === 0) { found = { gid, src, w, sub }; break; }
       }
       if (found) break;
