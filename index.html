@@ -184,6 +184,7 @@
     .tag.ready { background: rgba(16, 185, 129, 0.18); color: #6ee7b7; }
     .tag.missing { background: rgba(244, 63, 94, 0.15); color: #fda4af; }
     .tag.chain { background: rgba(245, 158, 11, 0.16); color: #fcd34d; }
+    .planner-anytime > summary { cursor: pointer; }
     .planner-chain { color: var(--muted); font-size: 0.8rem; margin-top: 0.2rem; }
     .planner-chain a { color: var(--accent); text-decoration: underline dotted; cursor: pointer; }
 
@@ -428,7 +429,7 @@
 
 <script>
 // Bump this on each release; it is shown next to the title.
-const APP_VERSION = "1.3.2";
+const APP_VERSION = "1.3.4";
 { const v = document.getElementById("app-version"); if (v) v.textContent = "v" + APP_VERSION; }
 const GUIDE_LINKS = {
   masks: "https://www.zeldadungeon.net/Zelda06Masks.php",
@@ -2071,7 +2072,8 @@ function gearSatisfied(gearId) {
 }
 function syncGearFromItems(itemId) {
   const ids = itemId ? gearGrantedBy(itemId) : GEAR_ITEMS.filter(g => g.group !== "Trade Items & Letters" && !GEAR_TO_MASK[g.id] && !GEAR_NO_AUTO.has(g.id) && GEAR_SOURCE[g.id] && (GEAR_SOURCE[g.id].items || []).length).map(g => g.id);
-  for (const g of ids) { if (gearSatisfied(g)) ownedGearSet.add(g); else if (itemId) ownedGearSet.delete(g); }
+  // Add-only: unticking a step/item must never take away gear you already marked as on hand
+  for (const g of ids) if (gearSatisfied(g)) ownedGearSet.add(g);
 }
 
 function gearSourceItems(gearId) {
@@ -2695,7 +2697,9 @@ function renderPlanner(f) {
     for (const w of SCHEDULES[item.id] || []) events.push({ ...w, item });
   }
   const ups = followUps(f);
-  if (!events.length && !ups.length) return `<div class="empty-state">No timed events left for the current filters — everything else can be done at any time.</div>`;
+  const upIds = new Set(ups.map(u => u.item.id));
+  const anytime = ITEMS.filter(i => !checkedSet.has(i.id) && !SCHEDULES[i.id] && !upIds.has(i.id) && baseFilter(i, f));
+  if (!events.length && !ups.length && !anytime.length) return `<div class="empty-state">No timed events left for the current filters — everything else can be done at any time.</div>`;
   events.sort((a, b) => a.d - b.d || a.s - b.s || a.e - b.e);
 
   let html = `<p class="planner-intro">Every timed event you still need, in the order it happens across one 3-day cycle. Items tagged <span class="tag cycle">One cycle</span> fail if you play the Song of Time partway through. Gear you don’t have yet counts as available if you can get it from an earlier timed item in the same cycle (shown under “Get first”). Click a title to open it in the checklist.</p>`;
@@ -2738,6 +2742,19 @@ function renderPlanner(f) {
         <div class="planner-tags">${left === 0 ? `<span class="tag chain">Gear from earlier item</span>` : `<span class="tag missing">Missing ${left}${covered ? ` · +${covered} earlier` : ""}</span>`}</div>
       </div>`;
     }
+  }
+  if (anytime.length) {
+    html += `<details class="planner-anytime"><summary class="section-title planner-period"><span>Anytime — no time limit (${anytime.length})</span></summary>`;
+    for (const item of sortItems(anytime)) {
+      const missing = missingCount(item);
+      html += `
+      <div class="planner-row">
+        <div class="planner-time">Any time</div>
+        <div><div class="planner-title" role="button" tabindex="0" onclick="jumpTo('${item.id}')">${item.title}</div></div>
+        <div class="planner-tags">${missing === 0 ? `<span class="tag ready">Have Gear</span>` : `<span class="tag missing">Missing ${missing}</span>`}</div>
+      </div>`;
+    }
+    html += `</details>`;
   }
   return html;
 }
