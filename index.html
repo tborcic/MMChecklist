@@ -440,7 +440,7 @@
 
 <script>
 // Bump this on each release; it is shown next to the title.
-const APP_VERSION = "1.2.0";
+const APP_VERSION = "1.2.1";
 { const v = document.getElementById("app-version"); if (v) v.textContent = "v" + APP_VERSION; }
 const GUIDE_LINKS = {
   masks: "https://www.zeldadungeon.net/Zelda06Masks.php",
@@ -2139,6 +2139,30 @@ function hashText(t) {
   return h.toString(36);
 }
 function stepKey(item, idx) { return `${item.id}~${hashText(item.steps[idx])}`; }
+// Text-hash keys of steps that were later reworded -> their current key (keeps old saves/exports working)
+const LEGACY_STEP_KEYS = {
+ "m16~6xz46r": "m16~17qg3xg",
+ "m16~10li4pp": "m16~1f3tpdc",
+ "m21~b6iuu3": "m21~n6x3yf",
+ "b1~kech1o": "b1~bbr905",
+ "f1~4rspit": "f1~xwl92y",
+ "f2~xwl92y": "f2~4rspit",
+ "m1~1bioz0m": "m1~1s8jaz5",
+ "m7~9w13g9": "m7~1b2defc",
+ "m7~1a1han8": "m7~ryhk6c",
+ "m7~pcfyah": "m7~tieggd",
+ "m7~11mwl14": "m7~1dlbb03",
+ "m8~lxhs28": "m8~kvhx29",
+ "m8~abmxvh": "m8~1d5m3gq",
+ "m9~950d7m": "m9~1l6d5tm",
+ "m9~euqftx": "m9~avmyy6",
+ "m9~jgk89e": "m9~weswym",
+ "m9~1jo9rpc": "m9~49p9jo",
+ "m10~2wfwr": "m10~zqbr08",
+ "hp14~m6tw4z": "hp14~bu4cg5",
+ "hp15~iut1x4": "hp15~165i77y",
+ "b6~1fuibaw": "b6~14k6bxd"
+};
 // Convert old position-based keys ("hp1_s2") to text-based keys
 function migrateStepKeys(keys) {
   const out = new Set();
@@ -2149,7 +2173,7 @@ function migrateStepKeys(keys) {
       const item = ITEMS.find(i => i.id === m[1]);
       const idx = Number(m[2]);
       if (item && item.steps && idx < item.steps.length) out.add(stepKey(item, idx));
-    } else out.add(k);
+    } else out.add(LEGACY_STEP_KEYS[k] || k);
   }
   return out;
 }
@@ -2379,7 +2403,7 @@ function resetProgress() {
 // ==================== EXPORT / IMPORT ====================
 function buildExport() {
   return {
-    app: "mm3d-tracker", version: 3, exportedAt: new Date().toISOString(),
+    app: "mm3d-tracker", version: 3, appVersion: APP_VERSION, exportedAt: new Date().toISOString(),
     checked: [...checkedSet], substeps: [...subCheckedSet], openSteps: [...openStepsSet],
     gear: [...ownedGearSet], notes, fairyCounts, hideCompleted, invOpen, ui
   };
@@ -2396,7 +2420,8 @@ function applyImport(data) {
   if (!data || data.app !== "mm3d-tracker") throw new Error("This file isn't a Majora's Mask tracker save.");
   const arr = v => (Array.isArray(v) ? v : []);
   checkedSet = new Set(arr(data.checked));
-  subCheckedSet = migrateStepKeys(arr(data.substeps)); // also converts version-2 exports
+  const importedSteps = migrateStepKeys(arr(data.substeps)); // also converts version-2 exports
+  subCheckedSet = importedSteps;
   openStepsSet = new Set(arr(data.openSteps));
   ownedGearSet = new Set(arr(data.gear));
   notes = data.notes;
@@ -2404,7 +2429,9 @@ function applyImport(data) {
   if (typeof data.hideCompleted === "boolean") hideCompleted = data.hideCompleted;
   if (typeof data.invOpen === "boolean") invOpen = data.invOpen;
   ui = data.ui; // validated field by field in sanitizeState()
-  sanitizeState(); save(); render();
+  sanitizeState(); syncGearFromItems(); save(); render();
+  const dropped = importedSteps.size - subCheckedSet.size;
+  if (dropped > 0) alert(`Imported. ${dropped} ticked sub-step(s) were skipped because those steps were reworded or removed since the save was exported.`);
 }
 function importProgress(input) {
   const file = input.files && input.files[0];
@@ -2518,12 +2545,9 @@ function renderCard(item, opts = {}) {
     subHtml += `</div>`;
   }
 
+  // Count comes from the per-fairy steps, so it can never disagree with them (or with an import)
   const fairyCounter = item.type === "fairy" ? `
-    <span class="counter">Stray Fairies:
-      <button type="button" onclick="changeFairy('${item.id}', -1)">−</button>
-      <span>${fairyCounts[item.id] || 0} / 15</span>
-      <button type="button" onclick="changeFairy('${item.id}', 1)">+</button>
-    </span>` : "";
+    <span class="counter">Stray Fairies: <span>${doneCount} / ${steps.length}</span></span>` : "";
 
   const hasNote = Boolean(notes[item.id]);
   const notesHtml = notesOpen.has(item.id)
