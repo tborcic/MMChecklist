@@ -183,6 +183,9 @@
     .tag.tod { background: rgba(168, 85, 247, 0.18); color: #e9d5ff; }
     .tag.ready { background: rgba(16, 185, 129, 0.18); color: #6ee7b7; }
     .tag.missing { background: rgba(244, 63, 94, 0.15); color: #fda4af; }
+    .tag.chain { background: rgba(245, 158, 11, 0.16); color: #fcd34d; }
+    .planner-chain { color: var(--muted); font-size: 0.8rem; margin-top: 0.2rem; }
+    .planner-chain a { color: var(--accent); text-decoration: underline dotted; cursor: pointer; }
 
     .item-desc { font-size: 0.92rem; color: #d4cee8; }
 
@@ -440,7 +443,7 @@
 
 <script>
 // Bump this on each release; it is shown next to the title.
-const APP_VERSION = "1.2.1";
+const APP_VERSION = "1.3.0";
 { const v = document.getElementById("app-version"); if (v) v.textContent = "v" + APP_VERSION; }
 const GUIDE_LINKS = {
   masks: "https://www.zeldadungeon.net/Zelda06Masks.php",
@@ -2038,7 +2041,7 @@ const GEAR_SOURCE = {
   g_bottle: { text: "See the Bottles category", items: ["b1", "b2", "b3", "b4", "b5", "b6", "b7"] },
   g_pictograph: { text: "Swamp Tourist Center, after you help Koume", items: ["b1"] },
   g_wallet: { text: "Bank in West Clock Town: deposit 200 Rupees", items: ["hp8"] },
-  g_giant_wallet: { text: "Oceanside Spider House: all 30 Gold Skulltulas", items: ["m6"] },
+  g_giant_wallet: { text: "Oceanside Spider House: clear all 30 Gold Skulltulas (a step of the All-Night Mask entry, which needs it)" },
   g_remains: { text: "Defeat all four temple bosses", items: ["hc1", "hc2", "hc3", "hc4"] },
   g_moons_tear: { text: "Astral Observatory telescope", items: ["hp1"] },
   g_land_deed: { text: "Trade the Moon's Tear to the South Clock Town Business Scrub", items: ["hp1"] },
@@ -2648,6 +2651,36 @@ function renderChecklist(f) {
   return html;
 }
 
+// Absolute time inside the cycle (hours); planner clock hours run 6..30 per day
+function evKey(w) { return (w.d - 1) * 24 + w.s; }
+function evEnd(w) { return (w.d - 1) * 24 + w.e; }
+// Which still-missing gear for `item` can be picked up from another timed item that fits earlier in
+// the same cycle (and whose own gear can be sorted the same way). Returns {missing, via}.
+function planGear(item, deadline, visited) {
+  const seen = new Set(visited).add(item.id);
+  let missing = 0; const via = [];
+  for (const r of item.requiresGear || []) {
+    if (reqOwned(r)) continue;
+    let found = null;
+    for (const gid of (Array.isArray(r) ? r : [r])) {
+      for (const srcId of gearSourceItems(gid)) {
+        const src = ITEM_BY_ID[srcId];
+        if (!src || srcId === "m1" || BASIC_GEAR.has(gid) || seen.has(srcId) || checkedSet.has(srcId) || !SCHEDULES[srcId]) continue;
+        const w = SCHEDULES[srcId].find(x => evKey(x) < deadline);
+        if (!w) continue;
+        const sub = planGear(src, evEnd(w), seen);
+        if (sub.missing === 0) { found = { gid, src, w, sub }; break; }
+      }
+      if (found) break;
+    }
+    if (found) via.push(found); else missing++;
+  }
+  return { missing, via };
+}
+function chainText(via, depth = 0) {
+  return via.map(v => `${gearName(v.gid)} <- <a onclick="jumpTo('${v.src.id}')">${v.src.title}</a> (${fmtWindow(v.w)})` + (v.sub.via.length ? ` [first: ${chainText(v.sub.via, depth + 1)}]` : "")).join("; ");
+}
+
 function renderPlanner(f) {
   const events = [];
   for (const item of ITEMS) {
@@ -2657,7 +2690,7 @@ function renderPlanner(f) {
   if (!events.length) return `<div class="empty-state">No timed events left for the current filters — everything else can be done at any time.</div>`;
   events.sort((a, b) => a.d - b.d || a.s - b.s || a.e - b.e);
 
-  let html = `<p class="planner-intro">Every timed event you still need, in the order it happens across one 3-day cycle. Items tagged <span class="tag cycle">One cycle</span> fail if you play the Song of Time partway through. Click a title to open it in the checklist.</p>`;
+  let html = `<p class="planner-intro">Every timed event you still need, in the order it happens across one 3-day cycle. Items tagged <span class="tag cycle">One cycle</span> fail if you play the Song of Time partway through. Gear you don’t have yet counts as available if you can get it from an earlier timed item in the same cycle (shown under “Get first”). Click a title to open it in the checklist.</p>`;
   let current = "";
   for (const ev of events) {
     const period = periodName(ev.d, ev.s);
@@ -2665,17 +2698,19 @@ function renderPlanner(f) {
       current = period;
       html += `<div class="section-title planner-period"><span>${period} ${period.startsWith("Day") ? "☀️" : "🌙"}</span></div>`;
     }
-    const missing = missingCount(ev.item);
+    const plan = planGear(ev.item, evEnd(ev), new Set());
+    const missing = plan.missing;
     html += `
       <div class="planner-row">
         <div class="planner-time">${fmtHour(ev.s)} – ${fmtHour(ev.e)}</div>
         <div>
           <div class="planner-title" role="button" tabindex="0" onclick="jumpTo('${ev.item.id}')">${ev.item.title}</div>
           <div class="planner-label">${ev.l}</div>
+          ${plan.via.length ? `<div class="planner-chain">Get first: ${chainText(plan.via)}</div>` : ""}
         </div>
         <div class="planner-tags">
           ${SAME_CYCLE.has(ev.item.id) ? `<span class="tag cycle">One cycle</span>` : ""}
-          ${missing === 0 ? `<span class="tag ready">Have Gear</span>` : `<span class="tag missing">Missing ${missing}</span>`}
+          ${missing === 0 ? (plan.via.length ? `<span class="tag chain">Gear from earlier item</span>` : `<span class="tag ready">Have Gear</span>`) : `<span class="tag missing">Missing ${missing}${plan.via.length ? ` · +${plan.via.length} earlier` : ""}</span>`}
         </div>
       </div>`;
   }
