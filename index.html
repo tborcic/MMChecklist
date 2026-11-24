@@ -439,7 +439,7 @@
 
 <script>
 // Bump this on each release; it is shown next to the title.
-const APP_VERSION = "1.6.5";
+const APP_VERSION = "1.6.7";
 { const v = document.getElementById("app-version"); if (v) v.textContent = "v" + APP_VERSION; }
 const GUIDE_LINKS = {
   masks: "https://www.zeldadungeon.net/Zelda06Masks.php",
@@ -657,14 +657,14 @@ const ITEMS = [
     requiresGear: ["g_kafei_mask"],
     req: "The Anju & Kafei quest must be followed through Day 1, Day 2 and Day 3 of ONE cycle.",
     guide: GUIDE_LINKS.masks,
-    desc: "Kafei is hiding in the back room of the Curiosity Shop, reached from the Laundry Pool. If you deliver Anju's letter to him, then come to the back room on the afternoon of the Final Day, Kafei leaves to chase Sakon. The Curiosity Shop owner then gives you the Keaton Mask and Kafei's letter to his mother.",
+    desc: "Kafei hides in a hideout behind the Laundry Pool. If you deliver Anju's letter to him on Day 2, then come back to the hideout between 1:00 PM and 6:00 PM on the Final Day, the Curiosity Shop Owner is there instead of Kafei. He gives you the Keaton Mask and Kafei's letter to his mother (the Special Delivery to Mama).",
     steps: [
       "Day 1, 2:10 PM–8:00 PM: wear Kafei's Mask and talk to Anju at the front desk of the Stock Pot Inn (East Clock Town). She asks you to meet her in the kitchen at 11:30 PM.",
       "Night 1, 11:30 PM: go to the Stock Pot Inn kitchen (ground floor) and talk to Anju. She gives you the Letter to Kafei.",
       "Before 9:00 AM on Day 2, put the Letter to Kafei in any red mailbox in Clock Town. The Postman will deliver it on Day 2.",
-      "Day 2, around 3:00 PM: go to the Laundry Pool. The Postman rings the bell, and Kafei steps out wearing the Keaton Mask to accept the letter. Talk to Kafei and he gives you the Pendant of Memories (keep it for the Couple's Mask).",
-      "Day 3, between 1:00 PM and 6:00 PM: ring the bell again and go into the back room. Watch the scene — Kafei sees Sakon and runs off to chase him.",
-      "Talk to the Curiosity Shop owner in the back room. He gives you the Keaton Mask and the Special Delivery to Mama."
+      "Day 2, around 3:00 PM: go to the Laundry Pool. The Postman rings the bell, and Kafei steps out wearing the Keaton Mask to accept the letter. Go through the door he came out of and wait for him to come back (4:10 PM–6:00 PM), then talk to Kafei and he gives you the Pendant of Memories (keep it for the Couple's Mask).",
+      "Day 3, between 1:00 PM and 6:00 PM: go to the Laundry Pool hideout and ring the bell next to the door. The Curiosity Shop Owner is there instead of Kafei.",
+      "Talk to the Curiosity Shop Owner. He gives you the Keaton Mask and the Special Delivery to Mama (just the Special Delivery if you already have the Keaton Mask)."
     ]
   },
   {
@@ -692,7 +692,7 @@ const ITEMS = [
     steps: [
       "Do Keaton Mask steps 1–4 to get the Letter to Kafei delivered and receive the Pendant of Memories on Day 2.",
       "Day 2 or Day 3, between 10:00 AM and 7:00 PM: give the Pendant of Memories to Anju at the Stock Pot Inn. She decides to stay and wait for Kafei.",
-      "Day 3, between 1:00 PM and 6:00 PM: be in the Curiosity Shop back room so Kafei sees Sakon and heads to Ikana (also get the Keaton Mask and the Special Delivery to Mama).",
+      "Day 3, between 1:00 PM and 6:00 PM: go to the Laundry Pool hideout and get the Keaton Mask and the Special Delivery to Mama from the Curiosity Shop Owner.",
       "Ride Epona into the Road to Ikana. Wear Garo's Mask and talk to the ghost guard so he makes a tree appear, then Hookshot up into Ikana Canyon.",
       "Go to Sakon's Hideout (lower Ikana Canyon) and meet Kafei at the entrance at 6:00 PM on Day 3. Wait for Sakon to arrive and open the hideout.",
       "Inside, you switch between Link and Kafei. Step on the switches and push the blocks in each room so the other character can move on. Kafei grabs the Sun's Mask at the end.",
@@ -2009,17 +2009,19 @@ ITEMS.push(
       "Learn the Elegy of Emptiness."
     ]
   },
-  { id: "s7", type: "song", day: "Anytime", tod: "Evening", region: "Ikana Canyon",
+  { id: "s7", type: "song", day: "Day 1", tod: "Evening", region: "Ikana Canyon",
     title: "Song of Storms",
-    requiresGear: ["g_captain_hat", "g_sword"],
-    req: "Night only; wear the Captain's Hat.",
+    requiresGear: ["g_captain_hat", ["g_fire_arrows", "g_deku_sticks"], "g_sword"],
+    req: "Night 1 only. Wear the Captain's Hat, so get it earlier on Day 1.",
     guide: "https://www.thonky.com/zelda-majoras-mask/ikana-valley#learn-a-new-song",
-    desc: "In Ikana Graveyard at night, wear the Captain's Hat and talk to a Stalchild so he opens the grave. Drop into the hole, defeat the Iron Knuckle, then check the revealed gravestone to learn the Song of Storms.",
+    desc: "At night on the first day, wear the Captain's Hat and go into Ikana Graveyard. The Stalchildren won't attack you and you can talk to them. Ask one of the three to open the grave, light three torches (Fire Arrows, or a Deku Stick using the torch in the previous room), defeat the Iron Knuckle, then check the revealed gravestone to learn the Song of Storms.",
     steps: [
-      "Go to Ikana Graveyard at night (Captain's Hat on; you get the hat by waking the giant skeleton with the Sonata of Awakening).",
-      "Talk to a Stalchild to open the grave and drop into the hole.",
-      "Defeat the Iron Knuckle.",
-      "Check the revealed gravestone to learn the Song of Storms."
+      "Get the Captain's Hat earlier on Day 1 (Sonata of Awakening wakes the giant skeleton behind the building in Ikana Graveyard).",
+      "At night on Day 1, wear the Captain's Hat and go into Ikana Graveyard.",
+      "Talk to any of the three Stalchildren while wearing the Captain's Hat and ask it to open the grave.",
+      "Light the three torches with Fire Arrows, or with a Deku Stick using the torch in the previous room.",
+      "Defeat the Iron Knuckle (dodge its axe and hit it, or use bombs) until its armor falls off.",
+      "Check the gravestone that was revealed to learn the Song of Storms."
     ]
   },
   { id: "s8", type: "song", day: "Anytime", tod: "Anytime", region: "Southern Swamp & Woodfall",
@@ -2220,20 +2222,20 @@ const SCHEDULES = {
     W(1, 10, 18, "Show Kafei's Mask to Anju at the Stock Pot Inn desk (daytime)"),
     W(1, 23.5, 23.75, "Meet Anju in the Inn kitchen at 11:30 PM — get the Letter to Kafei"),
     W(1, 23.75, 30, "Post the Letter to Kafei in any mailbox before morning"),
-    W(2, 15, 18, "Laundry Pool around 3:00 PM — the Postman rings the bell and Kafei gives you the Pendant of Memories"),
-    W(3, 12, 13, "Be in the Curiosity Shop back room by 1:00 PM — Keaton Mask")
+    W(2, 16.1667, 18, "Laundry Pool hideout, 4:10–6:00 PM — talk to Kafei when he returns for the Pendant of Memories (be there for the Postman at 3:00 PM)"),
+    W(3, 13, 18, "Laundry Pool hideout, 1:00–6:00 PM — the Curiosity Shop Owner gives the Keaton Mask and Special Delivery to Mama")
   ],
   m8: [W(3, 18, 30, "Give the Special Delivery to Mama to the Postman")],
   m9: [
     W(1, 23.5, 23.75, "Meet Anju in the Inn kitchen at 11:30 PM"),
-    W(2, 15, 18, "Get the Pendant from Kafei at the Laundry Pool (around 3:00 PM)"),
+    W(2, 16.1667, 18, "Get the Pendant from Kafei at the Laundry Pool (4:10–6:00 PM)"),
     W(2, 13, 20, "Give Anju the Pendant of Memories"),
-    W(3, 12, 13, "Curiosity Shop back room by 1:00 PM"),
+    W(3, 13, 18, "Laundry Pool hideout, 1:00–6:00 PM (Keaton Mask / Special Delivery to Mama)"),
     W(3, 17, 20, "Meet Kafei at Sakon's Hideout in Ikana Canyon (evening)"),
     W(3, 27, 30, "Wait in Anju's room at the Stock Pot Inn for Kafei (before dawn)")
   ],
   s1: [W(1, 6, 18, "Learn Epona's Song from Romani (balloon archery practice)")],
-  s7: [W(1, 18, 30, "Ikana Graveyard grave (night only)"), W(2, 18, 30, "Ikana Graveyard grave (night only)"), W(3, 18, 30, "Ikana Graveyard grave (night only)")],
+  s7: [W(1, 18, 30, "Ikana Graveyard grave: Night 1 only, wearing the Captain's Hat")],
   m10: [W(1, 22, 30, "Milk Bar sound check with Toto"), W(2, 22, 30, "Milk Bar sound check with Toto")],
   m11: [W(1, 24, 30, "Kamaro dances in north Termina Field"), W(2, 24, 30, "Kamaro dances in north Termina Field"), W(3, 24, 30, "Kamaro dances in north Termina Field")],
   m12: [W(1, 6, 18, "Grog's Cucco Shack (daytime)"), W(2, 6, 18, "Grog's Cucco Shack (daytime)"), W(3, 6, 18, "Grog's Cucco Shack (daytime)")],
@@ -2318,7 +2320,7 @@ const GEAR_SOURCE = {
   g_ocean_deed: { text: "Trade the Mountain Title Deed in Zora Hall", items: ["hp42"] },
   g_letter_kafei: { text: "Anju, Stock Pot Inn kitchen, 11:30 PM Night 1", items: ["m7"] },
   g_pendant: { text: "Kafei, Laundry Pool, Day 2", items: ["m7"] },
-  g_express_mail: { text: "Curiosity Shop back room, Day 3", items: ["m7"] },
+  g_express_mail: { text: "Laundry Pool hideout, Day 3, 1:00–6:00 PM (the Curiosity Shop Owner gives it to you)", items: ["m7"] },
   g_soaring: { text: "Kaepora Gaebora, on a platform reached by a Deku flower route near the Deku Palace (Southern Swamp). Hit an owl statue with your sword to activate it" },
   g_double_time: { text: "Scarecrow hint (Clock Town Observatory or Trading Post), then play the Song of Time with every note played twice" },
   g_inverted: { text: "Same Scarecrow hint: play the Song of Time backward" },
@@ -2415,6 +2417,10 @@ function hashText(t) {
 function stepKey(item, idx) { return `${item.id}~${hashText(item.steps[idx])}`; }
 // Text-hash keys of steps that were later reworded -> their current key (keeps old saves/exports working)
 const LEGACY_STEP_KEYS = {
+ "m7~1k1qwxt": "m7~l6r8es",
+ "m7~1dlbb03": "m7~9rkf0b",
+ "m7~kowbn0": "m7~12tesik",
+ "m9~avmyy6": "m9~t99nro",
  "m16~6xz46r": "m16~17qg3xg",
  "m16~10li4pp": "m16~1f3tpdc",
  "m21~b6iuu3": "m21~n6x3yf",
@@ -2424,13 +2430,13 @@ const LEGACY_STEP_KEYS = {
  "m1~1bioz0m": "m1~1s8jaz5",
  "m7~9w13g9": "m7~1b2defc",
  "m7~1a1han8": "m7~ryhk6c",
- "m7~pcfyah": "m7~1k1qwxt",
- "m7~11mwl14": "m7~1dlbb03",
- "m7~tieggd": "m7~1k1qwxt",
+ "m7~pcfyah": "m7~l6r8es",
+ "m7~11mwl14": "m7~9rkf0b",
+ "m7~tieggd": "m7~l6r8es",
  "m8~lxhs28": "m8~kvhx29",
  "m8~abmxvh": "m8~1d5m3gq",
  "m9~950d7m": "m9~1l6d5tm",
- "m9~euqftx": "m9~avmyy6",
+ "m9~euqftx": "m9~t99nro",
  "m9~jgk89e": "m9~weswym",
  "m9~1jo9rpc": "m9~49p9jo",
  "m10~2wfwr": "m10~zqbr08",
