@@ -81,6 +81,9 @@
       display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
       gap: 0.5rem; margin-bottom: 0.8rem;
     }
+    .how-row { align-items: flex-start; }
+    .how-list { display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.82rem; color: var(--muted); }
+    .how-line b { color: var(--text, inherit); }
     .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.45rem 0.7rem; }
     .stat-label { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
     .stat-value { font-size: 1.02rem; font-weight: 700; margin-top: 0.05rem; }
@@ -324,6 +327,7 @@
       <div class="stat-card"><div class="stat-label">Bottles</div><div class="stat-value gear" id="bottle-count">0 / 7</div></div>
       <div class="stat-card"><div class="stat-label">Great Fairy Rewards</div><div class="stat-value masks" id="fairy-count">0 / 4</div></div>
       <div class="stat-card"><div class="stat-label">Songs Learned</div><div class="stat-value gear" id="song-count">0 / 10</div></div>
+      <div class="stat-card"><div class="stat-label">Equipment Found</div><div class="stat-value gear" id="equip-count">0 / 10</div></div>
       <div class="stat-card"><div class="stat-label">Collected Gear</div><div class="stat-value gear" id="gear-count">0 / 0</div></div>
     </div>
 
@@ -351,17 +355,22 @@
     <div class="controls">
       <input type="search" id="search" placeholder="Search mask, location, day, time, step, or required item..." oninput="render()" />
       <select id="type-filter" onchange="render()">
-        <option value="all">All Categories (101)</option>
+        <option value="all">All Categories (111)</option>
         <option value="mask">Masks Only (24)</option>
         <option value="heart">Pieces of Heart Only (52)</option>
         <option value="container">Boss Heart Containers (4)</option>
         <option value="bottle">Bottles (7)</option>
         <option value="fairy">Stray Fairies / Great Fairies (4)</option>
         <option value="song">Songs (10)</option>
+        <option value="gear">Equipment (10)</option>
       </select>
       <select id="sort-mode" onchange="onSortChange()">
         <option value="default">Sort: Game order</option>
         <option value="closest">Sort: Closest to done</option>
+      </select>
+      <select id="group-mode" onchange="onGroupChange()">
+        <option value="region">Group: By region</option>
+        <option value="type">Group: By category</option>
       </select>
       <select id="day-filter" onchange="render()">
         <option value="all">All Days / Anytime</option>
@@ -430,7 +439,7 @@
 
 <script>
 // Bump this on each release; it is shown next to the title.
-const APP_VERSION = "1.5.0";
+const APP_VERSION = "1.6.5";
 { const v = document.getElementById("app-version"); if (v) v.textContent = "v" + APP_VERSION; }
 const GUIDE_LINKS = {
   masks: "https://www.zeldadungeon.net/Zelda06Masks.php",
@@ -537,6 +546,8 @@ const MASK_TO_GEAR = {
   m21: "g_captain_hat", m22: "g_gibdo_mask", m23: "g_giant_mask", m24: "g_fierce_deity_mask",
   // Bottles sync the same way (checklist entry <-> gear entry); "Empty Bottle" below is derived from them
   s1: "g_epona", s2: "g_sonata", s3: "g_soaring", s4: "g_lullaby", s5: "g_bossa", s6: "g_elegy", s7: "g_storms", s8: "g_oath", s9: "g_double_time", s10: "g_inverted",
+  e1: "g_razor_sword", e2: "g_gilded_sword", e3: "g_bombs", e4: "g_powder_keg", e5: "g_deku_sticks", e6: "g_magic_beans", e7: "g_lens", e8: "g_hookshot", e9: "g_notebook",
+  e10: "g_giant_wallet",
   b1: "g_bottle_1", b2: "g_bottle_2", b3: "g_bottle_3", b4: "g_bottle_4", b5: "g_bottle_5", b6: "g_bottle_6", b7: "g_bottle_7"
 };
 const GEAR_TO_MASK = Object.fromEntries(Object.entries(MASK_TO_GEAR).map(([m, g]) => [g, m]));
@@ -651,7 +662,7 @@ const ITEMS = [
       "Day 1, 2:10 PM–8:00 PM: wear Kafei's Mask and talk to Anju at the front desk of the Stock Pot Inn (East Clock Town). She asks you to meet her in the kitchen at 11:30 PM.",
       "Night 1, 11:30 PM: go to the Stock Pot Inn kitchen (ground floor) and talk to Anju. She gives you the Letter to Kafei.",
       "Before 9:00 AM on Day 2, put the Letter to Kafei in any red mailbox in Clock Town. The Postman will deliver it on Day 2.",
-      "Day 2, 4:10 PM–6:00 PM: go to the Laundry Pool, ring the bell next to the door at the back, and talk to Kafei when he opens it. He gives you the Pendant of Memories (keep it for the Couple's Mask).",
+      "Day 2, around 3:00 PM: go to the Laundry Pool. The Postman rings the bell, and Kafei steps out wearing the Keaton Mask to accept the letter. Talk to Kafei and he gives you the Pendant of Memories (keep it for the Couple's Mask).",
       "Day 3, between 1:00 PM and 6:00 PM: ring the bell again and go into the back room. Watch the scene — Kafei sees Sakon and runs off to chase him.",
       "Talk to the Curiosity Shop owner in the back room. He gives you the Keaton Mask and the Special Delivery to Mama."
     ]
@@ -2046,6 +2057,130 @@ ITEMS.push(
   }
 );
 
+ITEMS.push(
+  { id: "e1", type: "gear", day: "Day 1", tod: "Morning / Day", region: "Snowhead & Mountains",
+    title: "Razor Sword",
+    requiresGear: ["g_sword", "g_goron_mask"],
+    req: "Get it on Day 1 or 2 (Gilded Sword needs it). It reverts to the Kokiri Sword after 100 hits.",
+    guide: "https://www.thonky.com/zelda-majoras-mask/after-goht#get-the-gilded-sword",
+    desc: "Take your Kokiri Sword to the Mountain Smithy and pay 100 Rupees to upgrade it to the Razor Sword. Do it on Day 1 or Day 2 if you also want the Gilded Sword. After 100 uses the Razor Sword turns back into the Kokiri Sword. The smithy is reached after Snowhead (Goht) has been dealt with; Thonky doesn't state what unlocks it.",
+    steps: [
+      "Have 100 Rupees and your Kokiri Sword.",
+      "Go to the Mountain Smithy in Mountain Village.",
+      "Pay 100 Rupees to upgrade the Kokiri Sword to the Razor Sword."
+    ]
+  },
+  { id: "e2", type: "gear", day: "Day 2", tod: "Morning / Day", region: "Snowhead & Mountains",
+    title: "Gilded Sword (Gold Dust)",
+    requiresGear: ["g_razor_sword", "g_bottle_5"],
+    req: "Goht must be defeated. Give the smithy the Gold Dust and the Razor Sword by night on Day 2.",
+    guide: "https://www.thonky.com/zelda-majoras-mask/after-goht#win-at-the-goron-racetrack",
+    desc: "Win the Goron Racetrack as a Goron to get Gold Dust (the first win comes in a bottle). Give the Gold Dust and the Razor Sword to the Mountain Smithy no later than night on Day 2. Pick up the Gilded Sword after dawn of the final day, or after dawn of Day 2 if you handed both in on Day 1. Gold Dust disappears if you reset time.",
+    steps: [
+      "Defeat Goht and make Powder Kegs available so the Goron Racetrack opens.",
+      "Win the Goron Racetrack as a Goron (roll and hit green bottles for magic) to get the Gold Dust.",
+      "Give the Gold Dust and the Razor Sword to the Mountain Smithy by night on Day 2.",
+      "Pick up the Gilded Sword after dawn of the next day."
+    ]
+  },
+  { id: "e3", type: "gear", day: "Anytime", tod: "Morning / Day", region: "Clock Town",
+    title: "Bomb Bag",
+    requiresGear: [],
+    req: "Bought in the Bomb Shop. (From memory; not on the Thonky pages checked.)",
+    guide: "https://www.thonky.com/zelda-majoras-mask/clock-town",
+    desc: "The Bomb Shop in West Clock Town sells the Bomb Bag. This is from memory because Thonky's pages don't cover it, so check the price in your game.",
+    steps: [
+      "Go to the Bomb Shop in West Clock Town during the day.",
+      "Buy the Bomb Bag."
+    ]
+  },
+  { id: "e4", type: "gear", day: "Anytime", tod: "Anytime", region: "Snowhead & Mountains",
+    title: "Powder Kegs (Goron)",
+    requiresGear: ["g_goron_mask", "g_fire_arrows"],
+    req: "Needs Fire Arrows or Goht defeated, and the Goron Mask.",
+    guide: "https://www.thonky.com/zelda-majoras-mask/after-goht#make-powder-kegs-available",
+    desc: "If you have the Fire Arrows or have defeated Goht, you can get Powder Kegs. In Goron Village, talk to the big Goron in the north doorway (melt the ice with a Fire Arrow if needed) and pass his test: roll a keg up the ramps and through to the Goron Racetrack before it explodes. Afterwards you can also buy kegs from the Goron in the West Clock Town Bomb Shop (price not stated).",
+    steps: [
+      "Get the Fire Arrows from Snowhead Temple, or defeat Goht.",
+      "In Goron Village, talk to the big Goron in the north doorway as a Goron.",
+      "Roll the Powder Keg up the ramps and through to the Goron Racetrack before it explodes.",
+      "Afterwards buy kegs from the Goron in the Bomb Shop in West Clock Town."
+    ]
+  },
+  { id: "e5", type: "gear", day: "Anytime", tod: "Anytime", region: "Southern Swamp & Woodfall",
+    title: "Deku Sticks",
+    requiresGear: ["g_deku_mask"],
+    req: "Deku Babas in Woodfall Temple drop them.",
+    guide: "https://www.thonky.com/zelda-majoras-mask/woodfall-temple#get-a-third-stray-fairy",
+    desc: "Kill a Deku Baba in Woodfall Temple to get a Deku Stick. They regrow, so you can get as many as you like. Thonky doesn't mention a shop.",
+    steps: [
+      "Enter Woodfall Temple.",
+      "Kill a Deku Baba to get a Deku Stick."
+    ]
+  },
+  { id: "e6", type: "gear", day: "Anytime", tod: "Anytime", region: "Southern Swamp & Woodfall",
+    title: "Magic Beans",
+    requiresGear: ["g_deku_mask", "g_bottle"],
+    req: "The first bean is free; the rest cost 10 Rupees each.",
+    guide: "https://www.thonky.com/zelda-majoras-mask/southern-swamp#reach-the-bean-seller",
+    desc: "The bean seller under the Deku Palace garden gives you your first Magic Bean free and sells more for 10 Rupees each. Reach him through the Deku Palace inner garden (left door, then the hole and the slope). A Business Scrub next to the Swamp Tourist Center also sells beans for 10 Rupees each if you talk to him as a Deku Scrub. You need a bottle of water to grow them.",
+    steps: [
+      "Reach the bean seller under the Deku Palace garden as Deku Link.",
+      "Take the free Magic Bean and buy more for 10 Rupees each if you want them."
+    ]
+  },
+  { id: "e7", type: "gear", day: "Anytime", tod: "Anytime", region: "Snowhead & Mountains",
+    title: "Lens of Truth",
+    requiresGear: [],
+    req: "Do not wear the Bunny Hood.",
+    guide: "https://www.thonky.com/zelda-majoras-mask/mountain-village#get-a-treasure",
+    desc: "Talk to the owl (Kaepora Gaebora) near the far end of Goron Village. He flies to the Lone Peak Shrine and leaves feathers on invisible platforms. Jump from feather to feather without the Bunny Hood on and open the treasure chest in the cave to get the Lens of Truth.",
+    steps: [
+      "Talk to the owl near the far end of Goron Village.",
+      "Follow him to the Lone Peak Shrine and jump from feather to feather (no Bunny Hood).",
+      "Open the chest in the cave for the Lens of Truth."
+    ]
+  },
+  { id: "e8", type: "gear", day: "Anytime", tod: "Anytime", region: "Great Bay",
+    title: "Hookshot (Pirates' Fortress)",
+    requiresGear: ["g_zora_mask", "g_bow"],
+    req: "Swim in as Zora; shoot the beehive with an arrow.",
+    guide: "https://www.thonky.com/zelda-majoras-mask/pirate-fortress#get-the-fortress-treasure",
+    desc: "Swim under the water from Great Bay Coast and break the planks to enter the Pirates' Fortress. Get past or evade the guards (the Stone Mask helps), shoot the beehive in the hallway with an arrow so the pirates run, then open the big chest in Aveil's room for the Hookshot.",
+    steps: [
+      "Swim in from Great Bay Coast as Zora and break the planks.",
+      "Get past the guards (Stone Mask helps).",
+      "Shoot down the beehive in the hallway with an arrow.",
+      "Open the big chest in the middle of Aveil's room for the Hookshot."
+    ]
+  },
+  { id: "e9", type: "gear", day: "Anytime", tod: "Late Night", region: "Clock Town",
+    title: "Bombers' Notebook",
+    requiresGear: [],
+    req: "Needs the Great Fairy's bubble. Find all five Bombers before the next morning.",
+    guide: "https://www.thonky.com/zelda-majoras-mask/clock-town#get-the-bombers-notebook",
+    desc: "Jim, the Bombers' leader, lets you in after you pop his balloon with a bubble. Find all five Bombers in the hide-and-seek test before the next morning, then give the code to the Bomber blocking the secret passage in northeast East Clock Town. Walk through and talk to Jim again.",
+    steps: [
+      "Pop Jim's balloon with a bubble (Great Fairy's bubble power).",
+      "Find all five Bombers in the hide-and-seek test before the next morning.",
+      "Tell the code to the Bomber blocking the secret passage in northeast East Clock Town.",
+      "Walk through and talk to Jim again for the Bombers' Notebook."
+    ]
+  },
+  { id: "e10", type: "gear", day: "Anytime", tod: "Anytime", region: "Great Bay",
+    title: "Giant's Wallet (Oceanside Spider House)",
+    requiresGear: ["g_bombs", "g_bow", "g_hookshot"],
+    req: "Clear all 30 Gold Skulltulas; any day in MM3D.",
+    guide: "https://www.thonky.com/zelda-majoras-mask/great-bay-coast",
+    desc: "Clear all 30 Gold Skulltulas in the Oceanside Spider House on Great Bay Coast, then talk to the man who appears at the entrance to get the Giant's Wallet, which holds 500 Rupees. You need it to buy the All-Night Mask. This comes from the earlier All-Night Mask entry, not from a Thonky page, so check the details in your game.",
+    steps: [
+      "Bomb the cracked wall at the Oceanside Spider House entrance (next to the Fisherman's Hut) and slide down into the house.",
+      "Defeat all 30 Gold Skulltulas (pots, bug holes, beehives, high places).",
+      "Talk to the man who appears at the entrance to get the Giant's Wallet."
+    ]
+  }
+);
+
 // Step-by-step "how to get it" guides (Thonky walkthrough) instead of wiki description pages
 const THONKY = "https://www.thonky.com/zelda-majoras-mask/";
 const TEMPLE_GUIDE = {
@@ -2085,13 +2220,13 @@ const SCHEDULES = {
     W(1, 10, 18, "Show Kafei's Mask to Anju at the Stock Pot Inn desk (daytime)"),
     W(1, 23.5, 23.75, "Meet Anju in the Inn kitchen at 11:30 PM — get the Letter to Kafei"),
     W(1, 23.75, 30, "Post the Letter to Kafei in any mailbox before morning"),
-    W(2, 13, 18, "Ring the bell at the Laundry Pool — Kafei gives the Pendant of Memories"),
+    W(2, 15, 18, "Laundry Pool around 3:00 PM — the Postman rings the bell and Kafei gives you the Pendant of Memories"),
     W(3, 12, 13, "Be in the Curiosity Shop back room by 1:00 PM — Keaton Mask")
   ],
   m8: [W(3, 18, 30, "Give the Special Delivery to Mama to the Postman")],
   m9: [
     W(1, 23.5, 23.75, "Meet Anju in the Inn kitchen at 11:30 PM"),
-    W(2, 13, 18, "Get the Pendant from Kafei at the Laundry Pool"),
+    W(2, 15, 18, "Get the Pendant from Kafei at the Laundry Pool (around 3:00 PM)"),
     W(2, 13, 20, "Give Anju the Pendant of Memories"),
     W(3, 12, 13, "Curiosity Shop back room by 1:00 PM"),
     W(3, 17, 20, "Meet Kafei at Sakon's Hideout in Ikana Canyon (evening)"),
@@ -2289,8 +2424,9 @@ const LEGACY_STEP_KEYS = {
  "m1~1bioz0m": "m1~1s8jaz5",
  "m7~9w13g9": "m7~1b2defc",
  "m7~1a1han8": "m7~ryhk6c",
- "m7~pcfyah": "m7~tieggd",
+ "m7~pcfyah": "m7~1k1qwxt",
  "m7~11mwl14": "m7~1dlbb03",
+ "m7~tieggd": "m7~1k1qwxt",
  "m8~lxhs28": "m8~kvhx29",
  "m8~abmxvh": "m8~1d5m3gq",
  "m9~950d7m": "m9~1l6d5tm",
@@ -2339,12 +2475,14 @@ let jumpFilterSig = null;
 // so a hand-edited or malicious save file can't inject HTML/script into the page.
 const VALID_VIEWS = new Set(["checklist", "planner", "now"]);
 const VALID_SORTS = new Set(["default", "closest"]);
+const VALID_GROUPS = new Set(["region", "type"]);
 function cleanUi(raw) {
   const r = raw && typeof raw === "object" ? raw : {};
   const day = Number(r.nowDay), hour = Number(r.nowHour);
   return {
     view: VALID_VIEWS.has(r.view) ? r.view : "checklist",
     sort: VALID_SORTS.has(r.sort) ? r.sort : "default",
+    group: VALID_GROUPS.has(r.group) ? r.group : "region",
     nowDay: [1, 2, 3].includes(day) ? day : 1,
     nowHour: Number.isFinite(hour) && hour >= 6 && hour < 30 && hour * 2 === Math.floor(hour * 2) ? hour : 6,
     nowAnytime: r.nowAnytime === true
@@ -2449,7 +2587,7 @@ function toggleGear(gearId) {
 }
 
 function setAllGear(checked) {
-  if (!checked && !confirm("Clear all gear? This also un-completes every mask in the checklist, because masks, bottles and songs are synced with the gear list.")) return;
+  if (!checked && !confirm("Clear all gear? This also un-completes every mask in the checklist, because masks, bottles, songs and equipment are synced with the gear list.")) return;
   if (checked) GEAR_ITEMS.forEach(g => ownedGearSet.add(g.id)); else ownedGearSet.clear();
   for (const maskId of Object.values(GEAR_TO_MASK)) { if (checked) checkedSet.add(maskId); else checkedSet.delete(maskId); }
   syncGearFromItems();
@@ -2510,6 +2648,7 @@ function changeFairy(id, delta) {
 }
 
 function onHideCompletedChange() { hideCompleted = document.getElementById("hide-completed-filter").checked; forceShowId = null; save(); render(); }
+function onGroupChange() { ui.group = document.getElementById("group-mode").value; save(); render(); }
 function onSortChange() { ui.sort = document.getElementById("sort-mode").value; save(); render(); }
 function setView(v) { ui.view = v; forceShowId = null; save(); render(); }
 function onNowChange() {
@@ -2618,7 +2757,7 @@ function renderInventory() {
 }
 
 function updateStats() {
-  let hp = 0, hc = 0, masks = 0, bottles = 0, fairies = 0, songs = 0;
+  let hp = 0, hc = 0, masks = 0, bottles = 0, fairies = 0, songs = 0, equip = 0;
   for (const item of ITEMS) {
     if (checkedSet.has(item.id)) {
       if (item.type === "heart") hp++;
@@ -2627,6 +2766,7 @@ function updateStats() {
       else if (item.type === "bottle") bottles++;
       else if (item.type === "fairy") fairies++;
       else if (item.type === "song") songs++;
+      else if (item.type === "gear") equip++;
     }
   }
   const totalHearts = 3 + hc + Math.floor(hp / 4);
@@ -2639,6 +2779,7 @@ function updateStats() {
   set("bottle-count", `${bottles} / 7`);
   set("fairy-count", `${fairies} / 4`);
   set("song-count", `${songs} / 10`);
+  set("equip-count", `${equip} / 10`);
   set("gear-count", `${ownedGearSet.size} / ${GEAR_ITEMS.length}`);
 }
 
@@ -2652,7 +2793,7 @@ function renderCard(item, opts = {}) {
   const isChecked = checkedSet.has(item.id);
   const isOpen = openStepsSet.has(item.id) || Boolean(opts.query);
   const missing = missingCount(item);
-  const tagLabel = { mask: "Mask", container: "Heart Container", heart: "Piece of Heart", bottle: "Bottle", fairy: "Great Fairy", song: "Song" }[item.type];
+  const tagLabel = { mask: "Mask", container: "Heart Container", heart: "Piece of Heart", bottle: "Bottle", fairy: "Great Fairy", song: "Song", gear: "Equipment" }[item.type];
   const steps = item.steps || [];
   const doneCount = steps.filter((_, idx) => subCheckedSet.has(stepKey(item, idx))).length;
 
@@ -2666,6 +2807,16 @@ function renderCard(item, opts = {}) {
   }).join("");
 
   const needs = needsFirst(item);
+  // For every required gear you do not have: where it comes from, shown in the open (not only as a hover tip)
+  const howTo = (item.requiresGear || []).filter(r => !reqOwned(r)).map(r => {
+    const ids = Array.isArray(r) ? r : [r];
+    const parts = ids.map(id => {
+      const srcs = gearSourceItems(id).filter(x => x !== item.id && ITEM_BY_ID[x]);
+      const text = GEAR_TO_MASK[id] ? "" : gearSourceText(id);
+      return `<b>${escHtml(gearName(id))}</b>${text ? ": " + escHtml(text) : ""}${srcs.length ? " " + srcs.slice(0, 3).map(itemLink).join("") : ""}`;
+    });
+    return `<div class="how-line">${parts.join(" <i>or</i> ")}</div>`;
+  }).join("");
   const unlocks = UNLOCKS[item.id] || [];
   const sched = SCHEDULES[item.id] || [];
   const nowBadge = opts.nowWindows && opts.nowWindows.length
@@ -2714,6 +2865,7 @@ function renderCard(item, opts = {}) {
           ${gearChips ? `<div class="req-row"><span class="req-label">Required</span>${gearChips}</div>` : ""}
           ${item.req ? `<div class="req-row"><span class="req-label">Conditions</span><span class="cond-text">${item.req}</span></div>` : ""}
           ${sched.length ? `<div class="req-row"><span class="req-label">When</span>${sched.map(w => `<span class="when-chip" title="${escAttr(w.l)}">${fmtWindow(w)}</span>`).join("")}</div>` : ""}
+          ${howTo ? `<div class="req-row how-row"><span class="req-label">How to get</span><div class="how-list">${howTo}</div></div>` : ""}
           ${needs.length ? `<div class="req-row"><span class="req-label">Needs first</span>${needs.map(itemLink).join("")}</div>` : ""}
           ${unlocks.length ? `<div class="req-row"><span class="req-label">Unlocks</span>${(expandedUnlocks.has(item.id) ? unlocks : unlocks.slice(0, 6)).map(itemLink).join("")}${unlocks.length > 6 ? `<span class="link-chip" role="button" tabindex="0" onclick="toggleUnlocks('${item.id}')">${expandedUnlocks.has(item.id) ? "Show less" : `+${unlocks.length - 6} more`}</span>` : ""}</div>` : ""}
         </div>
@@ -2771,17 +2923,23 @@ function renderChecklist(f) {
     return `<div class="empty-state">No matching items found.${hideCompleted ? " (Completed items are hidden — untick “Hide Completed” to see them.)" : ""}</div>`;
   }
 
+  const byType = ui.group === "type";
+  const keyOf = i => byType ? i.type : i.region;
   const groups = {};
-  for (const item of filtered) (groups[item.region] = groups[item.region] || []).push(item);
+  for (const item of filtered) (groups[keyOf(item)] = groups[keyOf(item)] || []).push(item);
+  const TYPE_TITLES = { mask: "Masks", container: "Boss Heart Containers", heart: "Pieces of Heart", bottle: "Bottles", fairy: "Stray Fairies / Great Fairies", song: "Songs", gear: "Equipment" };
+  const keys = byType ? Object.keys(TYPE_TITLES).filter(k => groups[k]) : Object.keys(groups);
 
   let html = "";
-  for (const [region, list] of Object.entries(groups)) {
-    const regionAll = ITEMS.filter(i => i.region === region && (f.typeFilter === "all" || i.type === f.typeFilter));
+  for (const key of keys) {
+    const list = groups[key];
+    const regionAll = ITEMS.filter(i => keyOf(i) === key && (f.typeFilter === "all" || i.type === f.typeFilter));
     const doneInRegion = regionAll.filter(i => checkedSet.has(i.id)).length;
     const pct = regionAll.length ? Math.round((doneInRegion / regionAll.length) * 100) : 0;
+    const title = byType ? TYPE_TITLES[key] : (key === "Ikana Canyon" ? "Ikana" : key);
     html += `
       <div class="section-title">
-        <span>${region === "Ikana Canyon" ? "Ikana" : region}</span>
+        <span>${title}</span>
         <span class="section-count">${doneInRegion} / ${regionAll.length} collected · ${pct}%</span>
       </div>
       <div class="region-progress"><div style="width:${pct}%"></div></div>
@@ -2808,7 +2966,8 @@ function planGear(item, deadline, visited) {
       if (GEAR_ALL_OF.has(gid)) continue; // needs every source item, not just one
       for (const srcId of gearSourceItems(gid)) {
         const src = ITEM_BY_ID[srcId];
-        if (!src || srcId === "m1" || BASIC_GEAR.has(gid) || seen.has(srcId) || checkedSet.has(srcId)) continue;
+        // a source you already ticked still counts when you do not hold the gear (e.g. you unticked it), so the planner can show how to get it back
+        if (!src || srcId === "m1" || BASIC_GEAR.has(gid) || seen.has(srcId)) continue;
         // Items with no time limit can be done from the start of Day 1
         const fixed = GEAR_WINDOW[gid] || ITEM_DONE_WINDOW[srcId];
         const w = fixed ? (evKey(fixed) < deadline ? { ...fixed, done: true } : null)
@@ -2930,6 +3089,7 @@ function syncControls() {
   document.getElementById("now-controls").classList.toggle("show", ui.view === "now");
   document.getElementById("hide-completed-filter").checked = hideCompleted;
   document.getElementById("sort-mode").value = ui.sort;
+  document.getElementById("group-mode").value = ui.group;
   document.getElementById("now-day").value = String(ui.nowDay);
   document.getElementById("now-hour").value = String(ui.nowHour);
   document.getElementById("now-anytime").checked = ui.nowAnytime;
