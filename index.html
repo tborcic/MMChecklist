@@ -184,7 +184,6 @@
     .tag.ready { background: rgba(16, 185, 129, 0.18); color: #6ee7b7; }
     .tag.missing { background: rgba(244, 63, 94, 0.15); color: #fda4af; }
     .tag.chain { background: rgba(245, 158, 11, 0.16); color: #fcd34d; }
-    .planner-anytime > summary { cursor: pointer; }
     .planner-chain { color: var(--muted); font-size: 0.8rem; margin-top: 0.2rem; }
     .planner-chain a { color: var(--accent); text-decoration: underline dotted; cursor: pointer; }
 
@@ -429,7 +428,7 @@
 
 <script>
 // Bump this on each release; it is shown next to the title.
-const APP_VERSION = "1.3.4";
+const APP_VERSION = "1.3.5";
 { const v = document.getElementById("app-version"); if (v) v.textContent = "v" + APP_VERSION; }
 const GUIDE_LINKS = {
   masks: "https://www.zeldadungeon.net/Zelda06Masks.php",
@@ -2679,30 +2678,21 @@ function chainText(via, depth = 0) {
   return via.map(v => `${gearName(v.gid)} <- <a onclick="jumpTo('${v.src.id}')">${v.src.title}</a> (${fmtWindow(v.w)})` + (v.sub.via.length ? ` [first: ${chainText(v.sub.via, depth + 1)}]` : "")).join("; ");
 }
 
-// Untimed items that can only be done once an earlier (unchecked) item is finished, e.g. the deed trades
-function followUps(f) {
-  const out = [];
-  for (const item of ITEMS) {
-    if (checkedSet.has(item.id) || SCHEDULES[item.id] || !baseFilter(item, f)) continue;
-    const before = needsFirst(item).filter(id => id !== "m1" && !checkedSet.has(id) && ITEM_BY_ID[id].type === "heart"); // hearts only (the deed trades etc.); masks/bottles would flood the list
-    if (before.length) out.push({ item, before });
-  }
-  return out;
-}
-
 function renderPlanner(f) {
   const events = [];
   for (const item of ITEMS) {
     if (checkedSet.has(item.id) || !baseFilter(item, f)) continue;
     for (const w of SCHEDULES[item.id] || []) events.push({ ...w, item });
   }
-  const ups = followUps(f);
-  const upIds = new Set(ups.map(u => u.item.id));
-  const anytime = ITEMS.filter(i => !checkedSet.has(i.id) && !SCHEDULES[i.id] && !upIds.has(i.id) && baseFilter(i, f));
-  if (!events.length && !ups.length && !anytime.length) return `<div class="empty-state">No timed events left for the current filters — everything else can be done at any time.</div>`;
-  events.sort((a, b) => a.d - b.d || a.s - b.s || a.e - b.e);
+  // Items with no time limit can be done from the start, so they go at the top of Day 1
+  for (const item of ITEMS) {
+    if (checkedSet.has(item.id) || SCHEDULES[item.id] || !baseFilter(item, f)) continue;
+    events.push({ d: 1, s: 6, e: 30, l: "No time limit — do it whenever", anytime: true, item });
+  }
+  if (!events.length) return `<div class="empty-state">Nothing left for the current filters.</div>`;
+  events.sort((a, b) => a.d - b.d || a.s - b.s || (b.anytime ? 1 : 0) - (a.anytime ? 1 : 0) || a.e - b.e);
 
-  let html = `<p class="planner-intro">Every timed event you still need, in the order it happens across one 3-day cycle. Items tagged <span class="tag cycle">One cycle</span> fail if you play the Song of Time partway through. Gear you don’t have yet counts as available if you can get it from an earlier timed item in the same cycle (shown under “Get first”). Click a title to open it in the checklist.</p>`;
+  let html = `<p class="planner-intro">Every item you still need, in the order it happens across one 3-day cycle. Items with no time limit sit at the top of Day 1. Items tagged <span class="tag cycle">One cycle</span> fail if you play the Song of Time partway through. Gear you don’t have yet counts as available if you can get it from an earlier timed item in the same cycle (shown under “Get first”). Click a title to open it in the checklist.</p>`;
   let current = "";
   for (const ev of events) {
     const period = periodName(ev.d, ev.s);
@@ -2710,11 +2700,11 @@ function renderPlanner(f) {
       current = period;
       html += `<div class="section-title planner-period"><span>${period} ${period.startsWith("Day") ? "☀️" : "🌙"}</span></div>`;
     }
-    const plan = planGear(ev.item, evEnd(ev), new Set());
+    const plan = planGear(ev.item, ev.anytime ? 96 : evEnd(ev), new Set());
     const missing = plan.missing;
     html += `
       <div class="planner-row">
-        <div class="planner-time">${fmtHour(ev.s)} – ${fmtHour(ev.e)}</div>
+        <div class="planner-time">${ev.anytime ? "Any time" : `${fmtHour(ev.s)} – ${fmtHour(ev.e)}`}</div>
         <div>
           <div class="planner-title" role="button" tabindex="0" onclick="jumpTo('${ev.item.id}')">${ev.item.title}</div>
           <div class="planner-label">${ev.l}</div>
@@ -2725,36 +2715,6 @@ function renderPlanner(f) {
           ${missing === 0 ? (plan.via.length ? `<span class="tag chain">Gear from earlier item</span>` : `<span class="tag ready">Have Gear</span>`) : `<span class="tag missing">Missing ${missing}${plan.via.length ? ` · +${plan.via.length} earlier` : ""}</span>`}
         </div>
       </div>`;
-  }
-  if (ups.length) {
-    html += `<div class="section-title planner-period"><span>Follow-ups — no time limit, but only after the earlier item</span></div>`;
-    for (const u of ups) {
-      const missing = missingCount(u.item);
-      const covered = (u.item.requiresGear || []).filter(r => !reqOwned(r) && (Array.isArray(r) ? r : [r]).some(g => gearSourceItems(g).some(id => u.before.includes(id)))).length;
-      const left = missing - covered;
-      html += `
-      <div class="planner-row">
-        <div class="planner-time">Any time</div>
-        <div>
-          <div class="planner-title" role="button" tabindex="0" onclick="jumpTo('${u.item.id}')">${u.item.title}</div>
-          <div class="planner-chain">After: ${u.before.map(id => `<a onclick="jumpTo('${id}')">${ITEM_BY_ID[id].title}</a>`).join(", ")}</div>
-        </div>
-        <div class="planner-tags">${left === 0 ? `<span class="tag chain">Gear from earlier item</span>` : `<span class="tag missing">Missing ${left}${covered ? ` · +${covered} earlier` : ""}</span>`}</div>
-      </div>`;
-    }
-  }
-  if (anytime.length) {
-    html += `<details class="planner-anytime"><summary class="section-title planner-period"><span>Anytime — no time limit (${anytime.length})</span></summary>`;
-    for (const item of sortItems(anytime)) {
-      const missing = missingCount(item);
-      html += `
-      <div class="planner-row">
-        <div class="planner-time">Any time</div>
-        <div><div class="planner-title" role="button" tabindex="0" onclick="jumpTo('${item.id}')">${item.title}</div></div>
-        <div class="planner-tags">${missing === 0 ? `<span class="tag ready">Have Gear</span>` : `<span class="tag missing">Missing ${missing}</span>`}</div>
-      </div>`;
-    }
-    html += `</details>`;
   }
   return html;
 }
