@@ -252,15 +252,6 @@
     }
     .link-chip:hover { border-color: var(--accent); background: rgba(168, 85, 247, 0.25); }
     .link-chip.done { opacity: 0.55; text-decoration: line-through; }
-    .bottle-tracker { margin-top: 0.5rem; display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap; font-size: 0.78rem; color: var(--muted); }
-    .bottle-tracker-head { font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-right: 0.2rem; }
-    .bottle-slots { display: contents; }
-    .bottle-slot {
-      width: 1.45rem; height: 1.45rem; padding: 0; border-radius: 50%; cursor: pointer; font-size: 0.72rem; font-weight: 700;
-      color: var(--muted); background: transparent; border: 1px dashed #433670; display: inline-flex; align-items: center; justify-content: center;
-    }
-    .bottle-slot:hover { border-color: var(--accent); }
-    .bottle-slot.have { color: var(--green); border-style: solid; border-color: var(--green); background: rgba(34, 197, 94, 0.12); }
     .gear-chip.clickable { cursor: pointer; text-decoration: underline dotted; }
     .when-chip { padding: 0.1rem 0.45rem; border-radius: 5px; font-size: 0.76rem; background: rgba(56, 189, 248, 0.1); color: #bae6fd; border: 1px solid rgba(56, 189, 248, 0.3); }
 
@@ -335,7 +326,6 @@
       <div class="stat-card"><div class="stat-label">Collected Gear</div><div class="stat-value gear" id="gear-count">0 / 0</div></div>
     </div>
 
-    <div class="bottle-tracker" id="bottle-tracker"></div>
 
     <div class="view-tabs" id="view-tabs">
       <button type="button" data-view="checklist" onclick="setView('checklist')">Checklist</button>
@@ -438,7 +428,7 @@
 
 <script>
 // Bump this on each release; it is shown next to the title.
-const APP_VERSION = "1.3.1";
+const APP_VERSION = "1.3.2";
 { const v = document.getElementById("app-version"); if (v) v.textContent = "v" + APP_VERSION; }
 const GUIDE_LINKS = {
   masks: "https://www.zeldadungeon.net/Zelda06Masks.php",
@@ -490,6 +480,14 @@ const GEAR_ITEMS = [
   { id: "g_double_def", group: "Equipment & Items", label: "Double Defense (Great Bay Great Fairy)" },
   { id: "g_gf_sword", group: "Equipment & Items", label: "Great Fairy's Sword (Stone Tower Great Fairy)" },
 
+  { id: "g_bottle_1", group: "Bottles", label: "Kotake's Red Potion" },
+  { id: "g_bottle_2", group: "Bottles", label: "Romani's Milk" },
+  { id: "g_bottle_3", group: "Bottles", label: "Beaver Bros. Race" },
+  { id: "g_bottle_4", group: "Bottles", label: "Koume's Boat Target Game" },
+  { id: "g_bottle_5", group: "Bottles", label: "Goron Race (Gold Dust)" },
+  { id: "g_bottle_6", group: "Bottles", label: "Madame Aroma's Chateau Romani" },
+  { id: "g_bottle_7", group: "Bottles", label: "Gorman's Mysterious Milk" },
+
   { id: "g_moons_tear", group: "Trade Items & Letters", label: "Moon's Tear" },
   { id: "g_land_deed", group: "Trade Items & Letters", label: "Land Title Deed" },
   { id: "g_swamp_deed", group: "Trade Items & Letters", label: "Swamp Title Deed" },
@@ -532,7 +530,9 @@ const MASK_TO_GEAR = {
   m9: "g_couples_mask", m10: "g_troupe_mask", m11: "g_kamaro_mask", m12: "g_bunny_hood",
   m13: "g_romani_mask", m14: "g_garo_mask", m15: "g_truth_mask", m16: "g_scents_mask",
   m17: "g_goron_mask", m18: "g_don_gero_mask", m19: "g_zora_mask", m20: "g_stone_mask",
-  m21: "g_captain_hat", m22: "g_gibdo_mask", m23: "g_giant_mask", m24: "g_fierce_deity_mask"
+  m21: "g_captain_hat", m22: "g_gibdo_mask", m23: "g_giant_mask", m24: "g_fierce_deity_mask",
+  // Bottles sync the same way (checklist entry <-> gear entry); "Empty Bottle" below is derived from them
+  b1: "g_bottle_1", b2: "g_bottle_2", b3: "g_bottle_3", b4: "g_bottle_4", b5: "g_bottle_5", b6: "g_bottle_6", b7: "g_bottle_7"
 };
 const GEAR_TO_MASK = Object.fromEntries(Object.entries(MASK_TO_GEAR).map(([m, g]) => [g, m]));
 const GEAR_BY_ID = Object.fromEntries(GEAR_ITEMS.map(g => [g.id, g]));
@@ -2303,7 +2303,7 @@ function toggleGear(gearId) {
   const nowOwned = !ownedGearSet.has(gearId);
   if (nowOwned) ownedGearSet.add(gearId); else ownedGearSet.delete(gearId);
   const maskId = GEAR_TO_MASK[gearId];
-  if (maskId) { if (nowOwned) checkedSet.add(maskId); else checkedSet.delete(maskId); }
+  if (maskId) { if (nowOwned) checkedSet.add(maskId); else checkedSet.delete(maskId); syncGearFromItems(maskId); }
   save(); render();
 }
 
@@ -2311,6 +2311,7 @@ function setAllGear(checked) {
   if (!checked && !confirm("Clear all gear? This also un-completes every mask in the checklist, because masks are synced with the gear list.")) return;
   if (checked) GEAR_ITEMS.forEach(g => ownedGearSet.add(g.id)); else ownedGearSet.clear();
   for (const maskId of Object.values(GEAR_TO_MASK)) { if (checked) checkedSet.add(maskId); else checkedSet.delete(maskId); }
+  syncGearFromItems();
   save(); render();
 }
 
@@ -2783,26 +2784,12 @@ function syncControls() {
   ["day-filter", "tod-filter", "status-filter"].forEach(id => { document.getElementById(id).disabled = ui.view !== "checklist"; });
 }
 
-function renderBottleTracker() {
-  const el = document.getElementById("bottle-tracker");
-  if (!el) return;
-  const bottles = ITEMS.filter(i => i.type === "bottle");
-  const have = bottles.filter(b => checkedSet.has(b.id)).length;
-  el.innerHTML = `<span class="bottle-tracker-head">Bottles ${have}/${bottles.length}</span><span class="bottle-slots">` +
-    bottles.map((b, i) => {
-      const got = checkedSet.has(b.id);
-      const label = b.title.replace(/^Bottle #\d+\s*—\s*/, "");
-      return `<button type="button" class="bottle-slot ${got ? "have" : ""}" onclick="jumpTo('${b.id}')" title="${escAttr(label)}${got ? " (obtained)" : ""}">${got ? "✓" : i + 1}</button>`;
-    }).join("") + `</span>`;
-}
-
 function render() {
   // A jumped-to item stays visible only until the user changes a filter or search
   if (forceShowId && JSON.stringify(readFilters()) !== jumpFilterSig) forceShowId = null;
   const scrollY = window.scrollY;
   renderInventory();
   updateStats();
-  renderBottleTracker();
   syncControls();
   const f = readFilters();
   const app = document.getElementById("app");
