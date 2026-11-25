@@ -327,7 +327,7 @@
       <div class="stat-card"><div class="stat-label">Masks Collected</div><div class="stat-value masks" id="mask-count">0 / 24</div></div>
       <div class="stat-card"><div class="stat-label">Bottles</div><div class="stat-value gear" id="bottle-count">0 / 7</div></div>
       <div class="stat-card"><div class="stat-label">Great Fairy Rewards</div><div class="stat-value masks" id="fairy-count">0 / 4</div></div>
-      <div class="stat-card"><div class="stat-label">Songs Learned</div><div class="stat-value gear" id="song-count">0 / 10</div></div>
+      <div class="stat-card"><div class="stat-label">Songs Learned</div><div class="stat-value gear" id="song-count">0 / 11</div></div>
       <div class="stat-card"><div class="stat-label">Equipment Found</div><div class="stat-value gear" id="equip-count">0 / 10</div></div>
       <div class="stat-card"><div class="stat-label">Collected Gear</div><div class="stat-value gear" id="gear-count">0 / 0</div></div>
     </div>
@@ -356,13 +356,13 @@
     <div class="controls">
       <input type="search" id="search" placeholder="Search mask, location, day, time, step, or required item..." oninput="render()" />
       <select id="type-filter" onchange="render()">
-        <option value="all">All Categories (111)</option>
+        <option value="all">All Categories (112)</option>
         <option value="mask">Masks Only (24)</option>
         <option value="heart">Pieces of Heart Only (52)</option>
         <option value="container">Boss Heart Containers (4)</option>
         <option value="bottle">Bottles (7)</option>
         <option value="fairy">Stray Fairies / Great Fairies (4)</option>
-        <option value="song">Songs (10)</option>
+        <option value="song">Songs (11)</option>
         <option value="gear">Equipment (10)</option>
       </select>
       <select id="sort-mode" onchange="onSortChange()">
@@ -440,7 +440,7 @@
 
 <script>
 // Bump this on each release; it is shown next to the title.
-const APP_VERSION = "1.7.2";
+const APP_VERSION = "1.7.3";
 { const v = document.getElementById("app-version"); if (v) v.textContent = "v" + APP_VERSION; }
 const GUIDE_LINKS = {
   masks: "https://www.zeldadungeon.net/Zelda06Masks.php",
@@ -549,7 +549,7 @@ const MASK_TO_GEAR = {
   m17: "g_goron_mask", m18: "g_don_gero_mask", m19: "g_zora_mask", m20: "g_stone_mask",
   m21: "g_captain_hat", m22: "g_gibdo_mask", m23: "g_giant_mask", m24: "g_fierce_deity_mask",
   // Bottles sync the same way (checklist entry <-> gear entry); "Empty Bottle" below is derived from them
-  s1: "g_epona", s2: "g_sonata", s3: "g_soaring", s4: "g_lullaby", s5: "g_bossa", s6: "g_elegy", s7: "g_storms", s8: "g_oath", s9: "g_double_time", s10: "g_inverted",
+  s1: "g_epona", s2: "g_sonata", s3: "g_soaring", s4: "g_lullaby", s5: "g_bossa", s6: "g_elegy", s7: "g_storms", s8: "g_oath", s9: "g_double_time", s10: "g_inverted", s11: "g_scarecrow",
   e1: "g_razor_sword", e2: "g_gilded_sword", e3: "g_bombs", e4: "g_powder_keg", e5: "g_deku_sticks", e6: "g_magic_beans", e7: "g_lens", e8: "g_hookshot", e9: "g_notebook",
   e10: "g_giant_wallet",
   b1: "g_bottle_1", b2: "g_bottle_2", b3: "g_bottle_3", b4: "g_bottle_4", b5: "g_bottle_5", b6: "g_bottle_6", b7: "g_bottle_7"
@@ -2097,6 +2097,18 @@ ITEMS.push(
       "Talk to the Scarecrow in the Astral Observatory or the Trading Post.",
       "Play the Song of Time backward."
     ]
+  },
+  { id: "s11", type: "song", day: "Anytime", tod: "Anytime", region: "Clock Town",
+    title: "Scarecrow's Song",
+    requiresGear: ["g_ocarina"],
+    req: "You compose it yourself: any 8-note song, taught to Pierre the Scarecrow.",
+    guide: "https://www.thonky.com/zelda-majoras-mask/clock-town",
+    desc: "Unlike the other songs, nobody teaches you this one: you make up any 8-note song and teach it to Pierre the Scarecrow in the Trading Post or the Astral Observatory. Playing it later where a Scarecrow can appear makes Pierre show up on a distant pillar or ledge so you can Hookshot to him. Needed for two Pieces of Heart. Pick a tune you will remember.",
+    steps: [
+      "Go to Pierre the Scarecrow in the Trading Post (West Clock Town) or the Astral Observatory (reached from East Clock Town). Talk to him.",
+      "Play him any 8-note song of your choice on the Ocarina. He learns it and it becomes your Scarecrow's Song.",
+      "Play the same song near a Scarecrow spot (Tatl turns green) to make Pierre appear, then Hookshot to him. You need this for the Path to Snowhead and Great Bay Coast Pieces of Heart."
+    ]
   }
 );
 
@@ -2915,7 +2927,7 @@ function updateStats() {
   set("mask-count", `${masks} / 24`);
   set("bottle-count", `${bottles} / 7`);
   set("fairy-count", `${fairies} / 4`);
-  set("song-count", `${songs} / 10`);
+  set("song-count", `${songs} / 11`);
   set("equip-count", `${equip} / 10`);
   set("gear-count", `${ownedGearSet.size} / ${GEAR_ITEMS.length}`);
 }
