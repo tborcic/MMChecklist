@@ -440,7 +440,7 @@
 
 <script>
 // Bump this on each release; it is shown next to the title.
-const APP_VERSION = "1.6.13";
+const APP_VERSION = "1.6.14";
 { const v = document.getElementById("app-version"); if (v) v.textContent = "v" + APP_VERSION; }
 const GUIDE_LINKS = {
   masks: "https://www.zeldadungeon.net/Zelda06Masks.php",
@@ -603,9 +603,9 @@ const ITEMS = [
     id: "m3", type: "mask", day: "Night 1", tod: "Late Night", region: "Clock Town",
     title: "Blast Mask",
     requiresGear: ["g_soh", "g_sword"],
-    req: "Must be in North Clock Town at 12:00 AM on Night 1.",
+    req: "Must be in North Clock Town at 12:00 AM on Night 1. Do this in a different cycle from the Couple's Mask: stopping Sakon stops Sakon's Hideout from opening.",
     guide: GUIDE_LINKS.masks,
-    desc: "At midnight on the first night, the thief Sakon snatches the Bomb Shop Lady's bag of Big Bomb Bags in North Clock Town. Hit him before he escapes and she gives you the Blast Mask. Saving her is also what makes the All-Night Mask appear in the Curiosity Shop on Night 3.",
+    desc: "At midnight on the first night, the thief Sakon snatches the Bomb Shop Lady's bag of Big Bomb Bags in North Clock Town. Hit him before he escapes and she gives you the Blast Mask. Saving her is also what makes the All-Night Mask appear in the Curiosity Shop on Night 3. It cannot be done in the same cycle as the Couple's Mask, because stopping Sakon means he never opens his Hideout on the Final Day.",
     steps: [
       "Be in North Clock Town before 12:00 AM on the Night of the First Day (stand near the south entrance from South Clock Town).",
       "At 12:00 AM the Bomb Shop Lady walks in carrying a large bag and Sakon runs up and grabs it.",
@@ -690,9 +690,9 @@ const ITEMS = [
     id: "m9", type: "mask", day: "Night 3", tod: "Late Night", region: "Clock Town",
     title: "Couple's Mask",
     requiresGear: ["g_kafei_mask", "g_epona", "g_garo_mask", "g_hookshot"],
-    req: "Whole Anju & Kafei quest in ONE cycle, including a trip to Sakon's Hideout in Ikana Canyon on the evening of Day 3.",
+    req: "Whole Anju & Kafei quest in ONE cycle, including a trip to Sakon's Hideout in Ikana Canyon on the evening of Day 3. Do NOT stop Sakon's robbery on Night 1 (no Blast Mask in this cycle), or the Hideout will not open.",
     guide: GUIDE_LINKS.masks,
-    desc: "The final reward of the Anju & Kafei quest. Anju must decide to wait for Kafei (give her the Pendant of Memories), and you must help Kafei get his stolen Sun's Mask back from Sakon's Hideout. Kafei then returns to the Stock Pot Inn just before dawn on the Final Day and the two make the Couple's Mask, which they give to you.",
+    desc: "The final reward of the Anju & Kafei quest. Anju must decide to wait for Kafei (give her the Pendant of Memories), and you must help Kafei get his stolen Sun's Mask back from Sakon's Hideout. Kafei then returns to the Stock Pot Inn just before dawn on the Final Day and the two make the Couple's Mask, which they give to you. Do not stop Sakon's robbery at midnight on Night 1: if you hit him or blow up the bag, he never sells it to the Curiosity Shop, Kafei never follows him, and Sakon's Hideout will not open on the Final Day. Get the Blast Mask in a different cycle.",
     steps: [
       "Do Keaton Mask steps 1–4 to get the Letter to Kafei delivered and receive the Pendant of Memories on Day 2.",
       "Day 2 or Day 3, between 10:00 AM and 7:00 PM: give the Pendant of Memories to Anju at the Stock Pot Inn. She decides to stay and wait for Kafei.",
