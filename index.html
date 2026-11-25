@@ -440,7 +440,7 @@
 
 <script>
 // Bump this on each release; it is shown next to the title.
-const APP_VERSION = "1.6.15";
+const APP_VERSION = "1.7.0";
 { const v = document.getElementById("app-version"); if (v) v.textContent = "v" + APP_VERSION; }
 const GUIDE_LINKS = {
   masks: "https://www.zeldadungeon.net/Zelda06Masks.php",
@@ -1022,18 +1022,33 @@ const ITEMS = [
   // ==================== 52 PIECES OF HEART (MM3D) ====================
   // ---------- Clock Town (16) ----------
   { id: "hp1", type: "heart", day: "Anytime", tod: "Anytime", region: "Clock Town",
-    title: "South Clock Town — Clock Tower Ledge",
+    merged: ["hp1", "hp24", "hp32", "hp42", "hp46"], stepHearts: {5: "hp1", 8: "hp24", 11: "hp32", 15: "hp42", 19: "hp46"},
+    title: "Title Deed Quest — 5 Pieces of Heart",
     requiresGear: ["g_deku_mask"],
-    req: "Moon's Tear (from the Astral Observatory) traded to the South Clock Town Business Scrub in the same cycle.",
+    req: "Do the whole chain in one cycle. Human Link for the Swamp and Goron Village trades, Goron Link at Zora Hall, Zora Link at Ikana. Needs Epona, Garo's Mask and the Hookshot for the later stops.",
     guide: GUIDE_LINKS.hearts,
-    desc: "A Business Scrub sits next to a Deku Flower beside the Clock Tower in South Clock Town. Trade him the Moon's Tear (he gives you the Land Title Deed) and he leaves the flower behind. As Deku Link, launch from it and glide to the ledge in front of the Clock Tower door, where the Piece of Heart sits.",
+    desc: "A chain of five Business Scrubs, each trading you the next Title Deed and giving a Piece of Heart: South Clock Town (Moon's Tear for the Land Title Deed), Swamp Tourist Center (Land Deed for the Swamp Deed), Goron Village (Swamp Deed for the Mountain Deed), Zora Hall (Mountain Deed for the Ocean Deed) and Ikana Canyon (sells the Ocean Deed for 200 Rupees). Ticking each \"Heart n of 5\" step ticks that Piece of Heart.",
     steps: [
       "Win the Bombers' hide-and-seek in North Clock Town (catch all 5) to learn the secret code.",
       "Give the code to the Bomber at the tunnel in East Clock Town and go through the Bombers' Hideout to the Astral Observatory.",
       "Look through the telescope at the moon until the Moon's Tear falls. Go out the back door and pick it up.",
       "In South Clock Town, give the Moon's Tear to the Business Scrub by the Clock Tower. He gives you the Land Title Deed and leaves.",
       "As Deku Link, dive into his Deku Flower, launch, and glide to the ledge in front of the Clock Tower door.",
-      "Grab the Piece of Heart on the ledge."
+      "Grab the Piece of Heart on the ledge. (Heart 1 of 5)",
+      "Swamp Tourist Center: as Human Link, talk to the Business Scrub outside and trade the Land Title Deed for the Swamp Title Deed. He leaves.",
+      "Put on the Deku Mask, dive into his Deku Flower, launch, and glide onto the Tourist Center roof.",
+      "Grab the Piece of Heart on the roof. (Heart 2 of 5)",
+      "Goron Village: go up to the top ledge and talk to the Business Scrub as Human Link. Trade the Swamp Title Deed for the Mountain Title Deed.",
+      "Put on the Deku Mask, launch from his Deku Flower, and glide to the platform above.",
+      "Grab the Piece of Heart. (Heart 3 of 5)",
+      "Zora Hall: as Zora Link, enter the far-left room (where a Zora is peeping through the door).",
+      "Put on the Goron Mask and trade the Mountain Title Deed to the Business Scrub for the Ocean Title Deed.",
+      "Put on the Deku Mask, launch from his Deku Flower, and glide to the upper ledge.",
+      "Grab the Piece of Heart. (Heart 4 of 5)",
+      "Ikana Canyon: wear Garo's Mask, talk to the ghost guard on the Road to Ikana, and Hookshot up the tree.",
+      "Find the Business Scrub near Sakon's Hideout. As Zora Link, sell him the Ocean Title Deed (he pays 200 Rupees).",
+      "Put on the Deku Mask, launch from his Deku Flower, and glide across the river to the ledge.",
+      "Grab the Piece of Heart. (Heart 5 of 5)"
     ]
   },
   { id: "hp2", type: "heart", day: "Anytime", tod: "Anytime", region: "Clock Town",
@@ -1335,7 +1350,7 @@ const ITEMS = [
       "Grab the Piece of Heart on top."
     ]
   },
-  { id: "hp24", type: "heart", day: "Anytime", tod: "Anytime", region: "Southern Swamp & Woodfall",
+  { id: "hp24", mergedInto: "hp1", type: "heart", day: "Anytime", tod: "Anytime", region: "Southern Swamp & Woodfall",
     title: "Southern Swamp — Swamp Tourist Center Roof",
     requiresGear: ["g_land_deed", "g_deku_mask"],
     req: "Trade as Human Link (no mask on).",
@@ -1430,7 +1445,7 @@ const ITEMS = [
       "In Mountain Village, wear Don Gero's Mask and talk to the frogs to start the choir. Collect the Piece of Heart."
     ]
   },
-  { id: "hp32", type: "heart", day: "Anytime", tod: "Anytime", region: "Snowhead & Mountains",
+  { id: "hp32", mergedInto: "hp1", type: "heart", day: "Anytime", tod: "Anytime", region: "Snowhead & Mountains",
     title: "Goron Village — Business Scrub Ledge",
     requiresGear: ["g_swamp_deed", "g_deku_mask"],
     req: "Trade as Human Link (no mask on).",
@@ -1570,7 +1585,7 @@ const ITEMS = [
       "Collect the Piece of Heart."
     ]
   },
-  { id: "hp42", type: "heart", day: "Anytime", tod: "Anytime", region: "Great Bay",
+  { id: "hp42", mergedInto: "hp1", type: "heart", day: "Anytime", tod: "Anytime", region: "Great Bay",
     title: "Zora Hall — Business Scrub Ledge",
     requiresGear: ["g_epona", "g_mountain_deed", "g_zora_mask", "g_goron_mask", "g_deku_mask"],
     req: "Trade as Goron Link.",
@@ -1629,7 +1644,7 @@ const ITEMS = [
       "Open the chest to get the Piece of Heart."
     ]
   },
-  { id: "hp46", type: "heart", day: "Anytime", tod: "Anytime", region: "Ikana Canyon",
+  { id: "hp46", mergedInto: "hp1", type: "heart", day: "Anytime", tod: "Anytime", region: "Ikana Canyon",
     title: "Ikana Canyon — Business Scrub Ledge",
     requiresGear: ["g_epona", "g_garo_mask", "g_hookshot", "g_ocean_deed", "g_zora_mask", "g_deku_mask"],
     req: "Trade as Zora Link. This is the last trade in the deed chain.",
@@ -1832,10 +1847,10 @@ ITEMS.push(
     requiresGear: ["g_troupe_mask", "g_bunny_hood", "g_bottle", "g_epona"],
     req: "Day 2: Gorman is in the Stock Pot Inn from 8:00 AM; the Gorman Brothers hand out milk after 12:00 PM. The milk goes bad after 2 minutes.",
     guide: GUIDE_LINKS.masks,
-    desc: "MM3D addition: Gorman, the hungover Troupe Leader, is sick in bed at the Stock Pot Inn on Day 2. Wearing the Troupe Leader's Mask, you get his brothers at Gorman Track to give you Mysterious Milk. Rush it back before it spoils and he gives you a Bottle.",
+    desc: "MM3D addition: Gorman, the hungover Troupe Leader, is sick in bed at the Stock Pot Inn on Day 2. You have to talk to him while wearing the Troupe Leader's Mask, and he mentions that it has to be past noon. After 12:00 PM, wear the mask to get his brothers at Gorman Track to give you Mysterious Milk. Rush it back before it spoils and he gives you a Bottle.",
     steps: [
       "Get the Troupe Leader's Mask (Milk Bar sound check, Night 1 or 2).",
-      "Day 2, after 8:00 AM: go upstairs in the Stock Pot Inn to the last room. Wear the Troupe Leader's Mask and talk to Gorman — he asks for Mysterious Milk.",
+      "Day 2, after 8:00 AM: go upstairs in the Stock Pot Inn to the last room. You must wear the Troupe Leader's Mask to talk to Gorman. He asks for Mysterious Milk and mentions it has to be past noon (after 12:00 PM).",
       "After 12:00 PM, go to Gorman Track on Milk Road wearing the Troupe Leader's Mask and talk to the Gorman Brothers. They give you Mysterious Milk.",
       "Put on the Bunny Hood and hurry back to Gorman in the Stock Pot Inn within 2 minutes (warping with the Song of Soaring is fastest).",
       "Give him the milk and collect the Bottle."
@@ -2468,6 +2483,22 @@ function hashText(t) {
 function stepKey(item, idx) { return `${item.id}~${hashText(item.steps[idx])}`; }
 // Text-hash keys of steps that were later reworded -> their current key (keeps old saves/exports working)
 const LEGACY_STEP_KEYS = {
+ "b7~fdcjy8": "b7~12qorh4",
+ "hp1~1tegc3u": "hp1~m74s24",
+ "hp24~1v73gh2": "hp1~d6zx8l",
+ "hp24~emaihg": "hp1~emaihg",
+ "hp24~1dm0mj5": "hp1~13prhpw",
+ "hp32~9rmgo9": "hp1~1wj9p2w",
+ "hp32~1ris91c": "hp1~1ris91c",
+ "hp32~8ha1jx": "hp1~v649yx",
+ "hp42~1by0owj": "hp1~1pj413i",
+ "hp42~m6mld3": "hp1~m6mld3",
+ "hp42~1khucct": "hp1~1khucct",
+ "hp42~8ha1jx": "hp1~13f2jb2",
+ "hp46~1fqqwsu": "hp1~ub1u3o",
+ "hp46~93br8s": "hp1~93br8s",
+ "hp46~f0fryr": "hp1~f0fryr",
+ "hp46~8ha1jx": "hp1~1nhf20v",
  "m9~ea207q": "m9~1w2fg7p",
  "m7~1k1qwxt": "m7~l6r8es",
  "m7~1dlbb03": "m7~9rkf0b",
@@ -2575,6 +2606,7 @@ function sanitizeState() {
   for (const id of ownedGearSet) if (GEAR_TO_MASK[id]) checkedSet.add(GEAR_TO_MASK[id]);
 }
 sanitizeState();
+for (const id of checkedSet) syncMergedStep(id, true);
 syncGearFromItems();
 
 function save() {
@@ -2629,8 +2661,24 @@ function compareClosest(a, b) {
 function sortItems(list) { return ui.sort === "closest" ? [...list].sort(compareClosest) : list; }
 
 // ==================== ACTIONS ====================
+// A merged card (the Title Deed Quest) counts as done once every piece it holds is done
+function isDone(item) { return item.merged ? item.merged.every(i => checkedSet.has(i)) : checkedSet.has(item.id); }
+
+// Keep a merged card's "Heart n of 5" steps in step with the hearts it holds
+function syncMergedStep(id, checked) {
+  for (const m of ITEMS) {
+    if (!m.stepHearts) continue;
+    for (const [idx, heartId] of Object.entries(m.stepHearts)) {
+      if (heartId !== id) continue;
+      const k = stepKey(m, Number(idx));
+      if (checked) subCheckedSet.add(k); else subCheckedSet.delete(k);
+    }
+  }
+}
+
 function markItemChecked(id, checked) {
   if (checked) checkedSet.add(id); else checkedSet.delete(id);
+  syncMergedStep(id, checked);
   const gearId = MASK_TO_GEAR[id];
   if (gearId) { if (checked) ownedGearSet.add(gearId); else ownedGearSet.delete(gearId); }
   syncGearFromItems(id);
@@ -2655,8 +2703,9 @@ function setAllGear(checked) {
 function toggleInventoryPanel() { invOpen = !invOpen; save(); renderInventory(); }
 
 function toggleItem(id) {
-  const nowChecked = !checkedSet.has(id);
-  markItemChecked(id, nowChecked);
+  const it = ITEM_BY_ID[id];
+  const nowChecked = !isDone(it);
+  if (it.merged) it.merged.forEach(m => markItemChecked(m, nowChecked)); else markItemChecked(id, nowChecked);
   save(); render();
   if (nowChecked && hideCompleted && ui.view === "checklist") showUndoToast(id);
 }
@@ -2680,7 +2729,10 @@ function toggleSubStep(subId, parentId) {
   const nowDone = !subCheckedSet.has(subId);
   if (nowDone) subCheckedSet.add(subId); else subCheckedSet.delete(subId);
   const parent = ITEM_BY_ID[parentId];
-  if (parent && parent.steps && parent.steps.length) {
+  if (parent && parent.stepHearts) {
+    const idx = parent.steps.findIndex((_, i) => stepKey(parent, i) === subId);
+    if (parent.stepHearts[idx]) markItemChecked(parent.stepHearts[idx], nowDone);
+  } else if (parent && parent.steps && parent.steps.length) {
     const allDone = parent.steps.every((_, idx) => subCheckedSet.has(stepKey(parent, idx)));
     if (allDone) markItemChecked(parentId, true);
     // Unticking a single step deliberately leaves the item (and its mask/bottle gear) checked
@@ -2728,6 +2780,7 @@ function onNowChange() {
 
 function jumpTo(id) {
   if (!ITEM_BY_ID[id]) return;
+  id = ITEM_BY_ID[id].mergedInto || id;
   // Remember where we were so the browser Back button returns here
   try { history.replaceState({ mmView: ui.view, mmY: window.scrollY, mmForce: forceShowId, mmSig: jumpFilterSig }, ""); } catch (e) {}
   ui.view = "checklist";
@@ -2860,13 +2913,14 @@ function linkifyStep(text) {
 }
 
 function itemLink(id) {
-  const it = ITEM_BY_ID[id];
+  let it = ITEM_BY_ID[id];
   if (!it) return "";
-  return `<span class="link-chip ${checkedSet.has(id) ? "done" : ""}" role="button" tabindex="0" onclick="jumpTo('${id}')">${it.title}</span>`;
+  if (it.mergedInto) { it = ITEM_BY_ID[it.mergedInto]; id = it.id; } // merged pieces show as their quest card
+  return `<span class="link-chip ${isDone(it) ? "done" : ""}" role="button" tabindex="0" onclick="jumpTo('${id}')">${it.title}</span>`;
 }
 
 function renderCard(item, opts = {}) {
-  const isChecked = checkedSet.has(item.id);
+  const isChecked = isDone(item);
   const isOpen = openStepsSet.has(item.id) || Boolean(opts.query);
   const missing = missingCount(item);
   const tagLabel = { mask: "Mask", container: "Heart Container", heart: "Piece of Heart", bottle: "Bottle", fairy: "Great Fairy", song: "Song", gear: "Equipment" }[item.type];
@@ -2958,6 +3012,7 @@ function renderCard(item, opts = {}) {
 }
 
 function baseFilter(item, f) {
+  if (item.mergedInto) return false;
   if (item.id === forceShowId) return true;
   if (f.typeFilter !== "all" && item.type !== f.typeFilter) return false;
   if (f.regionFilter !== "all" && item.region !== f.regionFilter) return false;
@@ -2986,7 +3041,7 @@ function renderChecklist(f) {
   const filtered = ITEMS.filter(item => {
     if (item.id === forceShowId) return true;
     if (!baseFilter(item, f)) return false;
-    const isChecked = checkedSet.has(item.id);
+    const isChecked = isDone(item);
     if (f.dayFilter !== "all" && item.day !== f.dayFilter) return false;
     if (f.todFilter !== "all" && item.tod !== f.todFilter) return false;
     if (f.statusFilter === "checked" && !isChecked) return false;
@@ -3009,8 +3064,8 @@ function renderChecklist(f) {
   let html = "";
   for (const key of keys) {
     const list = groups[key];
-    const regionAll = ITEMS.filter(i => keyOf(i) === key && (f.typeFilter === "all" || i.type === f.typeFilter));
-    const doneInRegion = regionAll.filter(i => checkedSet.has(i.id)).length;
+    const regionAll = ITEMS.filter(i => !i.mergedInto && keyOf(i) === key && (f.typeFilter === "all" || i.type === f.typeFilter));
+    const doneInRegion = regionAll.filter(i => isDone(i)).length;
     const pct = regionAll.length ? Math.round((doneInRegion / regionAll.length) * 100) : 0;
     const title = byType ? TYPE_TITLES[key] : (key === "Ikana Canyon" ? "Ikana" : key);
     html += `
@@ -3084,7 +3139,7 @@ function renderPlanner(f) {
   // "Items I Have On Me" here also keeps items whose missing gear comes from an earlier item in the cycle
   const pf = { ...f, ownedOnly: false };
   for (const item of ITEMS) {
-    if (checkedSet.has(item.id) || !baseFilter(item, pf)) continue;
+    if (isDone(item) || !baseFilter(item, pf)) continue;
     for (const w of SCHEDULES[item.id] || []) {
       if (f.ownedOnly && planGear(item, evEnd(w), new Set()).missing > 0) continue;
       events.push({ ...w, item });
@@ -3092,7 +3147,7 @@ function renderPlanner(f) {
   }
   // Items with no time limit can be done from the start, so they go at the top of Day 1
   for (const item of ITEMS) {
-    if (checkedSet.has(item.id) || SCHEDULES[item.id] || !baseFilter(item, pf)) continue;
+    if (isDone(item) || SCHEDULES[item.id] || !baseFilter(item, pf)) continue;
     if (f.ownedOnly && planGear(item, 96, new Set()).missing > 0) continue;
     const r = readyInfo(item);
     const d = Math.floor((r.key - 6) / 24) + 1, st = r.key - (d - 1) * 24;
@@ -3138,7 +3193,7 @@ function renderNow(f) {
   const d = ui.nowDay, h = ui.nowHour;
   const timed = [], anytime = [];
   for (const item of ITEMS) {
-    if (checkedSet.has(item.id) || !baseFilter(item, f)) continue;
+    if (isDone(item) || !baseFilter(item, f)) continue;
     const ws = windowsNow(item, d, h);
     if (ws.length) timed.push({ item, ws });
     else if (ui.nowAnytime && !SCHEDULES[item.id] && item.day === "Anytime" && hasAllRequiredGear(item)) anytime.push(item);
