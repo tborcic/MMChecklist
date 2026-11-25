@@ -439,7 +439,7 @@
 
 <script>
 // Bump this on each release; it is shown next to the title.
-const APP_VERSION = "1.6.10";
+const APP_VERSION = "1.6.12";
 { const v = document.getElementById("app-version"); if (v) v.textContent = "v" + APP_VERSION; }
 const GUIDE_LINKS = {
   masks: "https://www.zeldadungeon.net/Zelda06Masks.php",
@@ -486,6 +486,9 @@ const GEAR_ITEMS = [
   { id: "g_wallet", group: "Equipment & Items", label: "Adult Wallet (200 Rupees)" },
   { id: "g_giant_wallet", group: "Equipment & Items", label: "Giant's Wallet (500 Rupees)" },
   { id: "g_remains", group: "Equipment & Items", label: "All 4 Boss Remains" },
+  { id: "g_odolwa", group: "Equipment & Items", label: "Odolwa Defeated (Woodfall Temple cleared)" },
+  { id: "g_goht", group: "Equipment & Items", label: "Goht Defeated (spring in Mountain Village)" },
+  { id: "g_gyorg", group: "Equipment & Items", label: "Gyorg Defeated (Great Bay Temple cleared)" },
   { id: "g_notebook", group: "Equipment & Items", label: "Bombers' Notebook" },
   { id: "g_large_quiver", group: "Equipment & Items", label: "Large Quiver" },
   { id: "g_ext_magic", group: "Equipment & Items", label: "Extended Magic (Woodfall Great Fairy)" },
@@ -1400,7 +1403,7 @@ const ITEMS = [
   // ---------- Snowhead & Mountains (4) ----------
   { id: "hp30", type: "heart", day: "Anytime", tod: "Anytime", region: "Snowhead & Mountains",
     title: "Road to Goron Village — Spring Lake Chest",
-    requiresGear: ["g_zora_mask", "g_goron_mask", "g_lullaby", "g_bow"],
+    requiresGear: ["g_zora_mask", "g_goron_mask", "g_lullaby", "g_bow", "g_goht"],
     req: "Goht must be defeated in this cycle (spring).",
     guide: GUIDE_LINKS.hearts,
     desc: "Once Goht is defeated and spring comes, the frozen lake on the Road to Goron Village (Twin Islands) melts. A large chest sits at the bottom. Dive down as Zora Link to open it.",
@@ -1413,8 +1416,8 @@ const ITEMS = [
   },
   { id: "hp31", type: "heart", day: "Anytime", tod: "Anytime", region: "Snowhead & Mountains",
     title: "Mountain Village — Frog Choir",
-    requiresGear: ["g_don_gero_mask", "g_deku_mask", "g_sonata", "g_zora_mask", "g_bossa", "g_hookshot", "g_goron_mask", "g_lullaby"],
-    req: "Goht defeated (spring), and you must have reached the Gekko in both Woodfall Temple and Great Bay Temple. Do it all in one cycle to be safe.",
+    requiresGear: ["g_don_gero_mask", "g_deku_mask", "g_sonata", "g_zora_mask", "g_bossa", "g_hookshot", "g_goron_mask", "g_lullaby", "g_odolwa", "g_goht", "g_gyorg"],
+    req: "Odolwa, Goht and Gyorg defeated (Goht brings spring; Odolwa and Gyorg stand in for reaching the Gekko minibosses in Woodfall and Great Bay Temples). Do it all in one cycle to be safe.",
     guide: GUIDE_LINKS.hearts,
     desc: "Don Gero, the frog conductor, wants his five-frog choir back together in Mountain Village. Find each frog while wearing Don Gero's Mask and tell them about the concert. Two of them are the frogs left behind after you beat the Gekko minibosses in Woodfall and Great Bay Temples. Once all five are home, they sing and give you a Piece of Heart.",
     steps: [
@@ -1457,7 +1460,7 @@ const ITEMS = [
   // ---------- Great Bay (10) ----------
   { id: "hp34", type: "heart", day: "Anytime", tod: "Anytime", region: "Great Bay",
     title: "Great Bay Coast — Fisherman's Jumping Game",
-    requiresGear: ["g_epona", "g_hookshot", "g_zora_mask", "g_bossa"],
+    requiresGear: ["g_epona", "g_hookshot", "g_zora_mask", "g_bossa", "g_gyorg"],
     req: "Gyorg must be defeated in this cycle (calm sea).",
     guide: GUIDE_LINKS.hearts,
     desc: "MM3D addition: once Gyorg is gone and the sea is calm, a fisherman on a small island off Great Bay Coast runs a jumping game. Torches light up on little platforms and you jump to each lit one. Score 20 or more for a Piece of Heart.",
@@ -1500,16 +1503,15 @@ const ITEMS = [
   { id: "hp37", type: "heart", day: "Anytime", tod: "Anytime", region: "Great Bay",
     title: "Oceanside Spider House — Mask Puzzle",
     requiresGear: ["g_epona", "g_captain_hat", "g_bombs", "g_hookshot", FIRE, "g_bow"],
-    req: "The Captain's Hat is required to read the color order from the Stalchildren.",
+    req: "Reported order: red, blue, green, yellow, blue, yellow (it may be different on your save). The Captain's Hat is needed to hear the hints.",
     guide: GUIDE_LINKS.hearts,
-    desc: "In the Library of the Oceanside Spider House on Great Bay Coast, colored masks hang on the wall. Six Stalchildren in the house tell you the order to shoot them in, but they only talk to someone wearing the Captain's Hat. Shoot the masks in the right order, beat the big Skulltula behind the gate, and open the chest.",
+    desc: "In the dining room of the Oceanside Spider House on Great Bay Coast, masks hang on the dining room wall (in the 3DS version each has a card suit symbol: club, heart, diamond or spade). One player reported the order red, blue, green, yellow, blue, yellow, but it may be different on your save (not confirmed). Talk to the six Stalchildren (two in the Library, four at the dining room table) while wearing the Captain's Hat to confirm the order, then shoot the masks in that order to open the fireplace and reach the chest.",
     steps: [
       "Bomb the cracked wall at the Oceanside Spider House entrance (next to the Fisherman's Hut) and slide down into the house.",
       "Hookshot the target above the door and burn the cobwebs with a Fire Arrow or lit Deku Stick.",
-      "Put on the Captain's Hat and talk to each Stalchild. Write down the color order they give.",
-      "In the Library, shoot the colored masks on the wall with arrows in that order. The gate opens.",
-      "Defeat the large Skulltula behind the gate.",
-      "Open the chest to get the Piece of Heart."
+      "Wear the Captain's Hat and talk to the Stalchildren: two in the Library and four in the dining room. Write down the order they give (in the 3DS version the hints may name card suits instead of colors). The order may be different on your save.",
+      "In the dining room, shoot the masks on the wall with arrows in that order. Reported order: red, blue, green, yellow, blue, yellow. The fireplace opens when the order is right.",
+      "Go through the fireplace and open the chest to get the Piece of Heart."
     ]
   },
   { id: "hp38", type: "heart", day: "Anytime", tod: "Anytime", region: "Great Bay",
@@ -1800,7 +1802,7 @@ ITEMS.push(
   },
   { id: "b5", type: "bottle", day: "Anytime", tod: "Anytime", region: "Snowhead & Mountains",
     title: "Bottle #5 — Goron Race (Gold Dust)",
-    requiresGear: ["g_goron_mask", "g_powder_keg", "g_lullaby", "g_bow"],
+    requiresGear: ["g_goron_mask", "g_powder_keg", "g_lullaby", "g_bow", "g_goht"],
     req: "Goht defeated in this cycle (spring). A Powder Keg clears the boulder at the racetrack entrance.",
     guide: GUIDE_LINKS.masks,
     desc: "After spring comes to the mountains, the Gorons hold a race at the Goron Racetrack on Twin Islands. Win as Goron Link and you get a Bottle of Gold Dust. You can also give the Gold Dust to the Mountain Smithy to make the Gilded Sword.",
@@ -2358,6 +2360,9 @@ const GEAR_SOURCE = {
   g_wallet: { text: "Bank in West Clock Town: deposit 200 Rupees", items: ["hp8"] },
   g_giant_wallet: { text: "Oceanside Spider House: clear all 30 Gold Skulltulas (a step of the All-Night Mask entry, which needs it)" },
   g_remains: { text: "Defeat all four temple bosses", items: ["hc1", "hc2", "hc3", "hc4"] },
+  g_odolwa: { text: "Defeat Odolwa in Woodfall Temple", items: ["hc1"] },
+  g_goht: { text: "Defeat Goht in Snowhead Temple", items: ["hc2"] },
+  g_gyorg: { text: "Defeat Gyorg in Great Bay Temple", items: ["hc3"] },
   g_moons_tear: { text: "Astral Observatory telescope", items: ["hp1"] },
   g_land_deed: { text: "Trade the Moon's Tear to the South Clock Town Business Scrub", items: ["hp1"] },
   g_swamp_deed: { text: "Trade the Land Title Deed at the Swamp Tourist Center", items: ["hp24"] },
