@@ -439,7 +439,7 @@
 
 <script>
 // Bump this on each release; it is shown next to the title.
-const APP_VERSION = "1.6.7";
+const APP_VERSION = "1.6.8";
 { const v = document.getElementById("app-version"); if (v) v.textContent = "v" + APP_VERSION; }
 const GUIDE_LINKS = {
   masks: "https://www.zeldadungeon.net/Zelda06Masks.php",
@@ -779,17 +779,37 @@ const ITEMS = [
   {
     id: "m15", type: "mask", day: "Anytime", tod: "Anytime", region: "Southern Swamp & Woodfall",
     title: "Mask of Truth",
-    requiresGear: ["g_deku_mask", "g_goron_mask", "g_bombs", "g_bow", "g_hookshot", "g_bottle", "g_magic_beans", FIRE],
+    requiresGear: ["g_deku_mask", "g_goron_mask", "g_bombs", "g_bow", "g_hookshot", "g_bottle", "g_magic_beans", "g_sonata", FIRE],
     req: "Bugs in a bottle (catch them under rocks), Magic Beans plus water (Spring Water or Song of Storms).",
     guide: GUIDE_LINKS.masks,
-    desc: "A man in the Swamp Spider House has been turned into a spider. Defeat all 30 Gold Skulltulas hidden in the house and he turns back and gives you the Mask of Truth, which lets you read the minds of animals and get Gossip Stones to talk. Skulltulas hide in pots, under bug holes, behind beehives, in high places and inside a tree.",
+    desc: "A man in the Swamp Spider House has been turned into a spider. Defeat all 30 Gold Skulltulas hidden in the house and he turns back and gives you the Mask of Truth, which lets you read the minds of animals and get Gossip Stones to talk. Skulltulas hide in pots, under bug holes, behind beehives, in high places and inside a tree. The step list below goes through all 30 in the order of the Zelda Dungeon guide, cross-checked with Zelda Wiki.",
     steps: [
       "Go to the island on the east side of Southern Swamp, near the Deku Palace's back exit. Burn the web over the door with a lit Deku Stick or a Fire Arrow.",
-      "Main room: break the pots, cut the grass and check the water by the statue at the bottom of the ramp. Shoot down the beehives with arrows so the Skulltulas behind them fall.",
-      "Release Bugs from a bottle into each patch of soft soil. A Skulltula climbs out of each one.",
-      "Plant Magic Beans in the soil patches and water them with Spring Water (or play the Song of Storms). Ride the plants up to the Skulltulas you couldn't reach.",
-      "Use the Hookshot to pull in Skulltula tokens on high walls and ceilings, and bomb anything that looks cracked.",
-      "In the room with the big tree, roll into the tree as Goron Link to knock out the Skulltulas hidden in it.",
+      "Skulltula 1: At the bottom of the ramp, moving back and forth within the water.",
+      "Skulltula 2: Moving up and down the pillar at the northeast corner of the room.",
+      "Skulltula 3: Inside a jar just to the left of the ramp.",
+      "Skulltula 4: Soft soil patch on the wall at the east end of the room: release Bugs from a bottle and a Skulltula pops out.",
+      "Skulltula 5: Second soft soil patch on the wall at the west end of the room: release Bugs from a bottle and a Skulltula pops out.",
+      "Skulltula 6: West room: roll into the crate that is third from the wall at the northwest part of the room.",
+      "Skulltula 7: Roll into a crate near the southwest part of the room.",
+      "Skulltula 8: Northeast part of the room: blow up the boulder with a Bomb or the Blast Mask, plant a Magic Bean and water it. Ride the plant to the western wall, where the Skulltula crawls around.",
+      "Skulltula 9: On top of the large tombstone in the center of the room: climb to the second floor and jump over to the tombstone.",
+      "Skulltula 10: Upper part of the room, northeast corner, hidden behind the lit torch.",
+      "Skulltula 11: Upstairs, on the pillar at the northwest corner of the room.",
+      "Skulltula 12: Along the northern wall, a bit higher up. Shoot it with an arrow or bubble, then use the Deku Flower to grab the token.",
+      "Skulltula 13: Use the Deku Flower to get to the east end of the room. At the southeast part, release Bugs near the soft soil patch and a Skulltula pops out.",
+      "Skulltulas 14–15: Eastern room: look up at the five beehives. Two hold Gold Skulltulas. Knock them down with the Bow or a bubble and collect the tokens.",
+      "Skulltulas 16–17: Room with five large pots: the one at the north end and the second from the south end both hold Skulltulas. Roll into the pots.",
+      "Skulltula 18: A few small pots at the south end of the room: slash the front one.",
+      "Skulltula 19: North end of the room: slash the wall to reveal a path. A Skulltula is right around the corner.",
+      "Skulltula 20: A Deku Scrub sleeps here. Play the Sonata of Awakening so it runs off, then use the Deku Flower to reach the higher ledge to the north. The Skulltula is on the wall.",
+      "Skulltula 21: Center of the northern room: four beehives on the ceiling. The one closest to the north end holds a Skulltula, so shoot it down with an arrow.",
+      "Skulltula 22: Moving up and down a pillar at the northeast part of the room.",
+      "Skulltula 23: On the wall where the ladder appeared: shoot it down, then climb the ladder to take the token.",
+      "Skulltula 24: Higher on the wall at the north end of the room: plant a Magic Bean at the northwest part, water it, and ride the plant to the Skulltula. Use the plant again to reach the door at the north end.",
+      "Skulltula 25: Two beehives in the tree: the northeast one holds a Gold Skulltula. Shoot it down with an arrow or bubble.",
+      "Skulltulas 26–28: Roll into the large tree in the center of the room. Three Gold Skulltulas fall out, so run around the room and defeat them.",
+      "Skulltulas 29–30: Two more Skulltulas around the perimeter of the room, one of which crawls around.",
       "When the counter shows 30/30, go back to the entrance room and talk to the man. He gives you the Mask of Truth."
     ]
   },
@@ -2174,10 +2194,35 @@ ITEMS.push(
     requiresGear: ["g_bombs", "g_bow", "g_hookshot"],
     req: "Clear all 30 Gold Skulltulas; any day in MM3D.",
     guide: "https://www.thonky.com/zelda-majoras-mask/great-bay-coast",
-    desc: "Clear all 30 Gold Skulltulas in the Oceanside Spider House on Great Bay Coast, then talk to the man who appears at the entrance to get the Giant's Wallet, which holds 500 Rupees. You need it to buy the All-Night Mask. This comes from the earlier All-Night Mask entry, not from a Thonky page, so check the details in your game.",
+    desc: "Clear all 30 Gold Skulltulas in the Oceanside Spider House on Great Bay Coast, then talk to the man who appears at the entrance to get the Giant's Wallet, which holds 500 Rupees. You need it to buy the All-Night Mask. The 30 Skulltula locations come from the Zelda Dungeon guide (Zelda Wiki confirms the 30 and the Hookshot); the reward details come from the earlier All-Night Mask entry, so check them in your game.",
     steps: [
       "Bomb the cracked wall at the Oceanside Spider House entrance (next to the Fisherman's Hut) and slide down into the house.",
-      "Defeat all 30 Gold Skulltulas (pots, bug holes, beehives, high places).",
+      "Skulltulas 1–2: On the wall on the ramp.",
+      "Skulltula 3: On the ceiling in the lower part of the room: burn the cobwebs with Fire Arrows, Hookshot the target behind them and go through the door.",
+      "Skulltula 4: Roll into the first large jar.",
+      "Skulltula 5: Roll into the last large jar (burn the spider webs first).",
+      "Skulltula 6: On one of the rafters on the ceiling: climb on top of the crates, then snag it with the Hookshot.",
+      "Skulltula 7: Behind the mask on the wall above the stairs (wait for it to come up).",
+      "Skulltula 8: Standing on the stairs, look at the opposite wall. Along the top in a dark crevice a Skulltula marches back and forth. Kill it and snag it with the Hookshot.",
+      "Skulltula 9: Roll into the lone jar next to a door.",
+      "Skulltula 10: Inside a little hole in the wall: burn the spider webs and use the Hookshot.",
+      "Skulltula 11: In a jar atop some crates in the corner of the room.",
+      "Skulltula 12: Behind a mask near the last door.",
+      "Skulltulas 13–14: West side of the room: push or pull the bookcase against the wall to the right to reveal an alcove with two Skulltulas.",
+      "Skulltula 15: North end of the room: three small bookcases. Pull the outer ones away, then push the middle one aside to reveal a small hole. Use the Hookshot.",
+      "Skulltula 16: Behind a painting at the northwest corner of the room.",
+      "Skulltula 17: Along the ceiling on the north side of the room.",
+      "Skulltula 18: On top of a bookcase at the southeast corner of the room.",
+      "Skulltula 19: Behind a painting at the southwest part of the room, in a small hole: use the Hookshot.",
+      "Skulltula 20: Roll into the brown crate at the north end of the room.",
+      "Skulltula 21: Canoes lean against the western wall opposite the door. In the 3DS version the Skulltula is along the northwestern wall (in the N64 version it is right behind the canoes).",
+      "Skulltula 22: Behind a spider web on the ceiling.",
+      "Skulltula 23: Roll into the brown crate to the left of the door where the boxes start getting higher. Enter the small hole and turn around: it is above the entrance.",
+      "Skulltula 24: Climb the crates on the left side of the door as far as they go, then Hookshot the target in the ceiling area on the right side of the room. In the upper area, slash the jars to find the last Skulltula in this room.",
+      "Skulltula 25: Roll into the giant jar in the corner, under the red mask.",
+      "Skulltula 26: Behind the painting closest to the red mask (Hookshot).",
+      "Skulltula 27: Crawling along the dark parts of the ceiling, along the walls. Stand on the table for a good shot.",
+      "Skulltulas 28–30: Put on the Goron Mask and use the Goron Pound (A + B).",
       "Talk to the man who appears at the entrance to get the Giant's Wallet."
     ]
   }
