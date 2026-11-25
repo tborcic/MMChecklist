@@ -439,7 +439,7 @@
 
 <script>
 // Bump this on each release; it is shown next to the title.
-const APP_VERSION = "1.6.9";
+const APP_VERSION = "1.6.10";
 { const v = document.getElementById("app-version"); if (v) v.textContent = "v" + APP_VERSION; }
 const GUIDE_LINKS = {
   masks: "https://www.zeldadungeon.net/Zelda06Masks.php",
@@ -1305,15 +1305,15 @@ const ITEMS = [
   { id: "hp22", type: "heart", day: "Anytime", tod: "Morning / Day", region: "Termina Field & Ranch",
     title: "Romani Ranch — Doggy Racetrack",
     requiresGear: ["g_truth_mask", "g_powder_keg"],
-    req: "Bet 50 Rupees and win at least 150 Rupees in one race. Daytime.",
+    req: "Win at least 150 Rupees in one race (bet 80 to qualify with 1st or 2nd place). Daytime, 6 AM to 8 PM, no transformation mask.",
     guide: GUIDE_LINKS.hearts,
-    desc: "Mamamu Yan's Doggy Racetrack is at the entrance of Romani Ranch. With the Mask of Truth you can pick up each dog and read its thoughts. A dog that says \"Ruff!\" and sounds confident is likely to win, \"Rrr-Ruff!\" means a middle finish, and \"Hoo-whine\" means likely last. The gold dog is the best pick when it sounds confident, and the black dog is the worst whatever it says. Bet 50 Rupees on a confident dog and win at least 150 Rupees to get the Piece of Heart.",
+    desc: "Mamamu Yan's Doggy Racetrack is at the entrance of Romani Ranch. With the Mask of Truth you can pick up each dog and read its thoughts. The race is mostly random, so no dog is guaranteed. A dog that says \"Ruff!\" is likely to finish in the top five, and the gold dog is the best pick (avoid the blue dog). 1st place pays triple your bet, 2nd pays double, and 3rd to 5th only returns the bet. Bet 80 Rupees so that 1st or 2nd place is enough, and win at least 150 Rupees to get the Piece of Heart.",
     steps: [
       "Blow up the Milk Road boulder with a Powder Keg if it's blocking the ranch.",
       "Go into the Doggy Racetrack (on the left as you enter Romani Ranch) in the daytime.",
-      "Put on the Mask of Truth, then pick up the dogs one at a time and read their thoughts. Winner: \"Ruff! My four paws feel lighter than usual today!\" (confident, especially the gold dog). Middle: \"Rrr-ruff! I don't feel much different than usual...\" Loser: \"Hoo-whine. I'm tired. I'm gonna take the day off tomorrow. Can dogs do that?\" Never pick the black dog.",
-      "Carry that dog to Mamamu Yan and bet 50 Rupees on it.",
-      "If it wins and you get 150 Rupees or more, collect the Piece of Heart. If it loses, bet on the same dog again."
+      "Put on the Mask of Truth, then pick up the dogs one at a time and read their thoughts. Bet on a dog that says: \"Ruff! My four paws feel lighter than usual today!\" (the gold dog is best, avoid the blue dog). It is only a good chance, not a sure win.",
+      "Take off any transformation mask, carry that dog to Mamamu Yan and bet 80 Rupees (1st place pays 240, 2nd pays 160, so either gives the Piece of Heart).",
+      "If you win 150 Rupees or more, collect the Piece of Heart. If it finishes 3rd or lower, race again and pick another Ruff! dog."
     ]
   },
 
