@@ -440,7 +440,7 @@
 
 <script>
 // Bump this on each release; it is shown next to the title.
-const APP_VERSION = "1.7.1";
+const APP_VERSION = "1.7.2";
 { const v = document.getElementById("app-version"); if (v) v.textContent = "v" + APP_VERSION; }
 const GUIDE_LINKS = {
   masks: "https://www.zeldadungeon.net/Zelda06Masks.php",
@@ -574,7 +574,7 @@ const ITEMS = [
     desc: "Skull Kid steals your Ocarina and curses you into a Deku Scrub. To undo it you must climb the Clock Tower at midnight before the moon falls, knock the Ocarina out of Skull Kid's hands, and travel back in time. The Happy Mask Salesman then heals you and the curse becomes the Deku Mask, which lets you turn into a Deku Scrub at will.",
     steps: [
       "As Deku Link, find the Clock Town Stray Fairy: by day it floats in the Laundry Pool (South Clock Town, down the stairs on the east side); by night it hovers over crates in East Clock Town (reach it with the nearby Deku Flower).",
-      "Take the fairy to the Great Fairy Fountain in North Clock Town — she gives you magic, which powers Deku Bubbles.",
+      "Take the fairy to the Great Fairy Fountain on the west side of North Clock Town (next to the Deku Scrub Playground) — she gives you magic, which powers Deku Bubbles.",
       "In North Clock Town, talk to Jim (the Bombers' leader) and win hide-and-seek by catching all 5 Bombers around town before the timer ends (you must finish before the morning of Day 2). He tells you the secret code.",
       "In East Clock Town, tell the code to the Bomber guarding the hideout tunnel, crawl through (pop the balloon in your way with a Deku Bubble), and come out in the Astral Observatory.",
       "Look through the telescope at the moon — watch the Moon's Tear fall, then go out the back door and pick it up in Termina Field.",
@@ -595,7 +595,7 @@ const ITEMS = [
     steps: [
       "Remove all masks so you are Human Link.",
       "Daytime (6 AM–6 PM): go to the Laundry Pool via the stairs in South Clock Town and grab the Stray Fairy floating there. Nighttime: go to East Clock Town and use the Deku Flower near the Stock Pot Inn to reach the fairy above the crates, then switch back to human.",
-      "Walk into the Great Fairy Fountain in North Clock Town with the fairy as Human Link.",
+      "Walk into the Great Fairy Fountain on the west side of North Clock Town (next to the Deku Scrub Playground) with the fairy as Human Link.",
       "The Great Fairy restores herself and gives you the Great Fairy's Mask."
     ]
   },
@@ -1885,7 +1885,7 @@ ITEMS.push(
       "Stray Fairy 13/15 — Ladder side of the Dragonfly room, alcove 1 of 3: pop the bubble with an arrow or reach it with a Deku float.",
       "Stray Fairy 14/15 — Ladder side of the Dragonfly room, alcove 2 of 3: pop the bubble with an arrow or reach it with a Deku float.",
       "Stray Fairy 15/15 — Ladder side of the Dragonfly room, alcove 3 of 3: pop the bubble with an arrow or reach it with a Deku float.",
-"Leave the temple and enter the Great Fairy Fountain in Woodfall.",
+"Leave the temple and walk to the Great Fairy Fountain in Woodfall: it is in the inner wall of the mountain, not far from the platform with the Owl Statue and the Deku altar.",
       "Collect the Extended Magic upgrade."
     ]
   },
@@ -1914,7 +1914,7 @@ ITEMS.push(
       "Stray Fairy 13/15 — Dinolfos fight, fairy 1 of 2: defeat the Dinolfos.",
       "Stray Fairy 14/15 — Dinolfos fight, fairy 2 of 2: defeat the second Dinolfos.",
       "Stray Fairy 15/15 — 2F northwest wall (Lens of Truth): find the hidden alcove and reach it by rolling as Goron or floating as Deku.",
-"Go to the Great Fairy Fountain near the Snowhead Temple entrance.",
+"Go to the Great Fairy Fountain near the Snowhead Temple entrance (on the mountain just outside the temple; the exact spot is not confirmed in the sources checked).",
       "Collect the Great Spin Attack upgrade."
     ]
   },
@@ -1943,7 +1943,7 @@ ITEMS.push(
       "Stray Fairy 13/15 — Enclosed area at the end of the green pipe: Hookshot across and open the chest.",
       "Stray Fairy 14/15 — Map room passageway: break the bubble with the fin boomerangs.",
       "Stray Fairy 15/15 — Room before the boss: pop the bubble under the central platform (between the wooden pillars) while standing on the green pipe.",
-"Go to the Great Fairy Fountain at Zora Cape.",
+"Go to the Great Fairy Fountain at Zora Cape: from the square stone platforms on the beach, jump platform to platform to a ledge with a boulder, Hookshot the palm trees across three small islands, climb the tall stone pillar to the ledge beyond, bomb the boulders and enter the cave.",
       "Collect the Double Defense upgrade."
     ]
   },
@@ -1973,7 +1973,7 @@ ITEMS.push(
       "Stray Fairy 13/15 — Water room: kill the Beamos with a bomb, then hit the crystal switch through the fence with the Zora Mask trick to make a chest appear.",
       "Stray Fairy 14/15 — Water room: swim past the Dexihand to a chest on a small underwater platform.",
       "Stray Fairy 15/15 — Lower lava area: shoot the sun face with a Light Arrow, climb the ladder, and open the chest below.",
-"Go to the Great Fairy Fountain in Ikana Canyon and collect the Great Fairy's Sword."
+"Go to the Great Fairy Fountain in Ikana Canyon, in the same area as the Music Box House: the entrance is to the right of the stone face in the wall leading to Stone Tower (from where Twinmold drops you, fall down the ledge to the right and go through the door of the jar-shaped house). Collect the Great Fairy's Sword."
     ]
   }
 );
@@ -2486,6 +2486,12 @@ function hashText(t) {
 function stepKey(item, idx) { return `${item.id}~${hashText(item.steps[idx])}`; }
 // Text-hash keys of steps that were later reworded -> their current key (keeps old saves/exports working)
 const LEGACY_STEP_KEYS = {
+ "m1~ihomn9": "m1~18rjle",
+ "m2~t4f8fi": "m2~h0cnx5",
+ "f1~1yne085": "f1~ojsfxd",
+ "f2~sfhpsc": "f2~zu1j4l",
+ "f3~1flkvz9": "f3~121nzz6",
+ "f4~y4l3uj": "f4~162jrl8",
  "hp1~d6zx8l": "hp1~wx7y6v",
  "hp1~1wj9p2w": "hp1~ulw55s",
  "hp1~1pj413i": "hp1~14gnyy8",
