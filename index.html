@@ -440,7 +440,7 @@
 
 <script>
 // Bump this on each release; it is shown next to the title.
-const APP_VERSION = "1.6.14";
+const APP_VERSION = "1.6.15";
 { const v = document.getElementById("app-version"); if (v) v.textContent = "v" + APP_VERSION; }
 const GUIDE_LINKS = {
   masks: "https://www.zeldadungeon.net/Zelda06Masks.php",
@@ -692,7 +692,7 @@ const ITEMS = [
     requiresGear: ["g_kafei_mask", "g_epona", "g_garo_mask", "g_hookshot"],
     req: "Whole Anju & Kafei quest in ONE cycle, including a trip to Sakon's Hideout in Ikana Canyon on the evening of Day 3. Do NOT stop Sakon's robbery on Night 1 (no Blast Mask in this cycle), or the Hideout will not open.",
     guide: GUIDE_LINKS.masks,
-    desc: "The final reward of the Anju & Kafei quest. Anju must decide to wait for Kafei (give her the Pendant of Memories), and you must help Kafei get his stolen Sun's Mask back from Sakon's Hideout. Kafei then returns to the Stock Pot Inn just before dawn on the Final Day and the two make the Couple's Mask, which they give to you. Do not stop Sakon's robbery at midnight on Night 1: if you hit him or blow up the bag, he never sells it to the Curiosity Shop, Kafei never follows him, and Sakon's Hideout will not open on the Final Day. Get the Blast Mask in a different cycle.",
+    desc: "The final reward of the Anju & Kafei quest. Anju must decide to wait for Kafei (give her the Pendant of Memories), and you must help Kafei get his stolen Sun's Mask back from Sakon's Hideout. Kafei then returns to the Stock Pot Inn on the Final Day (the reunion is at 4:30 AM) and the two make the Couple's Mask, which they give to you. Do not stop Sakon's robbery at midnight on Night 1: if you hit him or blow up the bag, he never sells it to the Curiosity Shop, Kafei never follows him, and Sakon's Hideout will not open on the Final Day. Get the Blast Mask in a different cycle.",
     steps: [
       "Do Keaton Mask steps 1–4 to get the Letter to Kafei delivered and receive the Pendant of Memories on Day 2.",
       "Day 2 or Day 3, between 10:00 AM and 7:00 PM: give the Pendant of Memories to Anju at the Stock Pot Inn. She decides to stay and wait for Kafei.",
@@ -701,7 +701,7 @@ const ITEMS = [
       "Go to Sakon's Hideout (lower Ikana Canyon) and meet Kafei at the entrance at 6:00 PM on Day 3. Wait for Sakon to arrive and open the hideout.",
       "Inside, you switch between Link and Kafei. Step on the switches and push the blocks in each room so the other character can move on. Kafei grabs the Sun's Mask at the end.",
       "Use the Song of Soaring (or travel) back to Clock Town. On Night 3 (after 6:00 PM), go into Anju's room (the Employees' Room) at the Stock Pot Inn.",
-      "Stay in the room until Kafei arrives shortly before dawn. Watch the reunion and receive the Couple's Mask."
+      "Stay in the room until Kafei reunites with Anju at 4:30 AM on the Final Day. Watch the reunion and receive the Couple's Mask."
     ]
   },
   {
@@ -2468,6 +2468,7 @@ function hashText(t) {
 function stepKey(item, idx) { return `${item.id}~${hashText(item.steps[idx])}`; }
 // Text-hash keys of steps that were later reworded -> their current key (keeps old saves/exports working)
 const LEGACY_STEP_KEYS = {
+ "m9~ea207q": "m9~1w2fg7p",
  "m7~1k1qwxt": "m7~l6r8es",
  "m7~1dlbb03": "m7~9rkf0b",
  "m7~kowbn0": "m7~12tesik",
