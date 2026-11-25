@@ -255,6 +255,7 @@
     }
     .link-chip:hover { border-color: var(--accent); background: rgba(168, 85, 247, 0.25); }
     .link-chip.done { opacity: 0.55; text-decoration: line-through; }
+    .step-link { color: var(--accent); text-decoration: underline; cursor: pointer; }
     .gear-chip.clickable { cursor: pointer; text-decoration: underline dotted; }
     .when-chip { padding: 0.1rem 0.45rem; border-radius: 5px; font-size: 0.76rem; background: rgba(56, 189, 248, 0.1); color: #bae6fd; border: 1px solid rgba(56, 189, 248, 0.3); }
 
@@ -439,7 +440,7 @@
 
 <script>
 // Bump this on each release; it is shown next to the title.
-const APP_VERSION = "1.6.12";
+const APP_VERSION = "1.6.13";
 { const v = document.getElementById("app-version"); if (v) v.textContent = "v" + APP_VERSION; }
 const GUIDE_LINKS = {
   masks: "https://www.zeldadungeon.net/Zelda06Masks.php",
@@ -2703,6 +2704,16 @@ function changeFairy(id, delta) {
   save(); render();
 }
 
+window.addEventListener("popstate", e => {
+  const st = e.state;
+  if (!st || st.mmY === undefined) return;
+  ui.view = st.mmView || "checklist";
+  forceShowId = st.mmForce || null;
+  jumpFilterSig = st.mmSig || null;
+  save(); render();
+  window.scrollTo(0, st.mmY);
+});
+
 function onHideCompletedChange() { hideCompleted = document.getElementById("hide-completed-filter").checked; forceShowId = null; save(); render(); }
 function onGroupChange() { ui.group = document.getElementById("group-mode").value; save(); render(); }
 function onSortChange() { ui.sort = document.getElementById("sort-mode").value; save(); render(); }
@@ -2716,10 +2727,13 @@ function onNowChange() {
 
 function jumpTo(id) {
   if (!ITEM_BY_ID[id]) return;
+  // Remember where we were so the browser Back button returns here
+  try { history.replaceState({ mmView: ui.view, mmY: window.scrollY, mmForce: forceShowId, mmSig: jumpFilterSig }, ""); } catch (e) {}
   ui.view = "checklist";
   forceShowId = id;
   jumpFilterSig = JSON.stringify(readFilters());
   save(); render();
+  try { history.pushState({ mmJump: id }, ""); } catch (e) {}
   const el = document.getElementById(`item-${id}`);
   if (el && el.scrollIntoView) {
     el.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -2839,6 +2853,11 @@ function updateStats() {
   set("gear-count", `${ownedGearSet.size} / ${GEAR_ITEMS.length}`);
 }
 
+// Turn "Keaton Mask steps 1–4" inside a step into a link that jumps to the Keaton Mask card
+function linkifyStep(text) {
+  return text.replace(/Keaton Mask steps \d–\d/g, m => `<a class="step-link" role="button" tabindex="0" onclick="event.preventDefault();event.stopPropagation();jumpTo('m7')">${m}</a>`);
+}
+
 function itemLink(id) {
   const it = ITEM_BY_ID[id];
   if (!it) return "";
@@ -2888,7 +2907,7 @@ function renderCard(item, opts = {}) {
         <label class="sub-item ${subDone ? "done" : ""}" onclick="event.stopPropagation()">
           <input type="checkbox" class="sub-check" ${subDone ? "checked" : ""} onchange="toggleSubStep('${subId}', '${item.id}')" />
           <span class="step-num">${idx + 1}.</span>
-          <span class="step-text">${stepText}</span>
+          <span class="step-text">${linkifyStep(stepText)}</span>
         </label>`;
     });
     subHtml += `</div>`;
