@@ -440,7 +440,7 @@
 
 <script>
 // Bump this on each release; it is shown next to the title.
-const APP_VERSION = "1.7.3";
+const APP_VERSION = "1.7.4";
 { const v = document.getElementById("app-version"); if (v) v.textContent = "v" + APP_VERSION; }
 const GUIDE_LINKS = {
   masks: "https://www.zeldadungeon.net/Zelda06Masks.php",
@@ -1440,11 +1440,11 @@ const ITEMS = [
     guide: GUIDE_LINKS.hearts,
     desc: "Don Gero, the frog conductor, wants his five-frog choir back together in Mountain Village. Find each frog while wearing Don Gero's Mask and tell them about the concert. Two of them are the frogs left behind after you beat the Gekko minibosses in Woodfall and Great Bay Temples. Once all five are home, they sing and give you a Piece of Heart.",
     steps: [
-      "Laundry Pool frog (Clock Town): wear Don Gero's Mask and talk to it.",
-      "Southern Swamp frog: after the swamp water is clean, find the frog on a log and talk to it with the mask on.",
-      "Woodfall Temple frog: defeat the Gekko miniboss, then talk to the frog that appears, wearing the mask.",
-      "Great Bay Temple frog: defeat the Gekko miniboss, then talk to the frog that appears, wearing the mask.",
-      "Defeat Goht so spring comes. The fifth frog is in the Mountain Village lake.",
+      "Laundry Pool frog (Clock Town): go down the stairs on the east side of South Clock Town to the Laundry Pool, wear Don Gero's Mask and talk to the frog.",
+      "Southern Swamp frog: as Deku Link, hop across the lilypads and water past the Deku Palace to find the frog sitting on a log. Talk to it with Don Gero's Mask on.",
+      "Woodfall Temple frog: Gekko and Snapper miniboss room, on the upper floor just past the Dinolfos room where you got the Hero's Bow (shoot the diamond target, ride the middle platform across). Easy to forget after the temple, so check the Temple map for the miniboss room. Talk to the frog with Don Gero's Mask.",
+      "Great Bay Temple frog: Gekko and Mad Jelly miniboss room, the second miniboss, through the icicle passage after Wart's room (needs Ice Arrows). Easy to forget after the temple, so check the Temple map for the miniboss room. Talk to the frog with Don Gero's Mask.",
+      "Defeat Goht so spring comes. The fifth pair of frogs sits on the lilypads in the Mountain Village water (they are not there while it is still winter).",
       "In Mountain Village, wear Don Gero's Mask and talk to the frogs to start the choir. Collect the Piece of Heart."
     ]
   },
@@ -2498,6 +2498,13 @@ function hashText(t) {
 function stepKey(item, idx) { return `${item.id}~${hashText(item.steps[idx])}`; }
 // Text-hash keys of steps that were later reworded -> their current key (keeps old saves/exports working)
 const LEGACY_STEP_KEYS = {
+ "hp31~1totd0x": "hp31~1h3lh2r",
+ "hp31~me42a2": "hp31~wgmvko",
+ "hp31~8v0087": "hp31~67cc33",
+ "hp31~zmpn1r": "hp31~j1bqjx",
+ "hp31~19k7ux7": "hp31~wgmvko",
+ "hp31~16k5wv4": "hp31~1h3lh2r",
+ "hp31~m2cefw": "hp31~ummpdm",
  "m1~ihomn9": "m1~18rjle",
  "m2~t4f8fi": "m2~h0cnx5",
  "f1~1yne085": "f1~ojsfxd",
